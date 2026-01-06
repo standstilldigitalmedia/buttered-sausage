@@ -6,7 +6,7 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f5nx2"]
 bg_color = Color(1, 1, 1, 0.078431375)
 
-[node name="ErrorDisplay" type="PanelContainer" node_paths=PackedStringArray("content_container")]
+[node name="ButteredSausageDisplay" type="PanelContainer" node_paths=PackedStringArray("content_container")]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0

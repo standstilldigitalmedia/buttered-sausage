@@ -24,7 +24,7 @@ var border_width_left: int = 3
 
 @export var panel_container: PanelContainer
 @export var message_label: RichTextLabel
-@export var error_close_button: Button
+@export var close_button: Button
 
 var severity: int
 var animator: ButteredSausageAnimator
@@ -138,7 +138,6 @@ func setup(msg: String, sev: int, auto_dismiss: bool = false, config: Dictionary
 	severity = sev
 	apply_style(sev)
 	apply_animations(sev)
-	error_close_button.pressed.connect(_on_close_pressed)
 	if auto_dismiss:
 		auto_dismiss_timer = Timer.new()
 		auto_dismiss_timer.one_shot = true
@@ -161,7 +160,7 @@ func close(slide: bool = false) -> void:
 	if is_closing:
 		return
 	is_closing = true
-	if auto_dismiss_timer and auto_dismiss_timer.time_left > 0:
+	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and auto_dismiss_timer.time_left > 0:
 		auto_dismiss_timer.stop()
 	if slide:
 		await animator.slide_close()

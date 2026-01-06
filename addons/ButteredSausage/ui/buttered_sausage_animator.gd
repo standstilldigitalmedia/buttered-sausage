@@ -193,7 +193,7 @@ func with_speed(speed: float) -> ButteredSausageAnimator:
 ## Animates the panel sliding into view with all configured effects. Starts monitoring panel size changes.
 func slide_open() -> void:
 	if not wrapper or not panel:
-		push_error("AWOCSlideAnimator: wrapper or panel is null")
+		push_error("ButteredSausageAnimator: wrapper or panel is null")
 		return
 	if slide_tween:
 		slide_tween.kill()
@@ -238,7 +238,6 @@ func slide_open() -> void:
 		wrapper.modulate.a = fade_from
 	wrapper.show()
 	await wrapper.get_tree().process_frame
-	# Recalculate target size after layout has completed
 	if axis == Axis.VERTICAL:
 		target_size = panel.get_combined_minimum_size().y
 	else:

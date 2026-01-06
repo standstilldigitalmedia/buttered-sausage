@@ -15,7 +15,7 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[node name="ErrorDisplayDemo" type="Control"]
+[node name="MessageDisplayDemo" type="Control" node_paths=PackedStringArray("main_message", "warning_1", "warning_2", "warning_3", "info_1", "info_2", "enable_stacking", "buttered_sausage_display")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,6 +23,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_demo")
+main_message = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/MainMessage")
+warning_1 = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Warning1")
+warning_2 = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Warning2")
+warning_3 = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Warning3")
+info_1 = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Info1")
+info_2 = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Info2")
+enable_stacking = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/EnableStacking")
+buttered_sausage_display = NodePath("MarginContainer/VBoxContainer/HBoxContainer/RightPanel/ButteredSausageDisplay")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -195,7 +203,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Error Display Output:"
 
-[node name="ErrorDisplay" parent="MarginContainer/VBoxContainer/HBoxContainer/RightPanel" instance=ExtResource("2_error_display")]
+[node name="ButteredSausageDisplay" parent="MarginContainer/VBoxContainer/HBoxContainer/RightPanel" instance=ExtResource("2_error_display")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3

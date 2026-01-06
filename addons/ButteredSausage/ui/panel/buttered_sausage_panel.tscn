@@ -5,14 +5,15 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
 bg_color = Color(1, 1, 1, 0.078431375)
 
-[node name="ErrorMessagePanel" type="Control" node_paths=PackedStringArray("panel_container", "message_label", "error_close_button")]
-layout_mode = 2
+[node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("panel_container", "message_label", "close_button")]
+layout_mode = 3
+anchors_preset = 0
 size_flags_horizontal = 3
 size_flags_vertical = 4
 script = ExtResource("1_astwa")
 panel_container = NodePath("PanelContainer")
-message_label = NodePath("PanelContainer/MarginContainer/HBoxContainer/ErrorLabel")
-error_close_button = NodePath("PanelContainer/MarginContainer/HBoxContainer/CloseButton")
+message_label = NodePath("PanelContainer/MarginContainer/HBoxContainer/MessageLabel")
+close_button = NodePath("PanelContainer/MarginContainer/HBoxContainer/CloseButton")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -32,7 +33,7 @@ theme_override_constants/margin_bottom = 6
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ErrorLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/HBoxContainer"]
+[node name="MessageLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -45,4 +46,4 @@ scroll_active = false
 layout_mode = 2
 text = "×"
 
-[connection signal="pressed" from="PanelContainer/MarginContainer/HBoxContainer/CloseButton" to="PanelContainer" method="clear_error"]
+[connection signal="pressed" from="PanelContainer/MarginContainer/HBoxContainer/CloseButton" to="." method="_on_close_pressed"]

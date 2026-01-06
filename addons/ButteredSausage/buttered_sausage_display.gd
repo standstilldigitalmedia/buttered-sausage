@@ -38,11 +38,11 @@ enum Severity {
 @export var border_width_left: int = 3
 
 var stacking_enabled: bool = true
-var current_panel = null
+var current_panel: ButteredSausagePanel = null
 
 
-## Closes all error message panels and hides the display.
-func clear_error() -> void:
+## Closes all message panels and hides the display.
+func clear_messages() -> void:
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
 			child.close()
@@ -53,6 +53,9 @@ func clear_error() -> void:
 ## Priority order: ERROR > SUCCESS > WARNING > INFO
 func keep_highest_priority_panel() -> void:
 	var panels: Array = []
+	if !content_container:
+		push_error("content_container must be set on buttered_sausage_display.tscn in the inspector")
+		return
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
 			panels.append(child)
@@ -81,12 +84,13 @@ func set_stacking_enabled(enabled: bool) -> void:
 		keep_highest_priority_panel()
 
 
-## Closes all message panels without hiding the display container.[br][br]
+## Closes all message panels and hides the display.[br][br]
 func clear_all_panels() -> void:
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
 			child.close()
 	current_panel = null
+	hide()
 	
 	
 ## Creates and displays a message panel with specified severity and auto-dismiss behavior.[br][br]
@@ -111,6 +115,9 @@ func create_message(msg: String, severity: int, auto_dismiss: bool) -> void:
 				break
 	if !found:
 		var panel = message_panel_scene.instantiate()
+		if !message_panel_scene:
+			push_error("message_panel_scene must be set on buttered_sausage_display.tscn in the inspector")
+			return
 		content_container.add_child(panel)
 		panel.setup(msg, severity, auto_dismiss, _get_panel_config())
 		panel.slide_open()

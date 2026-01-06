@@ -71,14 +71,14 @@ extends Control
 @onready var error_display: SSDMErrorDisplay = $ErrorDisplay
 
 func _ready() -> void:
-    # Show a simple success message
-    error_display.show_success("File saved successfully!")
+	# Show a simple success message
+	error_display.show_success("File saved successfully!")
 
-    # Show an error that requires dismissal
-    error_display.show_error("Failed to load configuration file")
+	# Show an error that requires dismissal
+	error_display.show_error("Failed to load configuration file")
 
-    # Show a warning with auto-dismiss
-    error_display.show_warning("Network connection unstable")
+	# Show a warning with auto-dismiss
+	error_display.show_warning("Network connection unstable")
 ```
 
 ### Using the Result Pattern
@@ -87,24 +87,24 @@ The real power comes from combining visual display with the Result pattern:
 
 ```gdscript
 func save_file(path: String) -> SSDMResult:
-    var result := SSDMResult.success("File saved successfully")
+	var result := SSDMResult.success("File saved successfully")
 
-    # Accumulate warnings during operation
-    if not has_write_permission(path):
-        result.with_warning("Limited write permissions")
+	# Accumulate warnings during operation
+	if not has_write_permission(path):
+		result.with_warning("Limited write permissions")
 
-    if file_exists(path):
-        result.with_info("Overwrote existing file")
+	if file_exists(path):
+		result.with_info("Overwrote existing file")
 
-    # Convert to failure if something critical happens
-    if disk_full():
-        result.to_failure("Save failed - disk full")
+	# Convert to failure if something critical happens
+	if disk_full():
+		result.to_failure("Save failed - disk full")
 
-    return result
+	return result
 
 func _on_save_pressed() -> void:
-    var result := save_file("user://config.dat")
-    error_display.populate_from_result(result)
+	var result := save_file("user://config.dat")
+	error_display.populate_from_result(result)
 ```
 
 ### Builder Pattern Examples
@@ -125,7 +125,7 @@ result.with_info("Loaded config.json")
 result.with_info("Validated 15 entries")
 
 if critical_error_occurred():
-    result.to_failure("Process halted due to critical error")
+	result.to_failure("Process halted due to critical error")
 
 error_display.populate_from_result(result)
 ```
@@ -186,10 +186,10 @@ Create your own animation profiles by configuring the `SSDMSlideAnimator`:
 ```gdscript
 var animator := SSDMSlideAnimator.new(wrapper, panel)
 animator.configure(SSDMSlideAnimator.Axis.VERTICAL, SSDMSlideAnimator.OpenDirection.POSITIVE) \
-    .with_scale(Vector2(0.8, 0.8)) \
-    .with_fade() \
-    .with_bounce() \
-    .with_speed(0.5)
+	.with_scale(Vector2(0.8, 0.8)) \
+	.with_fade() \
+	.with_bounce() \
+	.with_speed(0.5)
 animator.slide_open()
 ```
 
