@@ -36,6 +36,7 @@ enum Severity {
 @export var corner_radius: int = 4
 @export var border_width_bottom: int = 5
 @export var border_width_left: int = 3
+@export var panel_width: int = 400
 
 var stacking_enabled: bool = true
 var current_panel: ButteredSausagePanel = null
@@ -204,7 +205,8 @@ func _get_panel_config() -> Dictionary:
 		"error_border_color": error_border_color,
 		"corner_radius": corner_radius,
 		"border_width_bottom": border_width_bottom,
-		"border_width_left": border_width_left
+		"border_width_left": border_width_left,
+		"panel_width": panel_width,
 	}
 
 

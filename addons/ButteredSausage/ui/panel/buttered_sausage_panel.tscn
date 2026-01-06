@@ -44,6 +44,7 @@ scroll_active = false
 
 [node name="CloseButton" type="Button" parent="PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
+tooltip_text = "Close message"
 text = "×"
 
 [connection signal="pressed" from="PanelContainer/MarginContainer/HBoxContainer/CloseButton" to="." method="_on_close_pressed"]

@@ -15,11 +15,11 @@ const MODULATE_PROPERTY: String = "modulate"
 const ROTATION_PROPERTY: String = "rotation"
 const POSITION_PROPERTY: String = "position"
 const POSITION_X_PROPERTY: String = "position:x"
-const PANEL_WIDTH: int = 400
 const SLIDE_SPEED: float = 0.3
 
 var wrapper: Control
 var panel: Control
+var panel_width: int = 400
 var slide_tween: Tween
 var is_open: bool = false
 var _monitoring: bool = false
@@ -51,9 +51,10 @@ var rotation_pivot: Vector2 = Vector2.ZERO
 ## @param p_axis - VERTICAL for up/down slide, HORIZONTAL for left/right slide[br]
 ## @param p_open_direction - POSITIVE for down/right, NEGATIVE for up/left[br]
 ## @return This AWOCSlideAnimator instance for method chaining
-func configure(p_axis: Axis, p_open_direction: OpenDirection) -> ButteredSausageAnimator:
+func configure(p_axis: Axis, p_open_direction: OpenDirection, p_width) -> ButteredSausageAnimator:
 	axis = p_axis
 	open_direction = p_open_direction
+	panel_width = p_width
 	return self
 
 
@@ -210,7 +211,7 @@ func slide_open() -> void:
 		wrapper.custom_minimum_size.y = 0
 	else: 
 		property_name = X_PROPERTY
-		target_size = PANEL_WIDTH
+		target_size = panel_width
 		if open_direction == OpenDirection.POSITIVE:
 			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		else:
@@ -241,7 +242,7 @@ func slide_open() -> void:
 	if axis == Axis.VERTICAL:
 		target_size = panel.get_combined_minimum_size().y
 	else:
-		target_size = PANEL_WIDTH
+		target_size = panel_width
 	var has_fancy_animations = animate_scale or animate_fade or animate_rotation or animate_position or animate_color
 	slide_tween = wrapper.create_tween()
 	slide_tween.set_parallel(has_fancy_animations)
