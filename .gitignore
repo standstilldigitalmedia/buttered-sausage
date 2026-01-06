@@ -1,0 +1,34 @@
+# Godot 4+ specific ignores
+.godot/
+.import/
+
+# Godot-specific
+*.import
+*.translation
+
+# Mono-specific ignores (if using C#)
+.mono/
+data_*/
+mono_crash.*.json
+
+# System/tool-specific
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Build outputs
+builds/
+dist/
+*.x86_64
+*.x86
+*.wasm
+*.exe
+*.pck
+*.zip
+
+# Temporary files
+*.tmp
+*.log
