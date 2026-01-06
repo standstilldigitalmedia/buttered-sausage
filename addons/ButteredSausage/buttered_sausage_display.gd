@@ -15,28 +15,7 @@ enum Severity {
 
 @export var message_panel_scene: PackedScene
 @export var content_container: VBoxContainer
-
-@export_group("Auto-Dismiss Timing")
-@export var success_duration: float = 3.0
-@export var warning_duration: float = 4.0
-@export var info_duration: float = 6.0
-@export var error_duration: float = 6.0
-
-@export_group("Panel Colors")
-@export var success_color: Color = Color(0.2, 0.6, 0.2, 0.9)
-@export var success_border_color: Color = Color(0.1, 0.5, 0.1, 0.9)
-@export var info_color: Color = Color(0.2, 0.4, 0.8, 0.9)
-@export var info_border_color: Color = Color(0.1, 0.3, 0.7, 0.9)
-@export var warning_color: Color = Color(0.8, 0.6, 0.1, 0.9)
-@export var warning_border_color: Color = Color(0.7, 0.5, 0.0, 0.9)
-@export var error_color: Color = Color(0.8, 0.2, 0.2, 0.9)
-@export var error_border_color: Color = Color(0.7, 0.1, 0.1, 0.9)
-
-@export_group("Panel Style")
-@export var corner_radius: int = 4
-@export var border_width_bottom: int = 5
-@export var border_width_left: int = 3
-@export var panel_width: int = 400
+@export var buttered_sausage_config: ButteredSausageConfig
 
 var stacking_enabled: bool = true
 var current_panel: ButteredSausagePanel = null
@@ -120,7 +99,7 @@ func create_message(msg: String, severity: int, auto_dismiss: bool) -> void:
 			push_error("message_panel_scene must be set on buttered_sausage_display.tscn in the inspector")
 			return
 		content_container.add_child(panel)
-		panel.setup(msg, severity, auto_dismiss, _get_panel_config())
+		panel.setup(msg, severity, buttered_sausage_config, auto_dismiss)
 		panel.slide_open()
 		if not stacking_enabled:
 			current_panel = panel
@@ -187,27 +166,6 @@ func _get_severity_priority(severity: int) -> int:
 		Severity.INFO:
 			return 0
 	return 0
-
-
-func _get_panel_config() -> Dictionary:
-	return {
-		"success_duration": success_duration,
-		"warning_duration": warning_duration,
-		"info_duration": info_duration,
-		"error_duration": error_duration,
-		"success_color": success_color,
-		"success_border_color": success_border_color,
-		"info_color": info_color,
-		"info_border_color": info_border_color,
-		"warning_color": warning_color,
-		"warning_border_color": warning_border_color,
-		"error_color": error_color,
-		"error_border_color": error_border_color,
-		"corner_radius": corner_radius,
-		"border_width_bottom": border_width_bottom,
-		"border_width_left": border_width_left,
-		"panel_width": panel_width,
-	}
 
 
 func _ready() -> void:

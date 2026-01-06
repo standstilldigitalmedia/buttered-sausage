@@ -15,11 +15,9 @@ const MODULATE_PROPERTY: String = "modulate"
 const ROTATION_PROPERTY: String = "rotation"
 const POSITION_PROPERTY: String = "position"
 const POSITION_X_PROPERTY: String = "position:x"
-const SLIDE_SPEED: float = 0.3
 
 var wrapper: Control
 var panel: Control
-var panel_width: int = 400
 var slide_tween: Tween
 var is_open: bool = false
 var _monitoring: bool = false
@@ -44,6 +42,7 @@ var ease_type_open: Tween.EaseType = Tween.EASE_OUT
 var ease_type_close: Tween.EaseType = Tween.EASE_IN
 var animation_speed: float = 0.0
 var rotation_pivot: Vector2 = Vector2.ZERO
+var buttered_sausage_config: ButteredSausageConfig
 
 
 ## Configures the slide axis and open direction. Required before calling slide_open().[br][br]
@@ -51,10 +50,10 @@ var rotation_pivot: Vector2 = Vector2.ZERO
 ## @param p_axis - VERTICAL for up/down slide, HORIZONTAL for left/right slide[br]
 ## @param p_open_direction - POSITIVE for down/right, NEGATIVE for up/left[br]
 ## @return This AWOCSlideAnimator instance for method chaining
-func configure(p_axis: Axis, p_open_direction: OpenDirection, p_width) -> ButteredSausageAnimator:
+func configure(p_axis: Axis, p_open_direction: OpenDirection, config: ButteredSausageConfig) -> ButteredSausageAnimator:
 	axis = p_axis
 	open_direction = p_open_direction
-	panel_width = p_width
+	buttered_sausage_config = config
 	return self
 
 
@@ -200,7 +199,7 @@ func slide_open() -> void:
 		slide_tween.kill()
 	var property_name: String
 	var target_size: float
-	var anim_speed: float = animation_speed if animation_speed > 0 else SLIDE_SPEED
+	var anim_speed: float = animation_speed if animation_speed > 0 else buttered_sausage_config.slide_speed
 	if axis == Axis.VERTICAL:
 		property_name = Y_PROPERTY
 		target_size = panel.get_combined_minimum_size().y
@@ -211,7 +210,7 @@ func slide_open() -> void:
 		wrapper.custom_minimum_size.y = 0
 	else: 
 		property_name = X_PROPERTY
-		target_size = panel_width
+		target_size = buttered_sausage_config.panel_width
 		if open_direction == OpenDirection.POSITIVE:
 			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		else:
@@ -242,7 +241,7 @@ func slide_open() -> void:
 	if axis == Axis.VERTICAL:
 		target_size = panel.get_combined_minimum_size().y
 	else:
-		target_size = panel_width
+		target_size = buttered_sausage_config.panel_width
 	var has_fancy_animations = animate_scale or animate_fade or animate_rotation or animate_position or animate_color
 	slide_tween = wrapper.create_tween()
 	slide_tween.set_parallel(has_fancy_animations)
@@ -276,7 +275,7 @@ func slide_close() -> void:
 		return
 	var property_name: String
 	var current_size: float
-	var anim_speed: float = animation_speed if animation_speed > 0 else SLIDE_SPEED
+	var anim_speed: float = animation_speed if animation_speed > 0 else buttered_sausage_config.slide_speed
 	if axis == Axis.VERTICAL:
 		property_name = Y_PROPERTY
 		current_size = wrapper.custom_minimum_size.y if wrapper.custom_minimum_size.y > 0 else wrapper.size.y
@@ -390,6 +389,7 @@ func _on_panel_size_changed() -> void:
 			wrapper.custom_minimum_size.x = new_width
 		
 		
-func _init(panel_wrapper: Control, panel_container: Control) -> void:
+func _init(panel_wrapper: Control, panel_container: Control, config: ButteredSausageConfig) -> void:
 	wrapper = panel_wrapper
 	panel = panel_container
+	buttered_sausage_config = config
