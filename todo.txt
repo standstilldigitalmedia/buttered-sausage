@@ -1,0 +1,158 @@
+BUTTERED SAUSAGE - CODE IMPROVEMENT TODO LIST
+==============================================
+
+CRITICAL ISSUES (Fix First)
+----------------------------
+
+1. Fix all AWOC/SSDM references in comments and doc strings to use ButteredSausage
+   - buttered_sausage_panel.gd:2 says "SSDMErrorDisplay"
+   - buttered_sausage_animator.gd:53 says "AWOCSlideAnimator"
+   - Many other instances throughout codebase
+   - README.md is completely out of sync
+
+2. Update message_label export type from Label to RichTextLabel
+   - File: buttered_sausage_panel.gd:26
+   - Currently: @export var message_label: Label
+   - Should be: @export var message_label: RichTextLabel
+
+3. Add null checks in ButteredSausageDisplay._ready()
+   - Check message_panel_scene is not null before use
+   - Check content_container is not null before use
+   - Fail gracefully with error message
+
+4. Fix signal connection leak in ButteredSausagePanel.setup()
+   - Line 141: error_close_button.pressed.connect(_on_close_pressed)
+   - Need to disconnect before reconnecting or check if already connected
+   - Calling setup() multiple times will create multiple connections
+
+5. Add is_instance_valid() check for auto_dismiss_timer
+   - File: buttered_sausage_panel.gd:164
+   - Check timer validity before accessing time_left
+   - Current: if auto_dismiss_timer and auto_dismiss_timer.time_left > 0
+   - Need: if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and auto_dismiss_timer.time_left > 0
+
+
+POTENTIAL BUGS
+--------------
+
+6. Replace message text comparison with better deduplication strategy
+   - File: buttered_sausage_display.gd:109
+   - Currently compares RichTextLabel.text directly
+   - Won't work reliably with BBCode formatting
+   - Consider using hash or message ID instead
+
+7. Add return statement after push_error in ButteredSausageAnimator.slide_open()
+   - File: buttered_sausage_animator.gd:196
+   - Currently logs error but continues execution
+   - Should return early if wrapper or panel is null
+
+
+API DESIGN ISSUES
+-----------------
+
+8. Make ButteredSausageDisplay.clear_error() and clear_all_panels() consistent
+   - clear_error() calls hide() after clearing
+   - clear_all_panels() does NOT call hide()
+   - Should both behave the same way for consistency
+
+9. Add type annotation for current_panel variable
+   - File: buttered_sausage_display.gd:41
+   - Currently: var current_panel = null
+   - Should be: var current_panel: ButteredSausagePanel = null
+
+
+CODE QUALITY IMPROVEMENTS
+--------------------------
+
+10. Refactor config application in ButteredSausagePanel.setup()
+    - Lines 120-135 are repetitive config application
+    - Extract to helper function like _apply_config(config: Dictionary)
+    - Would improve readability and maintainability
+
+11. Cache StyleBoxFlat instances per severity instead of creating new ones
+    - File: buttered_sausage_panel.gd:70
+    - Currently creates new StyleBoxFlat for every panel
+    - Should create once per severity type and reuse
+    - Would improve performance with many panels
+
+12. Add documentation for PANEL_WIDTH constant
+    - File: buttered_sausage_animator.gd:18
+    - const PANEL_WIDTH: int = 400
+    - Add comment explaining why 400 pixels
+    - Or make it configurable
+
+
+MISSING FEATURES
+----------------
+
+13. Add max_visible_panels configuration option
+    - Prevent infinite panel spam
+    - Auto-dismiss oldest when limit reached
+    - Add to ButteredSausageDisplay as @export var max_visible_panels: int = 0 (0 = unlimited)
+
+14. Add panel_closed signal to ButteredSausageDisplay
+    - Emit when all panels are dismissed
+    - Useful for knowing when display is empty
+    - signal all_panels_closed()
+
+15. Add accessible label/tooltip to close button
+    - Currently just shows "×" character
+    - Add tooltip_text = "Close message"
+    - Or use accessible label for screen readers
+
+
+LOWER PRIORITY (Nice to Have)
+------------------------------
+
+16. Add keyboard navigation support
+    - Tab to focus panels
+    - Escape to close focused panel
+    - Arrow keys to navigate between panels
+
+17. Add hover-to-pause auto-dismiss feature
+    - Stop auto-dismiss timer when mouse hovers over panel
+    - Resume when mouse leaves
+    - Improves UX for reading long messages
+
+18. Add ability to update panel colors after creation
+    - Currently can only set colors in setup()
+    - Add update_colors() method or similar
+
+19. Add global animation style configuration
+    - Currently hardcoded per severity
+    - Allow users to customize animation profiles
+
+20. Add tween cleanup in animator destructor
+    - Ensure tweens are killed when animator is freed
+    - Prevent potential memory leaks
+
+
+DOCUMENTATION UPDATES (Do After Code Fixes)
+--------------------------------------------
+
+21. Update README.md with correct class names
+    - Replace all SSDMResult with ButteredSausage
+    - Replace all SSDMErrorDisplay with ButteredSausageDisplay
+    - Replace all SSDMSlideAnimator with ButteredSausageAnimator
+    - Update all code examples
+
+22. Add migration guide section to README
+    - For users coming from AWOC/SSDM versions
+    - Simple find/replace instructions
+
+23. Update API reference section
+    - Ensure all method signatures are current
+    - Add examples for new features (after implementing)
+
+24. Add troubleshooting section
+    - Common issues and solutions
+    - What to do if panels don't show
+    - What to do if animations look wrong
+
+
+NOTES
+-----
+- Prioritize items 1-7 before updating documentation
+- Items 8-15 are improvements that enhance the addon but aren't critical
+- Items 16-20 are nice-to-haves for future versions
+- Documentation updates should be done after all code changes are complete

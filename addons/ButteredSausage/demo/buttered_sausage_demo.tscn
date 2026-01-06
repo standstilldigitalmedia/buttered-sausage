@@ -1,0 +1,210 @@
+[gd_scene load_steps=4 format=3 uid="uid://buuml2eayrxv5"]
+
+[ext_resource type="Script" uid="uid://yeyrlw2i3mt8" path="res://addons/ButteredSausage/demo/buttered_sausage_demo.gd" id="1_demo"]
+[ext_resource type="PackedScene" uid="uid://c4u8l5ya7yuh0" path="res://addons/ButteredSausage/buttered_sausage_display.tscn" id="2_error_display"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.15, 0.15, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.35, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ErrorDisplayDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_demo")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "AWOCResult + ErrorDisplay Demo"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Enter messages below and click buttons to see the error display system in action"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LeftPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="InputLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Message Inputs"
+
+[node name="HSeparator1" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MainMessageLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Main Message:"
+
+[node name="MainMessage" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Enter main message..."
+
+[node name="WarningsLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Warnings:"
+
+[node name="Warning1" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Warning 1 (optional)"
+
+[node name="Warning2" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Warning 2 (optional)"
+
+[node name="Warning3" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Warning 3 (optional)"
+
+[node name="InfoLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Info Messages:"
+
+[node name="Info1" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Info 1 (optional)"
+
+[node name="Info2" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Info 2 (optional)"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="OptionsLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Options"
+
+[node name="HSeparator3" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EnableStacking" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Enable Stacking"
+
+[node name="HSeparator4" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ActionsLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Actions"
+
+[node name="HSeparator5" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ShowSuccess" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Show Success"
+
+[node name="ShowError" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Show Error"
+
+[node name="ShowWarning" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Show Warning"
+
+[node name="ShowInfo" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Show Info"
+
+[node name="HSeparator6" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ClearDisplay" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Clear Display"
+
+[node name="DemoScenarios" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Run Demo Scenarios"
+
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="DisplayLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/RightPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Error Display Output:"
+
+[node name="ErrorDisplay" parent="MarginContainer/VBoxContainer/HBoxContainer/RightPanel" instance=ExtResource("2_error_display")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/EnableStacking" to="." method="_on_enable_stacking_toggled"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowSuccess" to="." method="_on_show_success_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowError" to="." method="_on_show_error_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowWarning" to="." method="_on_show_warning_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowInfo" to="." method="_on_show_info_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ClearDisplay" to="." method="_on_clear_display_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/DemoScenarios" to="." method="_on_demo_scenarios_pressed"]
