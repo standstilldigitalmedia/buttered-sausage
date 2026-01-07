@@ -1,0 +1,157 @@
+BUTTERED SAUSAGE - CODE IMPROVEMENT TODO LIST
+==============================================
+#We need to add a warning in README about the string comparison in create_message in ButteredSausageDisplay. 
+People might be tempted to return an error like "The name: " + name_line_edit.text + " is invalid." This will 
+cause validation messages to spam because each returned error will be different if they are listening for 
+changes to name_line_edit.text.#
+
+#only two sides of Panel border are configurable. The other two sides need to be added to Config with 
+default size of 0.#
+
+#size and placement of panels needs to be configurable. Horizontal stack almost never makes sense unless we
+turn the text on its side and then its hard to read. Probably won't include a horizontal stack option. 
+However, people may want to start at the top and populate down or start at the bottom and poulate up
+Additional Notes: We need an element that puts itself at the bottom of the scene tree so it is always on top
+and takes up the entire width and height of its container. When new messages are added, it needs to check if
+it is at the bottom of the scene tree and if not, I guess unparent and reparent the main container? This container
+can not block mouse clicks or other input but some of its children or their children may need to receive input. 
+In this container, we will have a VBoxContainer with fixed width. This width will be configurable. Also, the 
+anchor points can be configured to upper left, center, etc with offsets. Horizontal animations should slide 
+out to the same configurable width as the VBox. Vertical animations should slide out to the height defined by 
+get_combined_minimum_size().y of the message panel. We've changed these elements around so much trying to get 
+things to work and there are only a few elements per scene, I think we'll just create all these scenes over 
+from scratch. We can keep a lot of the code.#
+
+#priority order for the single panel display mode needs to be configurable.#
+
+#we have icons now, straight from the Godot repository. res://addons/ButteredSausage/ui/images three names are 
+self-explanatory. LightOccluder2D.svg looks like a light bulb. It was the closest to Info as I could get. We
+need to add to the documents here and in AWOC that all icons used are from the Godot repository. Icon images
+should probably be configurable too. A bool in config will allow the user to easily turn off icons.#
+
+#label text alignment should be configurable.#
+
+#SSDM logo in every demo res://addons/ButteredSausage/ui/images/standstill_logo.png It is white text on a 
+black background.#
+
+#need to give the option to not play any animation and just show() and hide()#
+
+
+1. Fix all AWOC/SSDM references in comments and doc strings to use ButteredSausage
+   - buttered_sausage_panel.gd:2 says "SSDMErrorDisplay"
+   - buttered_sausage_animator.gd:53 says "AWOCSlideAnimator"
+   - Many other instances throughout codebase
+   - README.md is completely out of sync
+#This is at the top of the list but I actually think it should come more towards the end of the list. We're
+still deciding names for stuff and adding new code here and there. This documentation is going to get out of
+sync pretty quickly. May as well wait until we fix the other issues.
+
+
+MISSING FEATURES
+----------------
+
+13. Add max_visible_panels configuration option
+	- Prevent infinite panel spam
+	- Auto-dismiss oldest when limit reached
+	- Add to ButteredSausageDisplay as @export var max_visible_panels: int = 0 (0 = unlimited)
+
+14. Add panel_closed signal to ButteredSausageDisplay
+	- Emit when all panels are dismissed
+	- Useful for knowing when display is empty
+	- signal all_panels_closed()
+
+15. Add accessible label/tooltip to close button
+	- Currently just shows "×" character
+	- Add tooltip_text = "Close message"
+	- Or use accessible label for screen readers
+#I used the normal tool tip in the editor inspector. What would it take to make all of my code available to
+screen readers? Are there other accessibility options we need to consider?#
+
+
+LOWER PRIORITY (Nice to Have)
+------------------------------
+
+16. Add keyboard navigation support
+	- Tab to focus panels
+	- Escape to close focused panel
+	- Arrow keys to navigate between panels
+#I'm not sure how useful this would be as most panels are going to autodismiss after a few seconds anyway.
+Not to mention if someone wants to use this in their game, they may have tab and escape doing other things.
+They may not want the messages to close when esc is pressed.#
+
+17. Add hover-to-pause auto-dismiss feature
+	- Stop auto-dismiss timer when mouse hovers over panel
+	- Resume when mouse leaves
+	- Improves UX for reading long messages
+#This one I like. For sure, must have#
+
+18. Add ability to update panel colors after creation
+	- Currently can only set colors in setup()
+	- Add update_colors() method or similar
+
+19. Add global animation style configuration
+	- Currently hardcoded per severity
+	- Allow users to customize animation profiles
+
+20. Add tween cleanup in animator destructor
+	- Ensure tweens are killed when animator is freed
+	- Prevent potential memory leaks
+#needs to be implemented.
+
+
+DOCUMENTATION UPDATES (Do After Code Fixes)
+--------------------------------------------
+
+21. Update README.md with correct class names
+	- Replace all SSDMResult with ButteredSausage
+	- Replace all SSDMErrorDisplay with ButteredSausageDisplay
+	- Replace all SSDMSlideAnimator with ButteredSausageAnimator
+	- Update all code examples
+
+22. Add migration guide section to README
+	- For users coming from AWOC/SSDM versions
+	- Simple find/replace instructions
+#there are no users coming from AWOC. AWOC is pre-alpha.#
+
+23. Update API reference section
+	- Ensure all method signatures are current
+	- Add examples for new features (after implementing)
+
+24. Add troubleshooting section
+	- Common issues and solutions
+	- What to do if panels don't show
+	- What to do if animations look wrong
+
+
+NOTES
+-----
+- Prioritize items 1-7 before updating documentation
+- Items 8-15 are improvements that enhance the addon but aren't critical
+- Items 16-20 are nice-to-haves for future versions
+- Documentation updates should be done after all code changes are complete
+
+
+#REPO MANAGEMENT NOTES#
+ One-time setup:
+
+  1. Keep your main AWOC repo as your development workspace
+  2. Structure it like:
+  AWOC/
+  ├── addons/
+  │   ├── buttered_sausage/      # standalone lib
+  │   ├── resource_management/    # depends on buttered_sausage
+  │   └── preview_window/         # standalone or depends on others
+  └── [AWOC-specific code]
+  3. Create separate GitHub repos for each component (empty to start)
+  4. Add them as subtree remotes:
+  git remote add buttered-sausage-remote https://github.com/you/buttered-sausage.git
+  git remote add resource-mgmt-remote https://github.com/you/resource-management.git
+
+  Daily workflow:
+  - Edit everything normally in AWOC repo
+  - Commit changes like usual
+  - When a component is ready to release:
+  git subtree push --prefix=addons/buttered_sausage buttered-sausage-remote main
+
+  For dependencies:
+  In the standalone repos' READMEs, just document "Requires Buttered Sausage" with a link. Users installing from Asset Library will see this.

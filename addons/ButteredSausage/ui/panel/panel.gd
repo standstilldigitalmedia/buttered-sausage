@@ -7,10 +7,12 @@ extends Control
 const PANEL_THEME: String = "panel"
 
 @export var panel_container: PanelContainer
+@export var margin_container: MarginContainer
+@export var icon_texture_rect: TextureRect
 @export var message_label: RichTextLabel
 @export var close_button: Button
-@export var buttered_sausage_config: ButteredSausageConfig
 
+var panel_config: ButteredSausagePanelConfig
 var severity: int
 var animator: ButteredSausageAnimator
 var is_closing: bool = false
@@ -30,7 +32,8 @@ func update_message(message: String) -> void:
 ##
 ## @param severity - The severity level determining which animation to apply
 func apply_animations(severity: ButteredSausageDisplay.Severity) -> void:
-	animator = ButteredSausageAnimator.new(self, panel_container, buttered_sausage_config)
+	pass
+	"""animator = ButteredSausageAnimator.new(self, panel_container, buttered_sausage_config)
 	match severity:
 		ButteredSausageDisplay.Severity.SUCCESS:
 			animator.configure(ButteredSausageAnimator.Axis.VERTICAL, ButteredSausageAnimator.OpenDirection.POSITIVE, buttered_sausage_config) \
@@ -46,36 +49,59 @@ func apply_animations(severity: ButteredSausageDisplay.Severity) -> void:
 			animator.configure(ButteredSausageAnimator.Axis.VERTICAL, ButteredSausageAnimator.OpenDirection.POSITIVE, buttered_sausage_config) \
 				.with_scale(Vector2(0.3, 1)) \
 				.with_rotation_pivot_center() \
-				.with_rotation(0, 360)
+				.with_rotation(0, 360)"""
+	
 		
-			
-## Applies severity-specific background color to the panel.[br][br]
+func configure() -> void:
+	var severity: ButteredSausageDisplay.Severity = panel_config.severity
+	if !cached_styles.has(severity):
+		var style_box = panel_config.create_stylebox()
+		cached_styles[severity] = style_box
+	panel_container.add_theme_stylebox_override(PANEL_THEME, cached_styles[severity])
+	if panel_config.font:
+		message_label.add_theme_font_override("normal_font", panel_config.font)
+	message_label.add_theme_color_override("normal_font", panel_config.font_color)
+	message_label.add_theme_font_size_override("normal_font", panel_config.font_size)
+	if panel_config.hide_icon:
+		icon_texture_rect.hide()
+	else:
+		icon_texture_rect.texture = panel_config.icon
+	if panel_config.hide_close_button:
+		close_button.hide()
+	else:
+		close_button.icon = panel_config.close_button_icon
+	margin_container.add_theme_constant_override("margin_left", panel_config.margin_left)
+	margin_container.add_theme_constant_override("margin_top", panel_config.margin_top)
+	margin_container.add_theme_constant_override("margin_right", panel_config.margin_right)
+	margin_container.add_theme_constant_override("margin_bottom", panel_config.margin_bottom)			
+	
+"""## Applies severity-specific background color to the panel.[br][br]
 ##
 ## @param sev - The severity level determining the panel color
 func apply_style(sev: int) -> void:
 	if not cached_styles.has(sev):
 		var style_box = StyleBoxFlat.new()
-		style_box.corner_radius_top_left = buttered_sausage_config.corner_radius
-		style_box.corner_radius_top_right = buttered_sausage_config.corner_radius
-		style_box.corner_radius_bottom_left = buttered_sausage_config.corner_radius
-		style_box.corner_radius_bottom_right = buttered_sausage_config.corner_radius
-		style_box.border_width_bottom = buttered_sausage_config.border_width_bottom
-		style_box.border_width_left = buttered_sausage_config.border_width_left
+		style_box.corner_radius_top_left = config.corner_radius
+		style_box.corner_radius_top_right = config.corner_radius
+		style_box.corner_radius_bottom_left = config.corner_radius
+		style_box.corner_radius_bottom_right = config.corner_radius
+		style_box.border_width_bottom = config.border_width_bottom
+		style_box.border_width_left = config.border_width_left
 		cached_styles[sev] = style_box
 		match sev:
 			ButteredSausageDisplay.Severity.SUCCESS:
-				style_box.bg_color = buttered_sausage_config.success_color
-				style_box.border_color = buttered_sausage_config.success_border_color
+				style_box.bg_color = config.success_color
+				style_box.border_color = config.success_border_color
 			ButteredSausageDisplay.Severity.INFO:
-				style_box.bg_color = buttered_sausage_config.info_color
-				style_box.border_color = buttered_sausage_config.info_border_color
+				style_box.bg_color = config.info_color
+				style_box.border_color = config.info_border_color
 			ButteredSausageDisplay.Severity.WARNING:
-				style_box.bg_color = buttered_sausage_config.warning_color
-				style_box.border_color = buttered_sausage_config.warning_border_color
+				style_box.bg_color = config.warning_color
+				style_box.border_color = config.warning_border_color
 			ButteredSausageDisplay.Severity.ERROR:
-				style_box.bg_color = buttered_sausage_config.error_color
-				style_box.border_color = buttered_sausage_config.error_border_color
-	panel_container.add_theme_stylebox_override(PANEL_THEME, cached_styles[sev])
+				style_box.bg_color = config.error_color
+				style_box.border_color = config.error_border_color
+	panel_container.add_theme_stylebox_override(PANEL_THEME, cached_styles[sev])"""
 	
 	
 ## Returns the auto-dismiss timeout duration based on severity.[br]
@@ -86,15 +112,15 @@ func apply_style(sev: int) -> void:
 func get_dismiss_time(sev: int) -> float:
 	match sev:
 		ButteredSausageDisplay.Severity.SUCCESS:
-			return buttered_sausage_config.success_duration
+			return panel_config.duration
 		ButteredSausageDisplay.Severity.WARNING:
-			return buttered_sausage_config.warning_duration
+			return panel_config.duration
 		ButteredSausageDisplay.Severity.INFO:
-			return buttered_sausage_config.info_duration
+			return panel_config.duration
 		ButteredSausageDisplay.Severity.ERROR:
-			return buttered_sausage_config.error_duration
+			return panel_config.duration
 		_:
-			return buttered_sausage_config.error_duration
+			return panel_config.duration
 	
 	
 ## Initializes the panel with message, severity, styling, animations, and auto-dismiss timer.[br][br]
@@ -103,11 +129,11 @@ func get_dismiss_time(sev: int) -> float:
 ## @param sev - The severity level[br]
 ## @param auto_dismiss - If true, panel will auto-close after a timeout[br]
 ## @param config - Optional configuration dictionary with colors, timings, and styling
-func setup(msg: String, sev: int, config: ButteredSausageConfig, auto_dismiss: bool = false) -> void:
+func setup(msg: String, sev: int, config: ButteredSausagePanelConfig, auto_dismiss: bool = false) -> void:
 	message_label.text = msg
 	severity = sev
-	buttered_sausage_config = config
-	apply_style(sev)
+	panel_config = config
+	configure()
 	apply_animations(sev)
 	if auto_dismiss:
 		auto_dismiss_timer = Timer.new()

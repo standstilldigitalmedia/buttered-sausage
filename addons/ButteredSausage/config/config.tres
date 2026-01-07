@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ButteredSausageConfig" load_steps=2 format=3 uid="uid://bblvjqbkhcpn1"]
-
-[ext_resource type="Script" uid="uid://cxavv8b2o6lf8" path="res://addons/ButteredSausage/config/buttered_sausage_config.gd" id="1_djjvg"]
-
-[resource]
-script = ExtResource("1_djjvg")
-slide_speed = null

@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://cuj6w06hgu6ff"]
+
+[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_phkx2"]
+
+[resource]
+script = ExtResource("1_phkx2")

@@ -1,17 +1,21 @@
 [gd_scene load_steps=3 format=3 uid="uid://b3icksrw00gko"]
 
-[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/ButteredSausage/ui/panel/buttered_sausage_panel.gd" id="1_astwa"]
+[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/ButteredSausage/ui/panel/panel.gd" id="1_astwa"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
 bg_color = Color(1, 1, 1, 0.078431375)
 
-[node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("panel_container", "message_label", "close_button")]
+[node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("panel_container", "margin_container", "icon_texture_rect", "message_label", "close_button")]
 layout_mode = 3
 anchors_preset = 0
+offset_right = 16.0
+offset_bottom = 16.0
 size_flags_horizontal = 3
 size_flags_vertical = 4
 script = ExtResource("1_astwa")
 panel_container = NodePath("PanelContainer")
+margin_container = NodePath("PanelContainer/MarginContainer")
+icon_texture_rect = NodePath("PanelContainer/MarginContainer/HBoxContainer/IconTextureRect")
 message_label = NodePath("PanelContainer/MarginContainer/HBoxContainer/MessageLabel")
 close_button = NodePath("PanelContainer/MarginContainer/HBoxContainer/CloseButton")
 
@@ -32,6 +36,9 @@ theme_override_constants/margin_bottom = 6
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
+
+[node name="IconTextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
 
 [node name="MessageLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2

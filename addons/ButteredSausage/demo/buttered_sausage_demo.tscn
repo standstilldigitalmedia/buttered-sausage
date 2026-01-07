@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://buuml2eayrxv5"]
 
 [ext_resource type="Script" uid="uid://yeyrlw2i3mt8" path="res://addons/ButteredSausage/demo/buttered_sausage_demo.gd" id="1_demo"]
-[ext_resource type="PackedScene" uid="uid://c4u8l5ya7yuh0" path="res://addons/ButteredSausage/buttered_sausage_display.tscn" id="2_error_display"]
+[ext_resource type="PackedScene" uid="uid://c4u8l5ya7yuh0" path="res://addons/ButteredSausage/ui/display/display.tscn" id="2_error_display"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.15, 0.15, 0.18, 1)

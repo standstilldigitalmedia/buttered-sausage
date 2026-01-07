@@ -15,7 +15,7 @@ enum Severity {
 
 @export var message_panel_scene: PackedScene
 @export var content_container: VBoxContainer
-@export var buttered_sausage_config: ButteredSausageConfig
+@export var global_config: ButteredSausageGlobalConfig
 
 var stacking_enabled: bool = true
 var current_panel: ButteredSausagePanel = null
@@ -99,7 +99,15 @@ func create_message(msg: String, severity: int, auto_dismiss: bool) -> void:
 			push_error("message_panel_scene must be set on buttered_sausage_display.tscn in the inspector")
 			return
 		content_container.add_child(panel)
-		panel.setup(msg, severity, buttered_sausage_config, auto_dismiss)
+		match severity:
+			ButteredSausageDisplay.Severity.SUCCESS:
+				panel.setup(msg, severity, global_config.success_config, auto_dismiss)
+			ButteredSausageDisplay.Severity.ERROR:
+				panel.setup(msg, severity, global_config.error_config, auto_dismiss)
+			ButteredSausageDisplay.Severity.WARNING:
+				panel.setup(msg, severity, global_config.warning_config, auto_dismiss)
+			ButteredSausageDisplay.Severity.INFO:
+				panel.setup(msg, severity, global_config.info_config, auto_dismiss)
 		panel.slide_open()
 		if not stacking_enabled:
 			current_panel = panel
@@ -170,3 +178,4 @@ func _get_severity_priority(severity: int) -> int:
 
 func _ready() -> void:
 	hide()
+	global_config.set_panel_width()
