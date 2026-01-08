@@ -50,18 +50,6 @@ max_panels left.#
 #I used the normal tool tip in the editor inspector. What would it take to make all of my code available to
 screen readers? Are there other accessibility options we need to consider?#
 
-
-LOWER PRIORITY (Nice to Have)
-------------------------------
-17. Add hover-to-pause auto-dismiss feature
-	- Stop auto-dismiss timer when mouse hovers over panel
-	- Resume when mouse leaves
-	- Improves UX for reading long messages
-#This one I like. For sure, must have#
-
-DOCUMENTATION UPDATES (Do After Code Fixes)
---------------------------------------------
-
 24. Add troubleshooting section
 	- Common issues and solutions
 	- What to do if panels don't show

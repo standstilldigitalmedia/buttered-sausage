@@ -17,6 +17,8 @@ const PANEL_THEME: String = "panel"
 var panel_config: ButteredSausagePanelConfig
 var is_closing: bool = false
 var auto_dismiss_timer: Timer
+var timer_paused: bool = false
+var paused_time_left: float = 0.0
 static var cached_styles: Dictionary = {}
 
 
@@ -59,6 +61,14 @@ func configure() -> void:
 	icon_texture_rect.custom_minimum_size.y = panel_config.icon_height
 	close_button.custom_minimum_size.x = panel_config.close_button_width
 	close_button.custom_minimum_size.y = panel_config.close_button_height
+
+	# Set mouse filters so child controls don't interfere with hover detection
+	margin_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon_texture_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon_texture_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	message_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	close_button_control.mouse_filter = Control.MOUSE_FILTER_PASS
+	# Note: close_button itself needs MOUSE_FILTER_STOP to remain clickable
 
 ## Initializes the panel with message, styling, and auto-dismiss timer.[br][br]
 ##
@@ -116,8 +126,9 @@ func close(animate: bool = false) -> void:
 	if is_closing:
 		return
 	is_closing = true
-	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and auto_dismiss_timer.time_left > 0:
+	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer):
 		auto_dismiss_timer.stop()
+		timer_paused = false
 	if animate:
 		await slide_closed()
 	queue_free()
@@ -157,3 +168,26 @@ func _on_auto_dismiss_timeout() -> void:
 
 func _on_close_pressed() -> void:
 	close(true)
+
+
+## Pauses the auto-dismiss timer when mouse hovers over the panel
+func _on_mouse_entered() -> void:
+	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and not timer_paused:
+		if auto_dismiss_timer.time_left > 0:
+			paused_time_left = auto_dismiss_timer.time_left
+			auto_dismiss_timer.stop()
+			timer_paused = true
+
+
+## Resumes the auto-dismiss timer when mouse leaves the panel
+func _on_mouse_exited() -> void:
+	push_error("mouse exited")
+	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and timer_paused:
+		auto_dismiss_timer.start(paused_time_left)
+		timer_paused = false
+
+
+func _ready() -> void:
+	# Connect mouse signals for hover-to-pause functionality
+	panel_container.mouse_entered.connect(_on_mouse_entered)
+	panel_container.mouse_exited.connect(_on_mouse_exited)

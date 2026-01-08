@@ -234,12 +234,18 @@ func reverse() -> void:
 	if animator_config.animate_scale:
 		slide_tween.tween_property(panel, SCALE_PROPERTY, animator_config.scale_from, anim_speed)
 	if animator_config.animate_rotation:
+		# Calculate the reverse rotation target
+		# If rotating a full 360 degrees (or multiple), we need to rotate backwards by that amount
+		# to avoid the issue where Godot normalizes 360° to 0°, making from and to the same value
+		var rotation_delta = animator_config.rotation_to_degrees - animator_config.rotation_from_degrees
+		var reverse_target_degrees = animator_config.rotation_from_degrees - rotation_delta
+
 		if animator_config.rotation_orbit:
-			slide_tween.tween_property(panel, ROTATION_PROPERTY, deg_to_rad(animator_config.rotation_from_degrees), anim_speed)
+			slide_tween.tween_property(panel, ROTATION_PROPERTY, deg_to_rad(reverse_target_degrees), anim_speed)
 		else:
-			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, deg_to_rad(animator_config.rotation_from_degrees), anim_speed)
+			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, deg_to_rad(reverse_target_degrees), anim_speed)
 	if animator_config.animate_position:
-		slide_tween.tween_property(wrapper, POSITION_PROPERTY, animator_config.position_offset, anim_speed)
+		slide_tween.tween_property(panel, POSITION_PROPERTY, animator_config.position_offset, anim_speed)
 	if animator_config.animate_color:
 		slide_tween.tween_property(wrapper, MODULATE_PROPERTY, animator_config.color_from, anim_speed)
 	elif animator_config.animate_fade:
@@ -261,7 +267,7 @@ func reverse() -> void:
 		panel.rotation = 0.0
 		wrapper.rotation = 0.0
 	if animator_config.animate_position:
-		wrapper.position = Vector2.ZERO
+		panel.position = Vector2.ZERO
 	if animator_config.animate_color:
 		wrapper.modulate = Color.WHITE
 	elif animator_config.animate_fade:

@@ -19,7 +19,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 ### Visual Display System
 - Color-coded severity levels with smooth animations
 - Message stacking or single-message (priority) modes
-- Auto-dismiss for non-error messages
+- Auto-dismiss for non-error messages with hover-to-pause
 - Manual close buttons
 - Animation chains for complex sequences
 - Loop animations for persistent effects
@@ -223,6 +223,7 @@ Each severity level has its own pre-configured `ButteredSausagePanelConfig` reso
 **Timing:**
 - `auto_dismiss` - Enable automatic dismissal
 - `duration` - Seconds before auto-dismiss (default: 3.0 for success)
+- **Hover-to-Pause:** Auto-dismiss timers automatically pause when the user hovers their mouse over a panel, allowing them time to read longer messages. The timer resumes when the mouse exits the panel.
 
 **Animation Chains:**
 - `animation_chain` - Array of `ButteredSausageAnimatorConfig` for opening animations
