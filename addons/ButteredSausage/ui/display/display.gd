@@ -14,7 +14,6 @@ extends Control
 var _positioning_applied: bool = false
 var _target_position: Vector2 = Vector2.ZERO
 var _anchor_to_bottom: bool = false
-var _debug_counter: int = 0
 
 
 ## Populates the display with messages from a ButteredSausage result object.[br]
