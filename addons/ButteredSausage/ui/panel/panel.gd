@@ -1,6 +1,8 @@
 @tool
-## An individual message panel that displays within SSDMErrorDisplay with animated entrance/exit.[br]
-## Handles message display, auto-dismiss timers, and severity-based styling and animations.
+## An individual message panel that displays within ButteredSausageDisplay.[br]
+## Handles message display, auto-dismiss timers with hover-to-pause, severity-based styling, and animations.[br][br]
+##
+## Created and managed by ButteredSausageDisplay.
 class_name ButteredSausagePanel
 extends Control
 
@@ -24,11 +26,13 @@ static var cached_styles: Dictionary = {}
 
 ## Updates the displayed message text without creating a new panel.[br][br]
 ##
-## @param message - The new message text to display
+## @param message - The new message text to display[br]
 func update_message(message: String) -> void:
 	message_label.text = message
-	
-	
+
+
+## Applies the panel configuration to all UI elements.[br]
+## Sets styling, fonts, colors, icons, margins, and mouse filters.[br][br]
 func configure() -> void:
 	var severity: ButteredSausageSeverity.Level = panel_config.severity
 	if !cached_styles.has(severity):
@@ -88,7 +92,8 @@ func setup(msg: String, config: ButteredSausagePanelConfig) -> void:
 		auto_dismiss_timer.start(panel_config.duration)
 
 
-## Animates the panel into view using the configured animation chain with optional looping.
+## Animates the panel into view using the configured animation chain.[br]
+## Supports optional animation looping until panel closes.[br][br]
 func slide_open() -> void:
 	# If no animations configured, just show panel
 	if panel_config.animation_chain.is_empty():
@@ -170,16 +175,19 @@ func slide_closed() -> void:
 				panel_container.hide()
 	
 	
-## Called when auto-dismiss timer expires
+## Called when auto-dismiss timer expires.[br]
+## Closes the panel with animation.[br][br]
 func _on_auto_dismiss_timeout() -> void:
 	close(true)
 
 
+## Called when close button is pressed.[br]
+## Closes the panel with animation.[br][br]
 func _on_close_pressed() -> void:
 	close(true)
 
 
-## Pauses the auto-dismiss timer when mouse hovers over the panel
+## Pauses the auto-dismiss timer when mouse hovers over the panel.[br][br]
 func _on_mouse_entered() -> void:
 	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and not timer_paused:
 		if auto_dismiss_timer.time_left > 0:
@@ -188,15 +196,14 @@ func _on_mouse_entered() -> void:
 			timer_paused = true
 
 
-## Resumes the auto-dismiss timer when mouse leaves the panel
+## Resumes the auto-dismiss timer when mouse leaves the panel.[br][br]
 func _on_mouse_exited() -> void:
-	push_error("mouse exited")
 	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and timer_paused:
 		auto_dismiss_timer.start(paused_time_left)
 		timer_paused = false
 
 
+## Connects mouse hover signals for pause/resume functionality.[br][br]
 func _ready() -> void:
-	# Connect mouse signals for hover-to-pause functionality
 	panel_container.mouse_entered.connect(_on_mouse_entered)
 	panel_container.mouse_exited.connect(_on_mouse_exited)

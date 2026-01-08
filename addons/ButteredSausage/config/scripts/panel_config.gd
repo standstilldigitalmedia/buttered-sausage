@@ -1,11 +1,15 @@
 @tool
+## Configuration resource for ButteredSausagePanel.[br]
+## Defines visual styling, timing, and animation chains for message panels.[br][br]
+##
+## Used by ButteredSausageDisplay to configure panel appearance and behavior per severity level.
 class_name ButteredSausagePanelConfig
 extends Resource
 
-enum Axis { VERTICAL, HORIZONTAL }
-enum OpenDirection { POSITIVE, NEGATIVE }
-enum AnchorPresets {TopLeft, TopCenter, TopRight, CenterLeft, Center, CenterRight, BottomLeft, BottomCenter, BottomRight}
-enum Alignment {Left, Center, Right, Justify}
+enum Axis { VERTICAL, HORIZONTAL }  ## Animation axis
+enum OpenDirection { POSITIVE, NEGATIVE }  ## Animation direction
+enum AnchorPresets {TopLeft, TopCenter, TopRight, CenterLeft, Center, CenterRight, BottomLeft, BottomCenter, BottomRight}  ## Panel anchor points
+enum Alignment {Left, Center, Right, Justify}  ## Text alignment options
 enum CloseBehavior {
 	REVERSE_FIRST_ANIMATION,  ## Reverse the first animation from animation_chain
 	MIRROR_FULL_CHAIN,        ## Reverse entire animation_chain in reverse order
@@ -67,6 +71,9 @@ enum CloseBehavior {
 @export var severity: ButteredSausageSeverity.Level = ButteredSausageSeverity.Level.SUCCESS
 
 
+## Creates a StyleBoxFlat from the configured visual properties.[br][br]
+##
+## @return A StyleBoxFlat with configured colors, borders, and corner radii[br]
 func create_stylebox() -> StyleBox:
 	var style_box = StyleBoxFlat.new()
 	style_box.bg_color = background_color

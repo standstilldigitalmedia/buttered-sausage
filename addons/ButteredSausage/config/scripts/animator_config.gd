@@ -1,10 +1,15 @@
 @tool
+## Configuration resource for ButteredSausageAnimator.[br]
+## Defines animation parameters including size, scale, fade, rotation, position, color, and shake effects.[br][br]
+##
+## Dependencies: None. This is a standalone configuration resource.[br]
+## Create via Resource menu and configure in the inspector.
 class_name ButteredSausageAnimatorConfig
 extends Resource
 
-enum Axis { VERTICAL, HORIZONTAL }
-enum OpenDirection { POSITIVE, NEGATIVE }
-enum RotationPivot { TOP_LEFT, TOP_CENTER, TOP_RIGHT, CENTER_LEFT, CENTER, CENTER_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, CUSTOM }
+enum Axis { VERTICAL, HORIZONTAL }  ## Animation axis for size animations
+enum OpenDirection { POSITIVE, NEGATIVE }  ## Direction for slide animations
+enum RotationPivot { TOP_LEFT, TOP_CENTER, TOP_RIGHT, CENTER_LEFT, CENTER, CENTER_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, CUSTOM }  ## Pivot point presets for rotation and scale
 
 @export_group("Size Animation")
 @export var animate_size: bool = true

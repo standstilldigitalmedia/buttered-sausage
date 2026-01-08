@@ -1,14 +1,15 @@
 @tool
-## A visual error/message display system that shows messages with different severity levels.[br]
-## Supports stacking multiple messages or showing only the highest priority message.[br]
-## Integrates with SSDMResult for displaying operation results with details.[br]
-## Configure colors, timings, and styling through exported variables in the inspector.
+## A visual message display system that shows messages with different severity levels.[br]
+## Supports configurable panel limits, hover-to-pause auto-dismiss, and customizable animations.[br]
+## Integrates with ButteredSausage result pattern for displaying operation results with details.[br][br]
+##
+## Configure via ButteredSausageDisplayConfig resource in the inspector.
 class_name ButteredSausageDisplay
 extends Control
 
 @export var message_panel_scene: PackedScene
 @export var content_container: VBoxContainer
-@export var global_config: ButteredSausageGlobalConfig
+@export var global_config: ButteredSausageDisplayConfig
 
 var _positioning_applied: bool = false
 var _target_position: Vector2 = Vector2.ZERO
@@ -16,7 +17,7 @@ var _anchor_to_bottom: bool = false
 var _debug_counter: int = 0
 
 
-## Closes all message panels and hides the display.
+## Closes all message panels and hides the display.[br][br]
 func clear_all_panels() -> void:
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
@@ -24,9 +25,11 @@ func clear_all_panels() -> void:
 	hide()
 
 
-## Enforces max_visible_panels limit by closing panels
-## @param new_severity - The severity of the panel about to be created
-## @return true if the new panel should be created, false otherwise
+## Enforces max_visible_panels limit by closing panels.[br]
+## For single panel mode, prioritizes by severity. For limited mode, uses FIFO.[br][br]
+##
+## @param new_severity - The severity of the panel about to be created[br]
+## @return True if the new panel should be created, false otherwise[br]
 func _enforce_panel_limit(new_severity: int) -> bool:
 	if global_config.max_visible_panels <= 0:
 		return true  # Unlimited panels, always create
@@ -63,7 +66,10 @@ func _enforce_panel_limit(new_severity: int) -> bool:
 	return true  # Always create for limited mode
 
 
-## Immediately removes a panel from the tree and frees it
+## Immediately removes a panel from the tree and frees it.[br]
+## Stops timers and animations before removal.[br][br]
+##
+## @param panel - The panel to remove[br]
 func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
 	# Stop any timers and mark as closing to stop looping animations
 	panel.is_closing = true
@@ -109,13 +115,13 @@ func create_message(msg: String, severity: int) -> void:
 			content_container.move_child(panel, 0)
 
 		match severity:
-			ButteredSausageDisplay.ButteredSausageSeverity.Level.SUCCESS:
+			ButteredSausageSeverity.Level.SUCCESS:
 				panel.setup(msg, global_config.success_config)
-			ButteredSausageDisplay.ButteredSausageSeverity.Level.ERROR:
+			ButteredSausageSeverity.Level.ERROR:
 				panel.setup(msg, global_config.error_config)
-			ButteredSausageDisplay.ButteredSausageSeverity.Level.WARNING:
+			ButteredSausageSeverity.Level.WARNING:
 				panel.setup(msg, global_config.warning_config)
-			ButteredSausageDisplay.ButteredSausageSeverity.Level.INFO:
+			ButteredSausageSeverity.Level.INFO:
 				panel.setup(msg, global_config.info_config)
 		panel.slide_open()
 
@@ -134,32 +140,37 @@ func populate_from_result(result: ButteredSausage) -> void:
 					
 ## Shows an error message.[br][br]
 ##
-## @param message - The error message to display
+## @param message - The error message to display[br]
 func show_error(message: String) -> void:
 	create_message(message, ButteredSausageSeverity.Level.ERROR)
 
 
 ## Shows a success message.[br][br]
 ##
-## @param message - The success message to display
+## @param message - The success message to display[br]
 func show_success(message: String) -> void:
 	create_message(message, ButteredSausageSeverity.Level.SUCCESS)
 
 
 ## Shows a warning message.[br][br]
 ##
-## @param message - The warning message to display
+## @param message - The warning message to display[br]
 func show_warning(message: String) -> void:
 	create_message(message, ButteredSausageSeverity.Level.WARNING)
 
 
 ## Shows an info message.[br][br]
 ##
-## @param message - The info message to display
+## @param message - The info message to display[br]
 func show_info(message: String) -> void:
 	create_message(message, ButteredSausageSeverity.Level.INFO)
 
 
+## Returns the priority value for a given severity level.[br]
+## Used for single panel mode to determine which panel to keep.[br][br]
+##
+## @param severity - The severity level[br]
+## @return The priority value from global config[br]
 func _get_severity_priority(severity: int) -> int:
 	match severity:
 		ButteredSausageSeverity.Level.ERROR:
@@ -173,7 +184,8 @@ func _get_severity_priority(severity: int) -> int:
 	return 0
 
 
-## Applies the position preset from global config to the content container
+## Applies the position preset from global config to the content container.[br]
+## Sets up positioning mode and flags, then updates position.[br][br]
 func _apply_position_preset() -> void:
 	if _positioning_applied:
 		return
@@ -194,9 +206,9 @@ func _apply_position_preset() -> void:
 
 	# Determine if this preset needs bottom anchoring
 	_anchor_to_bottom = global_config.position_preset in [
-		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_LEFT,
-		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_CENTER,
-		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_RIGHT
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT,
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER,
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT
 	]
 
 	# Set flag BEFORE calling update so it doesn't return early
@@ -206,7 +218,8 @@ func _apply_position_preset() -> void:
 	_update_position()
 
 
-## Updates ContentContainer position based on preset and current parent size
+## Updates content container position based on preset and current parent size.[br]
+## Called every frame to keep position correct as container size changes.[br][br]
 func _update_position() -> void:
 	if not _positioning_applied:
 		return
@@ -220,42 +233,45 @@ func _update_position() -> void:
 	var pos: Vector2 = Vector2.ZERO
 
 	match global_config.position_preset:
-		ButteredSausageGlobalConfig.PositionPreset.TOP_LEFT:
+		ButteredSausageDisplayConfig.PositionPreset.TOP_LEFT:
 			pos = Vector2(margin, margin)
 
-		ButteredSausageGlobalConfig.PositionPreset.TOP_CENTER:
+		ButteredSausageDisplayConfig.PositionPreset.TOP_CENTER:
 			pos = Vector2((parent_size.x - width) / 2.0, margin)
 
-		ButteredSausageGlobalConfig.PositionPreset.TOP_RIGHT:
+		ButteredSausageDisplayConfig.PositionPreset.TOP_RIGHT:
 			pos = Vector2(parent_size.x - width - margin, margin)
 
-		ButteredSausageGlobalConfig.PositionPreset.CENTER_LEFT:
+		ButteredSausageDisplayConfig.PositionPreset.CENTER_LEFT:
 			pos = Vector2(margin, (parent_size.y - container_height) / 2.0)
 
-		ButteredSausageGlobalConfig.PositionPreset.CENTER:
+		ButteredSausageDisplayConfig.PositionPreset.CENTER:
 			pos = Vector2((parent_size.x - width) / 2.0, (parent_size.y - container_height) / 2.0)
 
-		ButteredSausageGlobalConfig.PositionPreset.CENTER_RIGHT:
+		ButteredSausageDisplayConfig.PositionPreset.CENTER_RIGHT:
 			pos = Vector2(parent_size.x - width - margin, (parent_size.y - container_height) / 2.0)
 
-		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_LEFT:
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT:
 			pos = Vector2(margin, parent_size.y - container_height - margin)
 
-		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_CENTER:
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER:
 			pos = Vector2((parent_size.x - width) / 2.0, parent_size.y - container_height - margin)
 
-		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_RIGHT:
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT:
 			pos = Vector2(parent_size.x - width - margin, parent_size.y - container_height - margin)
 
 	content_container.position = pos
 
 
+## Updates position every frame to keep panels positioned correctly.[br][br]
+##
+## @param _delta - Frame delta time (unused)[br]
 func _process(_delta: float) -> void:
-	# Update position every frame so panels stay positioned as VBox size changes
 	if _positioning_applied:
 		_update_position()
 
 
+## Initializes the display and propagates panel width to animation configs.[br][br]
 func _ready() -> void:
 	hide()
 

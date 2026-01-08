@@ -41,7 +41,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 - Standalone animator (`ButteredSausageAnimator` + `ButteredSausageAnimatorConfig`) can be used to animate any Control node
 
 ### Configuration System
-- **ButteredSausageGlobalConfig** - Global positioning, panel width, and per-severity configurations
+- **ButteredSausageDisplayConfig** - Global positioning, panel width, and per-severity configurations
 - **ButteredSausagePanelConfig** - Colors, fonts, icons, borders, timing, and animation chains
 - **ButteredSausageAnimatorConfig** - Individual animation effects with full customization
 - All configurations are Resources editable in the Inspector
@@ -205,9 +205,9 @@ This is especially important when validating text input in real-time (e.g., list
 
 ### Display Setup
 
-The `ButteredSausageDisplay` node comes pre-configured with all necessary resources. To customize the display, open `res://addons/ButteredSausage/config/resource/main/global_config.tres` in the Inspector. This file contains a `ButteredSausageGlobalConfig` resource with sensible defaults and references to all severity-specific panel configurations.
+The `ButteredSausageDisplay` node comes pre-configured with all necessary resources. To customize the display, open `res://addons/ButteredSausage/config/resource/main/global_config.tres` in the Inspector. This file contains a `ButteredSausageDisplayConfig` resource with sensible defaults and references to all severity-specific panel configurations.
 
-**ButteredSausageGlobalConfig** properties:
+**ButteredSausageDisplayConfig** properties:
 - `panel_width` - Width of all message panels (default: 400)
 - `position_preset` - Screen position (TOP_RIGHT, BOTTOM_LEFT, etc.)
 - `margin_from_edge` - Distance from screen edges (default: 20)
@@ -423,7 +423,7 @@ See the included demo scene at `addons/ButteredSausage/demo/buttered_sausage_dem
 This addon was developed as part of [AWOC (Avatar Wardrobe Organizer and Colorer)](https://github.com/standstilldigitalmedia/AWOC), a comprehensive avatar customization system for Godot. Check out AWOC if you need:
 - Advanced avatar customization
 - Wardrobe management
-- Color palette systems
+- Color overlay system with material management
 - Modular character systems
 
 ## License

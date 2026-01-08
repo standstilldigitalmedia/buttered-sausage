@@ -1,6 +1,9 @@
 @tool
-## Animates UI panels sliding in/out with optional scale, fade, rotation, bounce, and color effects.[br]
-## Uses builder pattern for configuring animations. Created by passing wrapper and panel controls to constructor.
+## Animates Control nodes with slide, scale, fade, rotation, position, color, and shake effects.[br]
+## Can be used standalone to animate any Control node or integrated with ButteredSausagePanel.[br][br]
+##
+## Dependencies: ButteredSausageAnimatorConfig only.[br]
+## Created by passing wrapper Control, panel Control, and configuration to constructor.
 class_name ButteredSausageAnimator
 extends RefCounted
 
@@ -24,17 +27,19 @@ var _monitoring: bool = false
 var animator_config: ButteredSausageAnimatorConfig
 
 
-## Configures the slide axis and open direction. Required before calling slide_open().[br][br]
+## Configures the animator with animation parameters.[br][br]
 ##
-## @param p_axis - VERTICAL for up/down slide, HORIZONTAL for left/right slide[br]
-## @param p_open_direction - POSITIVE for down/right, NEGATIVE for up/left[br]
-## @return This AWOCSlideAnimator instance for method chaining
+## @param config - The animator configuration resource[br]
+## @return This animator instance for method chaining[br]
 func configure(config: ButteredSausageAnimatorConfig) -> ButteredSausageAnimator:
 	animator_config = config
 	return self
 
 
-## Calculates the pivot offset based on the configured rotation pivot preset for a given control
+## Calculates the pivot offset for rotation based on the configured pivot preset.[br][br]
+##
+## @param node - The Control node to calculate pivot for[br]
+## @return The pivot offset as a Vector2[br]
 func _get_pivot_offset(node: Control) -> Vector2:
 	match animator_config.rotation_pivot_preset:
 		ButteredSausageAnimatorConfig.RotationPivot.TOP_LEFT:
@@ -60,7 +65,10 @@ func _get_pivot_offset(node: Control) -> Vector2:
 	return Vector2.ZERO
 
 
-## Calculates the pivot offset based on the configured scale pivot preset for a given control
+## Calculates the pivot offset for scale based on the configured pivot preset.[br][br]
+##
+## @param node - The Control node to calculate pivot for[br]
+## @return The pivot offset as a Vector2[br]
 func _get_scale_pivot_offset(node: Control) -> Vector2:
 	match animator_config.scale_pivot_preset:
 		ButteredSausageAnimatorConfig.RotationPivot.TOP_LEFT:
@@ -86,7 +94,10 @@ func _get_scale_pivot_offset(node: Control) -> Vector2:
 	return Vector2.ZERO
 
 
-## Returns true if any animations are configured (excluding shake which returns early).
+## Returns true if any animations are configured.[br]
+## Excludes shake animation which is handled separately.[br][br]
+##
+## @return True if any animation is enabled[br]
 func _has_animations() -> bool:
 	return (animator_config.animate_size or
 			animator_config.animate_scale or
@@ -96,7 +107,8 @@ func _has_animations() -> bool:
 			animator_config.animate_fade)
 
 
-## Animates the panel into view with all configured effects. Starts monitoring panel size changes.
+## Animates the Control nodes with all configured effects.[br]
+## Starts monitoring panel size changes after animation completes.[br][br]
 func play() -> void:
 	if not wrapper or not panel:
 		push_error("ButteredSausageAnimator: wrapper or panel is null")
@@ -217,7 +229,8 @@ func play() -> void:
 	start_monitoring()
 
 
-## Animates the panel out of view, reversing all configured effects. Stops monitoring and resets states.
+## Reverses all configured animations to hide the Control nodes.[br]
+## Stops monitoring and resets all animation states after completion.[br][br]
 func reverse() -> void:
 	if not wrapper or not panel:
 		return
@@ -306,7 +319,8 @@ func reverse() -> void:
 		wrapper.modulate.a = 1.0
 
 
-## Immediately closes the panel without animation. Stops monitoring and resets all animation states.
+## Immediately hides the Control nodes without animation.[br]
+## Stops monitoring and resets all animation states.[br][br]
 func close_immediate() -> void:
 	stop_monitoring()
 	is_open = false
@@ -338,7 +352,8 @@ func close_immediate() -> void:
 			wrapper.modulate.a = 1.0
 
 
-## Shakes the panel horizontally with decreasing intensity. Useful for error emphasis.
+## Shakes the wrapper Control horizontally with decreasing intensity.[br]
+## Useful for error emphasis or attention-grabbing effects.[br][br]
 func shake() -> void:
 	if not wrapper or not wrapper.visible:
 		return
@@ -352,7 +367,7 @@ func shake() -> void:
 	await shake_tween.finished
 
 
-## Starts monitoring panel size changes to automatically update wrapper size when panel content changes.
+## Starts monitoring panel size changes to automatically update wrapper size.[br][br]
 func start_monitoring() -> void:
 	if _monitoring or not panel:
 		return
@@ -361,7 +376,7 @@ func start_monitoring() -> void:
 		_monitoring = true
 
 
-## Stops monitoring panel size changes and disconnects the size_changed signal.
+## Stops monitoring panel size changes and disconnects the signal.[br][br]
 func stop_monitoring() -> void:
 	if not _monitoring or not panel:
 		return
@@ -370,6 +385,7 @@ func stop_monitoring() -> void:
 	_monitoring = false
 
 
+## Called when panel minimum size changes to update wrapper size.[br][br]
 func _on_panel_size_changed() -> void:
 	if not is_open or not wrapper or not wrapper.visible or not panel:
 		return
@@ -382,7 +398,13 @@ func _on_panel_size_changed() -> void:
 		if abs(wrapper.custom_minimum_size.x - new_width) > 1.0:
 			wrapper.custom_minimum_size.x = new_width
 		
-		
+
+
+## Initializes the animator with wrapper and panel Controls and configuration.[br][br]
+##
+## @param panel_wrapper - The wrapper Control that contains the panel[br]
+## @param panel_container - The panel Control to animate[br]
+## @param config - The animator configuration resource[br]
 func _init(panel_wrapper: Control, panel_container: Control, config: ButteredSausageAnimatorConfig) -> void:
 	wrapper = panel_wrapper
 	panel = panel_container
