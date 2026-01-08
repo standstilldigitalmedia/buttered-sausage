@@ -5,9 +5,7 @@ BUTTERED SAUSAGE - CODE IMPROVEMENT TODO LIST
 in reverse. This should be a configurable option that also allows for the option to not play a closing 
 animation at all and just hide()#
 
-#scale works but it is only scaling from the top left. I think it should have a pivot point like the rotation
-animation.#
-
+#scale works#
 #rotation works#
 #Color works.#
 #size works#

@@ -34,7 +34,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 - Animation chains - sequential series of effects
 - Multiple simultaneous effects: slide, scale, fade, rotation, color, position
 - Shake effect for emphasis
-- Configurable pivot points for rotation
+- Configurable pivot points for rotation and scale
 - Full control over timing, easing, and transitions
 - Support for looping animations
 
@@ -251,6 +251,9 @@ Each config can enable multiple effects simultaneously:
 - `animate_scale` - Enable scale effect
 - `scale_from` - Starting scale (e.g., Vector2(0.9, 0.9))
 - `scale_to` - Ending scale (e.g., Vector2.ONE)
+- `scale_pivot_preset` - Pivot point for scaling (CENTER, TOP_LEFT, BOTTOM_RIGHT, etc.)
+- `scale_pivot_custom` - Custom pivot point if using CUSTOM preset
+- **Note:** If both scale and rotation animations are enabled, the rotation pivot takes precedence since rotation is typically more sensitive to pivot placement.
 
 **Fade Animation:**
 - `animate_fade` - Enable fade effect

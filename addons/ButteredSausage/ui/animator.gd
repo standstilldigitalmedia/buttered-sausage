@@ -34,7 +34,7 @@ func configure(config: ButteredSausageAnimatorConfig) -> ButteredSausageAnimator
 	return self
 
 
-## Calculates the pivot offset based on the configured pivot preset for a given control
+## Calculates the pivot offset based on the configured rotation pivot preset for a given control
 func _get_pivot_offset(node: Control) -> Vector2:
 	match animator_config.rotation_pivot_preset:
 		ButteredSausageAnimatorConfig.RotationPivot.TOP_LEFT:
@@ -57,6 +57,32 @@ func _get_pivot_offset(node: Control) -> Vector2:
 			return node.size
 		ButteredSausageAnimatorConfig.RotationPivot.CUSTOM:
 			return animator_config.rotation_pivot_custom
+	return Vector2.ZERO
+
+
+## Calculates the pivot offset based on the configured scale pivot preset for a given control
+func _get_scale_pivot_offset(node: Control) -> Vector2:
+	match animator_config.scale_pivot_preset:
+		ButteredSausageAnimatorConfig.RotationPivot.TOP_LEFT:
+			return Vector2.ZERO
+		ButteredSausageAnimatorConfig.RotationPivot.TOP_CENTER:
+			return Vector2(node.size.x / 2, 0)
+		ButteredSausageAnimatorConfig.RotationPivot.TOP_RIGHT:
+			return Vector2(node.size.x, 0)
+		ButteredSausageAnimatorConfig.RotationPivot.CENTER_LEFT:
+			return Vector2(0, node.size.y / 2)
+		ButteredSausageAnimatorConfig.RotationPivot.CENTER:
+			return node.size / 2
+		ButteredSausageAnimatorConfig.RotationPivot.CENTER_RIGHT:
+			return Vector2(node.size.x, node.size.y / 2)
+		ButteredSausageAnimatorConfig.RotationPivot.BOTTOM_LEFT:
+			return Vector2(0, node.size.y)
+		ButteredSausageAnimatorConfig.RotationPivot.BOTTOM_CENTER:
+			return Vector2(node.size.x / 2, node.size.y)
+		ButteredSausageAnimatorConfig.RotationPivot.BOTTOM_RIGHT:
+			return node.size
+		ButteredSausageAnimatorConfig.RotationPivot.CUSTOM:
+			return animator_config.scale_pivot_custom
 	return Vector2.ZERO
 
 
@@ -131,6 +157,8 @@ func play() -> void:
 	# Setup initial states for animations
 	if animator_config.animate_scale:
 		panel.scale = animator_config.scale_from
+		# Set pivot offset for scale (will be overridden by rotation if both are enabled)
+		panel.pivot_offset = _get_scale_pivot_offset(panel)
 	if animator_config.animate_rotation:
 		if animator_config.rotation_orbit:
 			# Orbital rotation: rotate the panel around a pivot (creates sweeping circular motion)

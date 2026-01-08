@@ -15,6 +15,8 @@ enum RotationPivot { TOP_LEFT, TOP_CENTER, TOP_RIGHT, CENTER_LEFT, CENTER, CENTE
 @export var animate_scale: bool = false
 @export var scale_from: Vector2 = Vector2(0.9, 0.9)
 @export var scale_to: Vector2 = Vector2.ONE
+@export var scale_pivot_preset: RotationPivot = RotationPivot.CENTER
+@export var scale_pivot_custom: Vector2 = Vector2.ZERO
 
 @export_group("Fade")
 @export var animate_fade: bool = false
