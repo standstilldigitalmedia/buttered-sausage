@@ -1,40 +1,18 @@
 BUTTERED SAUSAGE - CODE IMPROVEMENT TODO LIST
 ==============================================
 
-#size and placement of panels needs to be configurable. Horizontal stack almost never makes sense unless we
-turn the text on its side and then its hard to read. Probably won't include a horizontal stack option. 
-However, people may want to start at the top and populate down or start at the bottom and poulate up
-Additional Notes: We need an element that puts itself at the bottom of the scene tree so it is always on top
-and takes up the entire width and height of its container. When new messages are added, it needs to check if
-it is at the bottom of the scene tree and if not, I guess unparent and reparent the main container? This container
-can not block mouse clicks or other input but some of its children or their children may need to receive input. 
-In this container, we will have a VBoxContainer with fixed width. This width will be configurable. Also, the 
-anchor points can be configured to upper left, center, etc with offsets. Horizontal animations should slide 
-out to the same configurable width as the VBox. Vertical animations should slide out to the height defined by 
-get_combined_minimum_size().y of the message panel. We've changed these elements around so much trying to get 
-things to work and there are only a few elements per scene, I think we'll just create all these scenes over 
-from scratch. We can keep a lot of the code.
-Additonal note: I think this is partially implemented. Display has a panel container at it's root and it is set to full rect.
-I just set Mouse -> filter to Pass(Propagate Up) on the panel container. Not sure if we even need the margin
-container anymore. Size and placement isn't curently configurable#
-
-#We need to add a warning in README about the string comparison in create_message in ButteredSausageDisplay. 
-People might be tempted to return an error like "The name: " + name_line_edit.text + " is invalid." This will 
-cause validation messages to spam because each returned error will be different if they are listening for 
-changes to name_line_edit.text.#
-
-#orbital rotation is working. in-place rotation is not working.#
+#The default behavior when no animations are specified in close_animation_chain is to play the first animation 
+in reverse. This should be a configurable option that also allows for the option to not play a closing 
+animation at all and just hide()#
 
 #scale works but it is only scaling from the top left. I think it should have a pivot point like the rotation
 animation.#
 
-#I remember why color isn't working now. We need to set the color to white so that when the color is modulated,
-it appears correctly.
-Additional comment: Color now works.#
-
+#rotation works#
+#Color works.#
 #size works#
-#fade works.#
-#position works.#
+#fade works#
+#position works#
 #shake works#
 
 1. Fix all AWOC/SSDM references in comments and doc strings to use ButteredSausage
@@ -75,48 +53,14 @@ screen readers? Are there other accessibility options we need to consider?#
 
 LOWER PRIORITY (Nice to Have)
 ------------------------------
-
-16. Add keyboard navigation support
-	- Tab to focus panels
-	- Escape to close focused panel
-	- Arrow keys to navigate between panels
-#I'm not sure how useful this would be as most panels are going to autodismiss after a few seconds anyway.
-Not to mention if someone wants to use this in their game, they may have tab and escape doing other things.
-They may not want the messages to close when esc is pressed.#
-
 17. Add hover-to-pause auto-dismiss feature
 	- Stop auto-dismiss timer when mouse hovers over panel
 	- Resume when mouse leaves
 	- Improves UX for reading long messages
 #This one I like. For sure, must have#
 
-18. Add ability to update panel colors after creation
-	- Currently can only set colors in setup()
-	- Add update_colors() method or similar
-
-20. Add tween cleanup in animator destructor
-	- Ensure tweens are killed when animator is freed
-	- Prevent potential memory leaks
-#needs to be implemented.
-
-
 DOCUMENTATION UPDATES (Do After Code Fixes)
 --------------------------------------------
-
-21. Update README.md with correct class names
-	- Replace all SSDMResult with ButteredSausage
-	- Replace all SSDMErrorDisplay with ButteredSausageDisplay
-	- Replace all SSDMSlideAnimator with ButteredSausageAnimator
-	- Update all code examples
-
-22. Add migration guide section to README
-	- For users coming from AWOC/SSDM versions
-	- Simple find/replace instructions
-#there are no users coming from AWOC. AWOC is pre-alpha.#
-
-23. Update API reference section
-	- Ensure all method signatures are current
-	- Add examples for new features (after implementing)
 
 24. Add troubleshooting section
 	- Common issues and solutions

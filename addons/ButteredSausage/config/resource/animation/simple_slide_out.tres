@@ -6,5 +6,7 @@
 script = ExtResource("1_phkx2")
 animate_size = false
 scale_from = Vector2(0.1, 0.1)
+rotation_to_degrees = 360.0
+position_offset = Vector2(10, 10)
 color_from = Color(1, 0, 0, 1)
 color_to = Color(0, 0, 1, 1)

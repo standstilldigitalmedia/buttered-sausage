@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c4u8l5ya7yuh0" path="res://addons/ButteredSausage/ui/display/display.tscn" id="2_error_display"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5jgn0"]
-bg_color = Color(0, 0, 0, 0)
+bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.15, 0.15, 0.18, 1)

@@ -53,7 +53,7 @@ All classes use the `ButteredSausage` prefix to avoid naming conflicts with othe
 var result := ButteredSausage.success("Operation completed!")
 ```
 
-**Curious about the name?** This addon was originally developed as part of the [AWOC (Avatar Wardrobe Organizer and Colorer)](https://github.com/standstill-interactive/awoc) system, where robust error handling and user feedback were essential. The original prefix was "SSDM" (Standstill Digital Media), but has been rebranded to Buttered Sausage for wider release.
+**Curious about the name?** This addon was originally developed as part of the [AWOC (Avatar Wardrobe Organizer and Colorer)](https://github.com/standstilldigitalmedia/AWOC) system, where robust error handling and user feedback were essential. The original prefix was "SSDM" (Standstill Digital Media), but has been rebranded to Buttered Sausage for wider release.
 
 ## Installation
 
@@ -154,6 +154,24 @@ parent_result.merge_from(child2)
 
 error_display.populate_from_result(parent_result)
 ```
+
+## Important Notes
+
+### Message Deduplication
+
+Buttered Sausage prevents duplicate messages from spamming the display. When creating a message, it checks all existing panels and won't create a new one if an identical message already exists (based on exact string comparison).
+
+**Warning:** Avoid using dynamic strings that change with each call:
+
+```gdscript
+# BAD - Creates a new panel every time because the string is different
+error_display.show_error("The name: " + name_input.text + " is invalid")
+
+# GOOD - Uses a static message, won't create duplicates
+error_display.show_error("Invalid name format")
+```
+
+This is especially important when validating text input in real-time (e.g., listening to `text_changed` signals). Use generic, static messages to avoid panel spam.
 
 ## Configuration
 
@@ -352,7 +370,7 @@ MIT License - See LICENSE file for details
 
 ## Credits
 
-Developed by [Standstill Digital Media](https://standstilldigitalmedia.com)
+Developed by [Standstill Digital Media](https://github.com/standstilldigitalmedia/)
 
 ## Contributing
 

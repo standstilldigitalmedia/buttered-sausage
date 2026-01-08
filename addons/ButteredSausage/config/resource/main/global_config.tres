@@ -10,7 +10,6 @@
 script = ExtResource("1_k50aj")
 position_preset = 0
 margin_from_edge = 0.0
-reverse_panel_order = true
 success_config = ExtResource("4_walfm")
 error_config = ExtResource("1_oldt4")
 warning_config = ExtResource("5_ckkuy")
