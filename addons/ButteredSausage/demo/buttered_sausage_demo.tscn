@@ -19,7 +19,7 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[node name="MessageDisplayDemo" type="Control" node_paths=PackedStringArray("main_message", "warning_1", "warning_2", "warning_3", "info_1", "info_2", "enable_stacking", "buttered_sausage_display")]
+[node name="MessageDisplayDemo" type="Control" node_paths=PackedStringArray("main_message", "warning_1", "warning_2", "warning_3", "info_1", "info_2", "max_panels_spinbox", "buttered_sausage_display")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,7 +33,7 @@ warning_2 = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer
 warning_3 = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Warning3")
 info_1 = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Info1")
 info_2 = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/Info2")
-enable_stacking = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/EnableStacking")
+max_panels_spinbox = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/MaxPanelsSpinBox")
 buttered_sausage_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect/ButteredSausageDisplay")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
@@ -59,13 +59,13 @@ theme_override_constants/separation = 10
 [node name="Title" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "AWOCResult + ErrorDisplay Demo"
+text = "Buttered Sausage Demo"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-text = "Enter messages below and click buttons to see the error display system in action"
+text = "Enter messages below and click buttons to see the message display system in action"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer"]
@@ -157,11 +157,16 @@ text = "Options"
 [node name="HSeparator3" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="EnableStacking" type="CheckBox" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="MaxPanelsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Max Visible Panels (0 = unlimited, 1 = single panel mode):"
+
+[node name="MaxPanelsSpinBox" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-button_pressed = true
-text = "Enable Stacking"
+max_value = 20.0
+rounded = true
+allow_greater = true
 
 [node name="HSeparator4" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -212,7 +217,7 @@ stretch_mode = 5
 unique_name_in_owner = true
 layout_mode = 1
 
-[connection signal="toggled" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/EnableStacking" to="." method="_on_enable_stacking_toggled"]
+[connection signal="value_changed" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/MaxPanelsSpinBox" to="." method="_on_max_panels_value_changed"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowSuccess" to="." method="_on_show_success_pressed"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowError" to="." method="_on_show_error_pressed"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowWarning" to="." method="_on_show_warning_pressed"]

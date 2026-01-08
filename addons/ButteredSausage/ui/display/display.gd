@@ -6,19 +6,10 @@
 class_name ButteredSausageDisplay
 extends Control
 
-enum Severity {
-	SUCCESS,
-	INFO,
-	WARNING,
-	ERROR
-}
-
 @export var message_panel_scene: PackedScene
 @export var content_container: VBoxContainer
 @export var global_config: ButteredSausageGlobalConfig
 
-var stacking_enabled: bool = true
-var current_panel: ButteredSausagePanel = null
 var _positioning_applied: bool = false
 var _target_position: Vector2 = Vector2.ZERO
 var _anchor_to_bottom: bool = false
@@ -26,55 +17,62 @@ var _debug_counter: int = 0
 
 
 ## Closes all message panels and hides the display.
-func clear_messages() -> void:
-	for child in content_container.get_children():
-		if child is ButteredSausagePanel:
-			child.close()
-	hide()
-			
-			
-## Keeps only the panel with the highest priority severity and closes all others.[br][br]
-## Priority order: ERROR > SUCCESS > WARNING > INFO
-func keep_highest_priority_panel() -> void:
-	var panels: Array = []
-	if !content_container:
-		push_error("content_container must be set on buttered_sausage_display.tscn in the inspector")
-		return
-	for child in content_container.get_children():
-		if child is ButteredSausagePanel:
-			panels.append(child)
-	if panels.size() == 0:
-		current_panel = null
-		return
-	var highest_priority_panel = panels[0]
-	var highest_priority = _get_severity_priority(highest_priority_panel.severity)
-	for panel in panels:
-		var priority = _get_severity_priority(panel.severity)
-		if priority > highest_priority:
-			highest_priority = priority
-			highest_priority_panel = panel
-	for panel in panels:
-		if panel != highest_priority_panel:
-			panel.close()
-	current_panel = highest_priority_panel
-
-
-## Enables or disables message stacking. When disabled, only one message is shown at a time.[br][br]
-##
-## @param enabled - True to allow multiple messages, false to show only highest priority
-func set_stacking_enabled(enabled: bool) -> void:
-	stacking_enabled = enabled
-	if not enabled:
-		keep_highest_priority_panel()
-
-
-## Closes all message panels and hides the display.[br][br]
 func clear_all_panels() -> void:
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
 			child.close()
-	current_panel = null
 	hide()
+
+
+## Enforces max_visible_panels limit by closing panels
+## @param new_severity - The severity of the panel about to be created
+## @return true if the new panel should be created, false otherwise
+func _enforce_panel_limit(new_severity: int) -> bool:
+	if global_config.max_visible_panels <= 0:
+		return true  # Unlimited panels, always create
+
+	var panels: Array[ButteredSausagePanel] = []
+	for child in content_container.get_children():
+		if child is ButteredSausagePanel:
+			panels.append(child)
+
+	# Special case: max_visible_panels = 1 (single panel mode)
+	# Only create new panel if it has higher or equal priority than existing
+	if global_config.max_visible_panels == 1:
+		var new_priority = _get_severity_priority(new_severity)
+		var should_create = true
+
+		for panel in panels:
+			var panel_priority = _get_severity_priority(panel.panel_config.severity)
+			if panel_priority > new_priority:
+				# Existing panel has higher priority, don't create new one
+				should_create = false
+			else:
+				# New panel has higher or equal priority, remove existing
+				_remove_panel_immediately(panel)
+
+		return should_create
+
+	# For max_visible_panels > 1: Remove oldest panels (FIFO) until under limit
+	# We want to stay at (max - 1) to make room for the new panel about to be added
+	while panels.size() >= global_config.max_visible_panels:
+		var oldest_panel = panels[0]  # First panel is oldest (FIFO)
+		_remove_panel_immediately(oldest_panel)
+		panels.remove_at(0)
+
+	return true  # Always create for limited mode
+
+
+## Immediately removes a panel from the tree and frees it
+func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
+	# Stop any timers and mark as closing to stop looping animations
+	panel.is_closing = true
+	if panel.auto_dismiss_timer and is_instance_valid(panel.auto_dismiss_timer):
+		panel.auto_dismiss_timer.stop()
+	# Remove from tree immediately to prevent any further processing
+	content_container.remove_child(panel)
+	# Queue for deletion
+	panel.queue_free()
 	
 	
 ## Creates and displays a message panel with specified severity.[br][br]
@@ -88,14 +86,7 @@ func create_message(msg: String, severity: int) -> void:
 		await get_tree().process_frame  # Wait for layout
 		_apply_position_preset()
 
-	if not stacking_enabled and current_panel != null and is_instance_valid(current_panel):
-		if current_panel.panel_config.severity == severity:
-			current_panel.update_message(msg)
-			return
-		else:
-			current_panel.slide_closed()
-	if not stacking_enabled:
-		clear_all_panels()
+	# Check for duplicate message
 	var found: bool = false
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
@@ -103,6 +94,10 @@ func create_message(msg: String, severity: int) -> void:
 				found = true
 				break
 	if !found:
+		# Enforce panel limit before creating new panel
+		if not _enforce_panel_limit(severity):
+			return  # Don't create panel, existing higher priority panel takes precedence
+
 		var panel = message_panel_scene.instantiate()
 		if !message_panel_scene:
 			push_error("message_panel_scene must be set on buttered_sausage_display.tscn in the inspector")
@@ -114,79 +109,67 @@ func create_message(msg: String, severity: int) -> void:
 			content_container.move_child(panel, 0)
 
 		match severity:
-			ButteredSausageDisplay.Severity.SUCCESS:
+			ButteredSausageDisplay.ButteredSausageSeverity.Level.SUCCESS:
 				panel.setup(msg, global_config.success_config)
-			ButteredSausageDisplay.Severity.ERROR:
+			ButteredSausageDisplay.ButteredSausageSeverity.Level.ERROR:
 				panel.setup(msg, global_config.error_config)
-			ButteredSausageDisplay.Severity.WARNING:
+			ButteredSausageDisplay.ButteredSausageSeverity.Level.WARNING:
 				panel.setup(msg, global_config.warning_config)
-			ButteredSausageDisplay.Severity.INFO:
+			ButteredSausageDisplay.ButteredSausageSeverity.Level.INFO:
 				panel.setup(msg, global_config.info_config)
 		panel.slide_open()
-		if not stacking_enabled:
-			current_panel = panel
 
 	show()
 
 
-## Populates the display with messages from an SSDMResult object.[br]
-## If stacking is enabled, shows the main message and all detail messages.[br]
-## If stacking is disabled, shows only the highest priority message.[br][br]
+## Populates the display with messages from a ButteredSausage result object.[br]
+## Shows the main message and all detail messages.[br][br]
 ##
-## @param result - The SSDMResult containing message and details to display
+## @param result - The ButteredSausage result containing message and details to display
 func populate_from_result(result: ButteredSausage) -> void:
-	if stacking_enabled:
-		create_message(result.message, result.severity)
-		for detail in result.details:
-			create_message(detail["message"], detail["severity"])
-	else:
-		var highest_severity = result.severity
-		var highest_message = result.message
-		for detail in result.details:
-			if _get_severity_priority(detail["severity"]) > _get_severity_priority(highest_severity):
-				highest_severity = detail["severity"]
-				highest_message = detail["message"]
-		create_message(highest_message, highest_severity)
+	create_message(result.message, result.severity)
+	for detail in result.details:
+		create_message(detail["message"], detail["severity"])
 		
 					
 ## Shows an error message.[br][br]
 ##
 ## @param message - The error message to display
 func show_error(message: String) -> void:
-	create_message(message, Severity.ERROR)
+	create_message(message, ButteredSausageSeverity.Level.ERROR)
 
 
 ## Shows a success message.[br][br]
 ##
 ## @param message - The success message to display
 func show_success(message: String) -> void:
-	create_message(message, Severity.SUCCESS)
+	create_message(message, ButteredSausageSeverity.Level.SUCCESS)
 
 
 ## Shows a warning message.[br][br]
 ##
 ## @param message - The warning message to display
 func show_warning(message: String) -> void:
-	create_message(message, Severity.WARNING)
+	create_message(message, ButteredSausageSeverity.Level.WARNING)
 
 
 ## Shows an info message.[br][br]
 ##
 ## @param message - The info message to display
 func show_info(message: String) -> void:
-	create_message(message, Severity.INFO)
-			
+	create_message(message, ButteredSausageSeverity.Level.INFO)
+
 
 func _get_severity_priority(severity: int) -> int:
 	match severity:
-		Severity.ERROR:
-			return 3
-		Severity.SUCCESS:
-			return 2
-		Severity.WARNING:
-			return 1
-		Severity.INFO:
-			return 0
+		ButteredSausageSeverity.Level.ERROR:
+			return global_config.error_priority
+		ButteredSausageSeverity.Level.SUCCESS:
+			return global_config.success_priority
+		ButteredSausageSeverity.Level.WARNING:
+			return global_config.warning_priority
+		ButteredSausageSeverity.Level.INFO:
+			return global_config.info_priority
 	return 0
 
 

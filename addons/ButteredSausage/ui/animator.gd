@@ -111,6 +111,8 @@ func play() -> void:
 	if not _has_animations():
 		wrapper.show()
 		await wrapper.get_tree().process_frame
+		if not is_instance_valid(wrapper) or not is_instance_valid(panel):
+			return  # Objects were freed during await
 		if animator_config.axis == Axis.VERTICAL:
 			wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
 			wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if animator_config.open_direction == OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
@@ -147,6 +149,8 @@ func play() -> void:
 		# No size animation - set wrapper to match panel size immediately
 		wrapper.show()
 		await wrapper.get_tree().process_frame
+		if not is_instance_valid(wrapper) or not is_instance_valid(panel):
+			return  # Objects were freed during await
 		if animator_config.axis == Axis.VERTICAL:
 			wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
 			wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if animator_config.open_direction == OpenDirection.POSITIVE else Control.SIZE_SHRINK_END

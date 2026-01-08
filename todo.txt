@@ -1,9 +1,10 @@
 BUTTERED SAUSAGE - CODE IMPROVEMENT TODO LIST
 ==============================================
 
-#The default behavior when no animations are specified in close_animation_chain is to play the first animation 
-in reverse. This should be a configurable option that also allows for the option to not play a closing 
-animation at all and just hide()#
+The class ButteredSausage only depends on Display for the Severity enum. Should we move this enum into its
+own file for people who just want to use the result functionality of Buttered Sausage and not all the display
+and animation that comes with Display and all its dependencies? I think Animator can stand on it's own too
+with only AnimatorConfig as a dependency. 
 
 #scale works#
 #rotation works#

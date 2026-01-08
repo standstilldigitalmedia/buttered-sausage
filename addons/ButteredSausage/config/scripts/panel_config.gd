@@ -6,6 +6,11 @@ enum Axis { VERTICAL, HORIZONTAL }
 enum OpenDirection { POSITIVE, NEGATIVE }
 enum AnchorPresets {TopLeft, TopCenter, TopRight, CenterLeft, Center, CenterRight, BottomLeft, BottomCenter, BottomRight}
 enum Alignment {Left, Center, Right, Justify}
+enum CloseBehavior {
+	REVERSE_FIRST_ANIMATION,  ## Reverse the first animation from animation_chain
+	MIRROR_FULL_CHAIN,        ## Reverse entire animation_chain in reverse order
+	NO_ANIMATION              ## Hide immediately without animation
+}
 
 @export_group("Background Color")
 @export var background_color: Color = Color(0.2, 0.6, 0.2, 0.9)
@@ -56,10 +61,10 @@ enum Alignment {Left, Center, Right, Justify}
 @export_group("Animation Chain")
 @export var animation_chain: Array[ButteredSausageAnimatorConfig] = []
 @export var close_animation_chain: Array[ButteredSausageAnimatorConfig] = []
-@export var mirror_full_open_chain_on_close: bool = false
+@export var close_behavior: CloseBehavior = CloseBehavior.REVERSE_FIRST_ANIMATION
 
 @export_group("Severity")
-@export var severity: ButteredSausageDisplay.Severity = ButteredSausageDisplay.Severity.SUCCESS
+@export var severity: ButteredSausageSeverity.Level = ButteredSausageSeverity.Level.SUCCESS
 
 
 func create_stylebox() -> StyleBox:

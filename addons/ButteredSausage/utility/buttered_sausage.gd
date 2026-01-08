@@ -8,7 +8,7 @@ extends RefCounted
 var message: String
 var data: Variant
 var error: Error
-var severity: ButteredSausageDisplay.Severity
+var severity: ButteredSausageSeverity.Level
 var details: Array[Dictionary] = []
 
 
@@ -18,7 +18,7 @@ var details: Array[Dictionary] = []
 ## @param data - Optional data payload to include with the result[br]
 ## @return A new AWOCResult with SUCCESS severity and OK error code[br]
 static func success(msg: String = "", data: Variant = null) -> ButteredSausage:
-	return ButteredSausage.new(msg, data, OK, ButteredSausageDisplay.Severity.SUCCESS)
+	return ButteredSausage.new(msg, data, OK, ButteredSausageSeverity.Level.SUCCESS)
 
 
 ## Creates a failure result with optional message, data, and error code.[br][br]
@@ -28,7 +28,7 @@ static func success(msg: String = "", data: Variant = null) -> ButteredSausage:
 ## @param p_error - The error code (defaults to FAILED)[br]
 ## @return A new AWOCResult with ERROR severity and specified error code
 static func failure(msg: String = "", data: Variant = null, p_error: Error = FAILED) -> ButteredSausage:
-	return ButteredSausage.new(msg, data, p_error, ButteredSausageDisplay.Severity.ERROR)
+	return ButteredSausage.new(msg, data, p_error, ButteredSausageSeverity.Level.ERROR)
 
 
 ## Creates a warning result with optional message, data, and error code.[br][br]
@@ -38,7 +38,7 @@ static func failure(msg: String = "", data: Variant = null, p_error: Error = FAI
 ## @param p_error - The error code (defaults to FAILED)[br]
 ## @return A new AWOCResult with WARNING severity
 static func warning(msg: String = "", data: Variant = null, p_error: Error = FAILED) -> ButteredSausage:
-	return ButteredSausage.new(msg, data, p_error, ButteredSausageDisplay.Severity.WARNING)
+	return ButteredSausage.new(msg, data, p_error, ButteredSausageSeverity.Level.WARNING)
 
 
 ## Creates an info result with optional message, data, and error code.[br][br]
@@ -48,7 +48,7 @@ static func warning(msg: String = "", data: Variant = null, p_error: Error = FAI
 ## @param p_error - The error code (defaults to FAILED)[br]
 ## @return A new AWOCResult with INFO severity
 static func info(msg: String = "", data: Variant = null, p_error: Error = FAILED) -> ButteredSausage:
-	return ButteredSausage.new(msg, data, p_error, ButteredSausageDisplay.Severity.INFO)
+	return ButteredSausage.new(msg, data, p_error, ButteredSausageSeverity.Level.INFO)
 	
 
 ## Adds a detail message with specified severity to this result. Supports builder pattern chaining.[br][br]
@@ -56,7 +56,7 @@ static func info(msg: String = "", data: Variant = null, p_error: Error = FAILED
 ## @param msg - The detail message to add[br]
 ## @param sev - The severity level of the detail message[br]
 ## @return This AWOCResult instance for method chaining
-func with_detail(msg: String, sev: ButteredSausageDisplay.Severity) -> ButteredSausage:
+func with_detail(msg: String, sev: ButteredSausageSeverity.Level) -> ButteredSausage:
 	details.append({"message": msg, "severity": sev})
 	return self
 
@@ -66,7 +66,7 @@ func with_detail(msg: String, sev: ButteredSausageDisplay.Severity) -> ButteredS
 ## @param msg - The warning message to add as a detail[br]
 ## @return This AWOCResult instance for method chaining
 func with_warning(msg: String) -> ButteredSausage:
-	return with_detail(msg, ButteredSausageDisplay.Severity.WARNING)
+	return with_detail(msg, ButteredSausageSeverity.Level.WARNING)
 
 
 ## Adds an info detail message to this result. Supports builder pattern chaining.[br][br]
@@ -74,7 +74,7 @@ func with_warning(msg: String) -> ButteredSausage:
 ## @param msg - The info message to add as a detail[br]
 ## @return This AWOCResult instance for method chaining
 func with_info(msg: String) -> ButteredSausage:
-	return with_detail(msg, ButteredSausageDisplay.Severity.INFO)
+	return with_detail(msg, ButteredSausageSeverity.Level.INFO)
 	
 	
 ## Adds an error detail message to this result and updates the error code. Supports builder pattern chaining.[br][br]
@@ -84,7 +84,7 @@ func with_info(msg: String) -> ButteredSausage:
 ## @return This AWOCResult instance for method chaining
 func with_error(msg: String, err: Error = FAILED) -> ButteredSausage:
 	error = err
-	return with_detail(msg, ButteredSausageDisplay.Severity.ERROR)
+	return with_detail(msg, ButteredSausageSeverity.Level.ERROR)
 	
 	
 
@@ -97,7 +97,7 @@ func to_failure(msg: String = "", err: Error = FAILED) -> ButteredSausage:
 	if !msg.is_empty():
 		message = msg
 	error = err
-	severity = ButteredSausageDisplay.Severity.ERROR
+	severity = ButteredSausageSeverity.Level.ERROR
 	return self
 
 
@@ -109,7 +109,7 @@ func to_success(msg: String = "") -> ButteredSausage:
 	if !msg.is_empty():
 		message = msg
 	error = OK
-	severity = ButteredSausageDisplay.Severity.SUCCESS
+	severity = ButteredSausageSeverity.Level.SUCCESS
 	return self
 
 
@@ -122,7 +122,7 @@ func to_warning(msg: String = "", err: Error = FAILED) -> ButteredSausage:
 	if !msg.is_empty():
 		message = msg
 	error = err
-	severity = ButteredSausageDisplay.Severity.WARNING
+	severity = ButteredSausageSeverity.Level.WARNING
 	return self
 
 
@@ -135,7 +135,7 @@ func to_info(msg: String = "", err: Error = FAILED) -> ButteredSausage:
 	if !msg.is_empty():
 		message = msg
 	error = err
-	severity = ButteredSausageDisplay.Severity.INFO
+	severity = ButteredSausageSeverity.Level.INFO
 	return self
 
 
@@ -173,7 +173,7 @@ func is_success() -> bool:
 	return error == OK
 	
 	
-func _init(p_message: String, p_data: Variant, p_error: Error, p_severity: ButteredSausageDisplay.Severity) -> void:
+func _init(p_message: String, p_data: Variant, p_error: Error, p_severity: ButteredSausageSeverity.Level) -> void:
 	message = p_message
 	data = p_data
 	error = p_error

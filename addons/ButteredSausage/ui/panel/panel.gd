@@ -30,7 +30,7 @@ func update_message(message: String) -> void:
 	
 	
 func configure() -> void:
-	var severity: ButteredSausageDisplay.Severity = panel_config.severity
+	var severity: ButteredSausageSeverity.Level = panel_config.severity
 	if !cached_styles.has(severity):
 		var style_box = panel_config.create_stylebox()
 		cached_styles[severity] = style_box
@@ -134,31 +134,40 @@ func close(animate: bool = false) -> void:
 	queue_free()
 
 ## Animates the panel closing based on configuration.[br]
-## Priority: 1) close_animation_chain, 2) mirror full open chain, 3) reverse first animation
+## Priority: 1) close_animation_chain (if provided), 2) close_behavior setting
 func slide_closed() -> void:
-	# If no animations configured at all, just hide
-	if panel_config.animation_chain.is_empty():
-		panel_container.hide()
-		return
-
 	# Priority 1: Use custom close animation chain if provided
 	if not panel_config.close_animation_chain.is_empty():
 		for anim_config in panel_config.close_animation_chain:
 			var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
 			await animator.play()
+		panel_container.hide()
+		return
 
-	# Priority 2: Mirror the full open chain in reverse
-	elif panel_config.mirror_full_open_chain_on_close:
-		for i in range(panel_config.animation_chain.size() - 1, -1, -1):
-			var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[i])
-			await animator.reverse()
+	# Priority 2: Use close_behavior setting
+	match panel_config.close_behavior:
+		ButteredSausagePanelConfig.CloseBehavior.NO_ANIMATION:
+			# Just hide immediately
+			panel_container.hide()
 
-	# Priority 3: Default - reverse just the first animation
-	else:
-		var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[0])
-		await animator.reverse()
+		ButteredSausagePanelConfig.CloseBehavior.MIRROR_FULL_CHAIN:
+			# Reverse entire animation chain in reverse order
+			if panel_config.animation_chain.is_empty():
+				panel_container.hide()
+			else:
+				for i in range(panel_config.animation_chain.size() - 1, -1, -1):
+					var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[i])
+					await animator.reverse()
+				panel_container.hide()
 
-	panel_container.hide()
+		ButteredSausagePanelConfig.CloseBehavior.REVERSE_FIRST_ANIMATION:
+			# Default - reverse just the first animation
+			if panel_config.animation_chain.is_empty():
+				panel_container.hide()
+			else:
+				var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[0])
+				await animator.reverse()
+				panel_container.hide()
 	
 	
 ## Called when auto-dismiss timer expires

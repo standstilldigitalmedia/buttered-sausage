@@ -18,7 +18,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 
 ### Visual Display System
 - Color-coded severity levels with smooth animations
-- Message stacking or single-message (priority) modes
+- Configurable panel limits (unlimited, single panel, or custom max)
 - Auto-dismiss for non-error messages with hover-to-pause
 - Manual close buttons
 - Animation chains for complex sequences
@@ -29,6 +29,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 - State conversion (success → failure, etc.) while preserving details
 - Merge results from nested operations
 - Type-safe with full autocomplete support
+- Standalone - can be used without the UI/display components
 
 ### Animation System
 - Animation chains - sequential series of effects
@@ -37,6 +38,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 - Configurable pivot points for rotation and scale
 - Full control over timing, easing, and transitions
 - Support for looping animations
+- Standalone animator (`ButteredSausageAnimator` + `ButteredSausageAnimatorConfig`) can be used to animate any Control node
 
 ### Configuration System
 - **ButteredSausageGlobalConfig** - Global positioning, panel width, and per-severity configurations
@@ -93,7 +95,33 @@ func _ready() -> void:
 
 ### Using the Result Pattern
 
-The real power comes from combining visual display with the Result pattern:
+The Result pattern (`ButteredSausage` class + `ButteredSausageSeverity` enum) can be used standalone without the display system or integrated with visual feedback.
+
+**Dependencies:** Only requires `ButteredSausage` and `ButteredSausageSeverity` - no UI components needed.
+
+**Standalone Usage:**
+```gdscript
+func process_data() -> ButteredSausage:
+	var result := ButteredSausage.success("Processing complete")
+
+	if some_warning:
+		result.with_warning("Minor issue detected")
+
+	if critical_error:
+		result.to_failure("Failed to process")
+
+	return result
+
+# Check result without displaying
+func _ready() -> void:
+	var result := process_data()
+	if result.is_success():
+		print("Success: ", result.message)
+	else:
+		print("Failed: ", result.message)
+```
+
+**Integrated with Display:**
 
 ```gdscript
 func save_file(path: String) -> ButteredSausage:
@@ -184,23 +212,30 @@ The `ButteredSausageDisplay` node comes pre-configured with all necessary resour
 - `position_preset` - Screen position (TOP_RIGHT, BOTTOM_LEFT, etc.)
 - `margin_from_edge` - Distance from screen edges (default: 20)
 - `reverse_panel_order` - New panels appear at bottom instead of top
-- `use_single_panel_mode` - Show only highest priority message
+- `max_visible_panels` - Maximum number of visible panels (0 = unlimited)
+- `error_priority`, `success_priority`, `warning_priority`, `info_priority` - Priority values for single panel mode (higher = higher priority)
 - `success_config`, `error_config`, `warning_config`, `info_config` - Per-severity panel configurations
 
-### Display Modes
+### Panel Limits
 
-**Stacking Mode** (default) - Show all messages:
+The `max_visible_panels` setting controls how many panels can be displayed simultaneously:
+
+**Unlimited Mode** (default) - Show all messages:
 ```gdscript
-# In Inspector: set global_config.use_single_panel_mode = false
-# Or programmatically:
-error_display.set_stacking_enabled(true)
+# In Inspector: set global_config.max_visible_panels = 0
 ```
 
-**Priority Mode** - Show only the highest severity message:
+**Single Panel Mode** - Show only the highest priority message:
 ```gdscript
-# In Inspector: set global_config.use_single_panel_mode = true
-# Or programmatically:
-error_display.set_stacking_enabled(false)
+# In Inspector: set global_config.max_visible_panels = 1
+# Uses priority values from global_config (default: ERROR=3, SUCCESS=2, WARNING=1, INFO=0)
+# In case of tie, most recent message wins
+```
+
+**Limited Mode** - Show up to N messages:
+```gdscript
+# In Inspector: set global_config.max_visible_panels = 5
+# When limit is reached, oldest panels are automatically dismissed (FIFO)
 ```
 
 ### Panel Configuration
@@ -227,8 +262,11 @@ Each severity level has its own pre-configured `ButteredSausagePanelConfig` reso
 
 **Animation Chains:**
 - `animation_chain` - Array of `ButteredSausageAnimatorConfig` for opening animations
-- `close_animation_chain` - Array of `ButteredSausageAnimatorConfig` for closing animations
-- `mirror_full_open_chain_on_close` - Reverse the open chain for closing
+- `close_animation_chain` - Array of `ButteredSausageAnimatorConfig` for custom closing animations
+- `close_behavior` - Default closing behavior when `close_animation_chain` is empty:
+  - `REVERSE_FIRST_ANIMATION` (default) - Reverses the first animation from `animation_chain`
+  - `MIRROR_FULL_CHAIN` - Reverses entire `animation_chain` in reverse order
+  - `NO_ANIMATION` - Hides immediately without animation
 
 ### Animation Configuration
 
@@ -306,14 +344,35 @@ After creating your animation configs, add them to the `animation_chain` array i
 2. If any animation has `loop_animation = true`, continuously loop those animations
 3. Stop looping when the panel closes
 
-For closing animations, you have three options:
-1. Define a custom `close_animation_chain`
-2. Set `mirror_full_open_chain_on_close = true` to reverse the entire opening chain
-3. Use the default (reverses only the first animation in the chain)
+For closing animations, you have multiple options:
+1. **Custom close chain** - Define a `close_animation_chain` with specific closing animations (takes precedence)
+2. **Default behavior** - When `close_animation_chain` is empty, use the `close_behavior` setting:
+   - `REVERSE_FIRST_ANIMATION` - Reverses only the first animation (default, fastest)
+   - `MIRROR_FULL_CHAIN` - Reverses entire opening chain in reverse order (mirrors open)
+   - `NO_ANIMATION` - Hides immediately without animation (instant dismiss)
 
 ## API Reference
 
-### ButteredSausageDisplay
+### Standalone Components
+
+These components can be used independently without the full display system:
+
+**ButteredSausageSeverity** - Severity level enum
+- **Dependencies:** None
+- **Usage:** Define message severity levels
+- **Levels:** `SUCCESS`, `INFO`, `WARNING`, `ERROR`
+
+**ButteredSausage** - Result pattern class
+- **Dependencies:** `ButteredSausageSeverity`
+- **Usage:** Encapsulate operation results with messages, errors, and accumulated details
+
+**ButteredSausageAnimator** - Control animation system
+- **Dependencies:** `ButteredSausageAnimatorConfig`
+- **Usage:** Animate any Control node with slides, scales, fades, rotations, colors, and positions
+
+### Full Display System
+
+**ButteredSausageDisplay**
 
 **Main Methods:**
 - `show_success(message: String)` - Display success message (auto-dismiss)
@@ -322,9 +381,8 @@ For closing animations, you have three options:
 - `show_error(message: String)` - Display error message (manual dismiss)
 - `populate_from_result(result: ButteredSausage)` - Display all messages from a Result object
 - `clear_all_panels()` - Close all message panels
-- `set_stacking_enabled(enabled: bool)` - Toggle between stacking/priority modes
 
-### ButteredSausage (Result Class)
+**ButteredSausage (Result Class)**
 
 **Factory Methods:**
 - `ButteredSausage.success(msg: String, data: Variant = null)` - Create success result

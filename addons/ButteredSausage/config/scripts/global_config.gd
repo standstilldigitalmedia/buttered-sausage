@@ -27,9 +27,10 @@ enum PositionPreset {
 @export var warning_config: ButteredSausagePanelConfig
 @export var info_config: ButteredSausagePanelConfig
 
-@export_group("Single Panel Mode")
-## Priority values: Higher number = higher precedence. Set all equal for most-recent-wins behavior.
-@export var use_single_panel_mode: bool = false
+@export_group("Panel Limits")
+## Maximum number of visible panels. 0 = unlimited, 1 = single panel mode. When limit is reached, oldest panels are auto-dismissed.
+@export var max_visible_panels: int = 0
+## Priority values for single panel mode (max_visible_panels = 1). Higher number = higher priority. In case of tie, most recent wins.
 @export var error_priority: int = 3
 @export var success_priority: int = 2
 @export var warning_priority: int = 1

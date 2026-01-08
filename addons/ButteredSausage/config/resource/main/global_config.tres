@@ -14,3 +14,7 @@ success_config = ExtResource("4_walfm")
 error_config = ExtResource("1_oldt4")
 warning_config = ExtResource("5_ckkuy")
 info_config = ExtResource("2_h6xa4")
+max_visible_panels = 1
+error_priority = 1
+warning_priority = 3
+info_priority = 4

@@ -6,7 +6,7 @@ extends Control
 @export var warning_3: LineEdit
 @export var info_1: LineEdit
 @export var info_2: LineEdit
-@export var enable_stacking: CheckBox
+@export var max_panels_spinbox: SpinBox
 @export var buttered_sausage_display: ButteredSausageDisplay
 
 
@@ -16,8 +16,8 @@ func _ready() -> void:
 	warning_2.text = "Failed to delete temporary cache"
 	info_1.text = "Processed 47 files in 2.3 seconds"
 	info_2.text = "Found 3 duplicate entries"
-	enable_stacking.button_pressed = true
-	buttered_sausage_display.set_stacking_enabled(true)
+	max_panels_spinbox.value = 0  # Unlimited by default
+	buttered_sausage_display.global_config.max_visible_panels = 0
 
 
 func _on_show_success_pressed() -> void:
@@ -48,8 +48,8 @@ func _on_clear_display_pressed() -> void:
 	buttered_sausage_display.clear_all_panels()
 
 
-func _on_enable_stacking_toggled(toggled_on: bool) -> void:
-	buttered_sausage_display.set_stacking_enabled(toggled_on)
+func _on_max_panels_value_changed(value: float) -> void:
+	buttered_sausage_display.global_config.max_visible_panels = int(value)
 
 
 func _on_demo_scenarios_pressed() -> void:
@@ -77,8 +77,8 @@ func _on_demo_scenarios_pressed() -> void:
 	buttered_sausage_display.populate_from_result(parent_result)
 	await get_tree().create_timer(1.5).timeout
 	var result3 = ButteredSausage.failure("Cannot create resource - validation failed")
-	result3.with_detail("Resource name 'invalid*name' contains illegal characters", ButteredSausageDisplay.Severity.ERROR)
-	result3.with_detail("Resource name already exists in library", ButteredSausageDisplay.Severity.ERROR)
+	result3.with_detail("Resource name 'invalid*name' contains illegal characters", ButteredSausageSeverity.Level.ERROR)
+	result3.with_detail("Resource name already exists in library", ButteredSausageSeverity.Level.ERROR)
 	result3.with_info("Suggested name: 'invalid_name_2'")
 	buttered_sausage_display.populate_from_result(result3)
 
