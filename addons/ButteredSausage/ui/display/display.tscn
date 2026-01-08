@@ -14,6 +14,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_f5nx2")
 script = ExtResource("1_4271g")
 message_panel_scene = ExtResource("2_cqqm1")

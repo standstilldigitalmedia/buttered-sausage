@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("2_mh6cy")
 background_color = Color(0.48677072, 0.79595864, 0.48452926, 0.90200007)
+label_text_alignment = 2
 icon = ExtResource("3_gyoli")
 close_button_icon = ExtResource("2_ewdwf")
 border_color = Color(0.3491902, 0.735357, 0.3491902, 0.90200007)

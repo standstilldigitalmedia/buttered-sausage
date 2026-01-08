@@ -5,9 +5,13 @@ extends Resource
 enum Axis { VERTICAL, HORIZONTAL }
 enum OpenDirection { POSITIVE, NEGATIVE }
 enum AnchorPresets {TopLeft, TopCenter, TopRight, CenterLeft, Center, CenterRight, BottomLeft, BottomCenter, BottomRight}
+enum Alignment {Left, Center, Right, Justify}
 
 @export_group("Background Color")
 @export var background_color: Color = Color(0.2, 0.6, 0.2, 0.9)
+
+@export_group("Text Alignment")
+@export var label_text_alignment: Alignment = Alignment.Center
 
 @export_group("Font")
 @export var font: Font

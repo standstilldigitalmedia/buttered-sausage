@@ -13,7 +13,6 @@ const PANEL_THEME: String = "panel"
 @export var close_button: Button
 
 var panel_config: ButteredSausagePanelConfig
-var animator: ButteredSausageAnimator
 var is_closing: bool = false
 var auto_dismiss_timer: Timer
 static var cached_styles: Dictionary = {}
@@ -36,6 +35,7 @@ func configure() -> void:
 		message_label.add_theme_font_override("normal_font", panel_config.font)
 	message_label.add_theme_color_override("normal_font", panel_config.font_color)
 	message_label.add_theme_font_size_override("normal_font", panel_config.font_size)
+	message_label.horizontal_alignment = panel_config.label_text_alignment as int
 	if panel_config.hide_icon:
 		icon_texture_rect.hide()
 	else:
@@ -80,7 +80,11 @@ func slide_open() -> void:
 	for anim_config in panel_config.animation_chain:
 		if anim_config.loop_animation:
 			has_looping_animations = true
-		animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
+		if anim_config.animate_color:
+			var stylebox = StyleBoxFlat.new()
+			stylebox.bg_color = Color(1.0, 1.0, 1.0, 1.0)
+			panel_container.add_theme_stylebox_override(PANEL_THEME, stylebox)
+		var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
 		await animator.play()
 
 	# Loop only animations marked for looping
@@ -89,7 +93,7 @@ func slide_open() -> void:
 			for anim_config in panel_config.animation_chain:
 				if not anim_config.loop_animation:
 					continue  # Skip animations not marked for looping
-				animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
+				var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
 				await animator.play()
 				if is_closing:
 					break  # Exit immediately if panel is closing
@@ -119,18 +123,18 @@ func slide_closed() -> void:
 	# Priority 1: Use custom close animation chain if provided
 	if not panel_config.close_animation_chain.is_empty():
 		for anim_config in panel_config.close_animation_chain:
-			animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
+			var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
 			await animator.play()
 
 	# Priority 2: Mirror the full open chain in reverse
 	elif panel_config.mirror_full_open_chain_on_close:
 		for i in range(panel_config.animation_chain.size() - 1, -1, -1):
-			animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[i])
+			var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[i])
 			await animator.reverse()
 
 	# Priority 3: Default - reverse just the first animation
 	else:
-		animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[0])
+		var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[0])
 		await animator.reverse()
 
 	panel_container.hide()

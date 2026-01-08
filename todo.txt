@@ -5,8 +5,6 @@ People might be tempted to return an error like "The name: " + name_line_edit.te
 cause validation messages to spam because each returned error will be different if they are listening for 
 changes to name_line_edit.text.#
 
-#only two sides of Panel border are configurable. The other two sides need to be added to Config with 
-default size of 0.#
 
 #size and placement of panels needs to be configurable. Horizontal stack almost never makes sense unless we
 turn the text on its side and then its hard to read. Probably won't include a horizontal stack option. 
@@ -20,21 +18,33 @@ anchor points can be configured to upper left, center, etc with offsets. Horizon
 out to the same configurable width as the VBox. Vertical animations should slide out to the height defined by 
 get_combined_minimum_size().y of the message panel. We've changed these elements around so much trying to get 
 things to work and there are only a few elements per scene, I think we'll just create all these scenes over 
-from scratch. We can keep a lot of the code.#
-
-#priority order for the single panel display mode needs to be configurable.#
-
-#we have icons now, straight from the Godot repository. res://addons/ButteredSausage/ui/images three names are 
-self-explanatory. LightOccluder2D.svg looks like a light bulb. It was the closest to Info as I could get. We
-need to add to the documents here and in AWOC that all icons used are from the Godot repository. Icon images
-should probably be configurable too. A bool in config will allow the user to easily turn off icons.#
-
-#label text alignment should be configurable.#
+from scratch. We can keep a lot of the code.
+Additonal note: I think this is partially implemented. Display has a panel container at it's root and it is set to full rect.
+I just set Mouse -> filter to Pass(Propagate Up) on the panel container. Not sure if we even need the margin
+container anymore.#
 
 #SSDM logo in every demo res://addons/ButteredSausage/ui/images/standstill_logo.png It is white text on a 
 black background.#
 
-#need to give the option to not play any animation and just show() and hide()#
+#panel_size does nothing#
+
+#if an animation in the chain has no animations configured, Godot starts throwing errors because there is 
+nothing to tween.#
+
+#orbital rotation is working. in-place rotation is not working.#
+
+#scale works but it is only scaling from the top left. I think it should have a pivot point like the rotation
+animation.#
+
+#I remember why color isn't working now. We need to set the color to white so that when the color is modulated,
+it appears correctly.
+Additional comment: Color now works.#
+
+#size works#
+#fade works.#
+#position works.#
+#shake works#
+
 
 
 1. Fix all AWOC/SSDM references in comments and doc strings to use ButteredSausage
@@ -54,6 +64,13 @@ MISSING FEATURES
 	- Prevent infinite panel spam
 	- Auto-dismiss oldest when limit reached
 	- Add to ButteredSausageDisplay as @export var max_visible_panels: int = 0 (0 = unlimited)
+#I think keep_highest_priority_panel in ButteredSausageDisplay could be modified to accomplish this. This
+would also eliminate the need for the use_single_panel_mode bool in GlobalConfig. Instead, we'd now have a
+max_panels: int If 0, unlimited. If 1, only the highest priority. If more than 1, get rid of the ones that have
+the least amount of time left on their auto-dismiss timer until there are only max_panels left. If all the auto-
+dismiss panels have been removed and we still have more than max_panels, get rid of the panel that has been
+shown the longest first. Or maybe just get rid of the one that has been shown the longest until there are
+max_panels left.#
 
 14. Add panel_closed signal to ButteredSausageDisplay
 	- Emit when all panels are dismissed
@@ -88,10 +105,6 @@ They may not want the messages to close when esc is pressed.#
 18. Add ability to update panel colors after creation
 	- Currently can only set colors in setup()
 	- Add update_colors() method or similar
-
-19. Add global animation style configuration
-	- Currently hardcoded per severity
-	- Allow users to customize animation profiles
 
 20. Add tween cleanup in animator destructor
 	- Ensure tweens are killed when animator is freed
