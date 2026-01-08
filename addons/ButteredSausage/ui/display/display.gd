@@ -4,7 +4,7 @@
 ## Integrates with SSDMResult for displaying operation results with details.[br]
 ## Configure colors, timings, and styling through exported variables in the inspector.
 class_name ButteredSausageDisplay
-extends PanelContainer
+extends Control
 
 enum Severity {
 	SUCCESS,
@@ -19,6 +19,10 @@ enum Severity {
 
 var stacking_enabled: bool = true
 var current_panel: ButteredSausagePanel = null
+var _positioning_applied: bool = false
+var _target_position: Vector2 = Vector2.ZERO
+var _anchor_to_bottom: bool = false
+var _debug_counter: int = 0
 
 
 ## Closes all message panels and hides the display.
@@ -78,6 +82,12 @@ func clear_all_panels() -> void:
 ## @param msg - The message text to display[br]
 ## @param severity - The severity level (use Severity enum)
 func create_message(msg: String, severity: int) -> void:
+	# Apply positioning FIRST if not yet applied
+	if not _positioning_applied:
+		show()  # Must be visible for sizing
+		await get_tree().process_frame  # Wait for layout
+		_apply_position_preset()
+
 	if not stacking_enabled and current_panel != null and is_instance_valid(current_panel):
 		if current_panel.panel_config.severity == severity:
 			current_panel.update_message(msg)
@@ -98,6 +108,11 @@ func create_message(msg: String, severity: int) -> void:
 			push_error("message_panel_scene must be set on buttered_sausage_display.tscn in the inspector")
 			return
 		content_container.add_child(panel)
+
+		# If reverse order is enabled, move new panel to the top (index 0)
+		if global_config.reverse_panel_order:
+			content_container.move_child(panel, 0)
+
 		match severity:
 			ButteredSausageDisplay.Severity.SUCCESS:
 				panel.setup(msg, global_config.success_config)
@@ -110,6 +125,7 @@ func create_message(msg: String, severity: int) -> void:
 		panel.slide_open()
 		if not stacking_enabled:
 			current_panel = panel
+
 	show()
 
 
@@ -131,7 +147,6 @@ func populate_from_result(result: ButteredSausage) -> void:
 				highest_severity = detail["severity"]
 				highest_message = detail["message"]
 		create_message(highest_message, highest_severity)
-	show()
 		
 					
 ## Shows an error message.[br][br]
@@ -175,8 +190,121 @@ func _get_severity_priority(severity: int) -> int:
 	return 0
 
 
+## Applies the position preset from global config to the content container
+func _apply_position_preset() -> void:
+	if _positioning_applied:
+		return
+
+	var margin: float = global_config.margin_from_edge
+	var width: float = global_config.panel_width
+
+	# Use layout_mode 0 (unmanaged positioning) - simplest approach
+	content_container.set("layout_mode", 0)
+
+	# Set width
+	content_container.custom_minimum_size.x = width
+	content_container.custom_minimum_size.y = 0
+
+	# Set size flags
+	content_container.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	content_container.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+
+	# Determine if this preset needs bottom anchoring
+	_anchor_to_bottom = global_config.position_preset in [
+		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_LEFT,
+		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_CENTER,
+		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_RIGHT
+	]
+
+	print("ButteredSausageDisplay: Applied position preset: ", global_config.position_preset)
+	print("  Width: ", width)
+	print("  Anchor to bottom: ", _anchor_to_bottom)
+
+	# Set flag BEFORE calling update so it doesn't return early
+	_positioning_applied = true
+
+	# Initial position (will be updated every frame for bottom positioning)
+	_update_position()
+
+
+## Updates ContentContainer position based on preset and current parent size
+func _update_position() -> void:
+	if not _positioning_applied:
+		return
+
+	var margin: float = global_config.margin_from_edge
+	var width: float = global_config.panel_width
+
+	# Use get_parent_area_size() to get the actual available space
+	var parent_size: Vector2 = get_parent_area_size()
+	var container_height: float = content_container.size.y
+
+	# Debug output - show whenever container size changes
+	var should_debug = _debug_counter < 20
+	if should_debug:
+		_debug_counter += 1
+		print("_update_position called (#", _debug_counter, "):")
+		print("  Parent area size: ", parent_size)
+		print("  ContentContainer size: ", content_container.size)
+		print("  Panel width: ", width)
+		print("  Margin: ", margin)
+
+	var pos: Vector2 = Vector2.ZERO
+
+	match global_config.position_preset:
+		ButteredSausageGlobalConfig.PositionPreset.TOP_LEFT:
+			pos = Vector2(margin, margin)
+
+		ButteredSausageGlobalConfig.PositionPreset.TOP_CENTER:
+			pos = Vector2((parent_size.x - width) / 2.0, margin)
+
+		ButteredSausageGlobalConfig.PositionPreset.TOP_RIGHT:
+			pos = Vector2(parent_size.x - width - margin, margin)
+
+		ButteredSausageGlobalConfig.PositionPreset.CENTER_LEFT:
+			pos = Vector2(margin, (parent_size.y - container_height) / 2.0)
+
+		ButteredSausageGlobalConfig.PositionPreset.CENTER:
+			pos = Vector2((parent_size.x - width) / 2.0, (parent_size.y - container_height) / 2.0)
+
+		ButteredSausageGlobalConfig.PositionPreset.CENTER_RIGHT:
+			pos = Vector2(parent_size.x - width - margin, (parent_size.y - container_height) / 2.0)
+
+		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_LEFT:
+			pos = Vector2(margin, parent_size.y - container_height - margin)
+
+		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_CENTER:
+			pos = Vector2((parent_size.x - width) / 2.0, parent_size.y - container_height - margin)
+
+		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_RIGHT:
+			pos = Vector2(parent_size.x - width - margin, parent_size.y - container_height - margin)
+
+	# Debug output
+	if should_debug:
+		print("  Calculated position: ", pos)
+		print("  ContentContainer.pivot_offset: ", content_container.pivot_offset)
+		print("  ContentContainer.size: ", content_container.size)
+		print("  ContentContainer.custom_minimum_size: ", content_container.custom_minimum_size)
+		print("  ContentContainer global_position will be: ", global_position + pos)
+		print("  Display root global_position: ", global_position)
+		print("  Display root size: ", size)
+		print("  Would place ContentContainer at: x=[", pos.x, " to ", pos.x + width, "], y=[", pos.y, " to ", pos.y + container_height, "]")
+		print("  Parent area bounds: x=[0 to ", parent_size.x, "], y=[0 to ", parent_size.y, "]")
+		if pos.x < 0 or pos.y < 0 or pos.x + width > parent_size.x or pos.y + container_height > parent_size.y:
+			print("  WARNING: ContentContainer is outside parent bounds!")
+
+	content_container.position = pos
+
+
+func _process(_delta: float) -> void:
+	# Update position every frame so panels stay positioned as VBox size changes
+	if _positioning_applied:
+		_update_position()
+
+
 func _ready() -> void:
 	hide()
+
 	# Propagate panel_width from global config to all animator configs
 	for severity_config in [global_config.success_config, global_config.error_config,
 							global_config.warning_config, global_config.info_config]:

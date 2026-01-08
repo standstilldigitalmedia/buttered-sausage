@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="ButteredSausagePanelConfig" load_steps=7 format=3 uid="uid://bbqyrx4tafifj"]
+[gd_resource type="Resource" script_class="ButteredSausagePanelConfig" load_steps=6 format=3 uid="uid://bbqyrx4tafifj"]
 
 [ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_irkix"]
+[ext_resource type="Resource" uid="uid://cuj6w06hgu6ff" path="res://addons/ButteredSausage/config/resource/animation/simple_slide_out.tres" id="2_2ew84"]
 [ext_resource type="Script" uid="uid://dxekb6n68o6ls" path="res://addons/ButteredSausage/config/scripts/panel_config.gd" id="2_5ojep"]
 [ext_resource type="Texture2D" uid="uid://djcgf5qjk0rwx" path="res://addons/ButteredSausage/ui/images/icons/Close.svg" id="2_7s8hq"]
-[ext_resource type="Resource" uid="uid://1r45vqkbmg4l" path="res://addons/ButteredSausage/config/resource/animation/color_forward.tres" id="2_cls2k"]
 [ext_resource type="Texture2D" uid="uid://cctiohehd871o" path="res://addons/ButteredSausage/ui/images/icons/LightOccluder2D.svg" id="3_2ew84"]
-[ext_resource type="Resource" uid="uid://c65207ifn3f33" path="res://addons/ButteredSausage/config/resource/animation/color_back.tres" id="3_l3gio"]
 
 [resource]
 script = ExtResource("2_5ojep")
@@ -14,5 +13,5 @@ icon = ExtResource("3_2ew84")
 close_button_icon = ExtResource("2_7s8hq")
 border_color = Color(0.3491902, 0.5847179, 0.8548469, 0.5)
 duration = 5.0
-animation_chain = Array[ExtResource("1_irkix")]([ExtResource("2_cls2k"), ExtResource("3_l3gio")])
+animation_chain = Array[ExtResource("1_irkix")]([ExtResource("2_2ew84")])
 severity = 1

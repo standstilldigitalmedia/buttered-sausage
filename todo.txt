@@ -1,10 +1,9 @@
 BUTTERED SAUSAGE - CODE IMPROVEMENT TODO LIST
 ==============================================
-#We need to add a warning in README about the string comparison in create_message in ButteredSausageDisplay. 
-People might be tempted to return an error like "The name: " + name_line_edit.text + " is invalid." This will 
-cause validation messages to spam because each returned error will be different if they are listening for 
-changes to name_line_edit.text.#
+#panel_width does nothing#
 
+#why does Display only work in the demo project when it is contained within a VBox? It I put it in a TextureRect
+or MarginContainer, everything goes wonky.#
 
 #size and placement of panels needs to be configurable. Horizontal stack almost never makes sense unless we
 turn the text on its side and then its hard to read. Probably won't include a horizontal stack option. 
@@ -21,15 +20,15 @@ things to work and there are only a few elements per scene, I think we'll just c
 from scratch. We can keep a lot of the code.
 Additonal note: I think this is partially implemented. Display has a panel container at it's root and it is set to full rect.
 I just set Mouse -> filter to Pass(Propagate Up) on the panel container. Not sure if we even need the margin
-container anymore.#
-
-#SSDM logo in every demo res://addons/ButteredSausage/ui/images/standstill_logo.png It is white text on a 
-black background.#
-
-#panel_size does nothing#
+container anymore. Size and placement isn't curently configurable#
 
 #if an animation in the chain has no animations configured, Godot starts throwing errors because there is 
 nothing to tween.#
+
+#We need to add a warning in README about the string comparison in create_message in ButteredSausageDisplay. 
+People might be tempted to return an error like "The name: " + name_line_edit.text + " is invalid." This will 
+cause validation messages to spam because each returned error will be different if they are listening for 
+changes to name_line_edit.text.#
 
 #orbital rotation is working. in-place rotation is not working.#
 
@@ -45,8 +44,6 @@ Additional comment: Color now works.#
 #position works.#
 #shake works#
 
-
-
 1. Fix all AWOC/SSDM references in comments and doc strings to use ButteredSausage
    - buttered_sausage_panel.gd:2 says "SSDMErrorDisplay"
    - buttered_sausage_animator.gd:53 says "AWOCSlideAnimator"
@@ -56,10 +53,8 @@ Additional comment: Color now works.#
 still deciding names for stuff and adding new code here and there. This documentation is going to get out of
 sync pretty quickly. May as well wait until we fix the other issues.
 
-
 MISSING FEATURES
 ----------------
-
 13. Add max_visible_panels configuration option
 	- Prevent infinite panel spam
 	- Auto-dismiss oldest when limit reached

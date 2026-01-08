@@ -4,9 +4,6 @@
 
 [resource]
 script = ExtResource("1_phkx2")
-animate_size = false
 scale_from = Vector2(0.1, 0.1)
-animate_color = true
 color_from = Color(1, 0, 0, 1)
 color_to = Color(0, 0, 1, 1)
-loop_animation = true

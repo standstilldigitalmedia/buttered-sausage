@@ -13,3 +13,8 @@ config_version=5
 config/name="Buttered Sausage"
 run/main_scene="uid://buuml2eayrxv5"
 config/features=PackedStringArray("4.5", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1800
+window/size/viewport_height=920
