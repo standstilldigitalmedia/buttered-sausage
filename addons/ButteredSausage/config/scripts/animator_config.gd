@@ -4,8 +4,10 @@ extends Resource
 
 enum Axis { VERTICAL, HORIZONTAL }
 enum OpenDirection { POSITIVE, NEGATIVE }
+enum RotationPivot { TOP_LEFT, TOP_CENTER, TOP_RIGHT, CENTER_LEFT, CENTER, CENTER_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, CUSTOM }
 
-@export_group("Direction")
+@export_group("Size Animation")
+@export var animate_size: bool = true
 @export var axis: Axis = Axis.VERTICAL
 @export var open_direction: OpenDirection = OpenDirection.POSITIVE
 
@@ -21,9 +23,11 @@ enum OpenDirection { POSITIVE, NEGATIVE }
 
 @export_group("Rotation")
 @export var animate_rotation: bool = false
-@export var rotation_from: float = 0.0
-@export var rotation_to: float = 0.0
-@export var rotation_pivot: Vector2 = Vector2.ZERO
+@export var rotation_from_degrees: float = 0.0
+@export var rotation_to_degrees: float = 0.0
+@export var rotation_orbit: bool = false  ## If true, panel orbits around pivot. If false, spins in place.
+@export var rotation_pivot_preset: RotationPivot = RotationPivot.CENTER
+@export var rotation_pivot_custom: Vector2 = Vector2.ZERO
 
 @export_group("Position")
 @export var animate_position: bool = false
@@ -34,10 +38,19 @@ enum OpenDirection { POSITIVE, NEGATIVE }
 @export var color_from: Color = Color.WHITE
 @export var color_to: Color = Color.WHITE
 
+@export_group("Shake")
+@export var animate_shake: bool = false
+@export var shake_amount: float = 3.0
+@export var shake_speed: float = 0.05
+
 @export_group("Timing and Easing")
 @export var transition_type: Tween.TransitionType = Tween.TRANS_CUBIC
 @export var ease_type_open: Tween.EaseType = Tween.EASE_OUT
 @export var ease_type_close: Tween.EaseType = Tween.EASE_IN
-@export var animation_speed: float = 0.0
+@export var animation_speed: float = 1.0
 
-var panel_width: int
+@export_group("Panel Sizing")
+@export var panel_width: float = 400.0
+
+@export_group("Loop Behavior")
+@export var loop_animation: bool = false

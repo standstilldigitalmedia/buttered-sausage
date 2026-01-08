@@ -46,7 +46,9 @@ enum AnchorPresets {TopLeft, TopCenter, TopRight, CenterLeft, Center, CenterRigh
 @export var duration: float = 3.0
 
 @export_group("Animation Chain")
-@export var animation_chain: Array[ButteredSausageAnimatorConfig] = [] 
+@export var animation_chain: Array[ButteredSausageAnimatorConfig] = []
+@export var close_animation_chain: Array[ButteredSausageAnimatorConfig] = []
+@export var mirror_full_open_chain_on_close: bool = false
 
 @export_group("Severity")
 @export var severity: ButteredSausageDisplay.Severity = ButteredSausageDisplay.Severity.SUCCESS

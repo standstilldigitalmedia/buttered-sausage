@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://jkal2q278h44"]
+
+[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_g1c1b"]
+
+[resource]
+script = ExtResource("1_g1c1b")
+animate_size = false
+animate_rotation = true
+rotation_to_degrees = 360.0

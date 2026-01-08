@@ -32,3 +32,6 @@ dist/
 # Temporary files
 *.tmp
 *.log
+
+# Windows null device file (created by Unix-style /dev/null redirects)
+/nul

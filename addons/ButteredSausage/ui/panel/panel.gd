@@ -13,7 +13,6 @@ const PANEL_THEME: String = "panel"
 @export var close_button: Button
 
 var panel_config: ButteredSausagePanelConfig
-var severity: int
 var animator: ButteredSausageAnimator
 var is_closing: bool = false
 var auto_dismiss_timer: Timer
@@ -27,31 +26,6 @@ func update_message(message: String) -> void:
 	message_label.text = message
 	
 	
-## Configures the slide animator with severity-specific animation effects.[br]
-## ERROR panels scale in with fade and bounce. WARNING panels bounce. SUCCESS and INFO slide smoothly.[br][br]
-##
-## @param severity - The severity level determining which animation to apply
-func apply_animations(severity: ButteredSausageDisplay.Severity) -> void:
-	pass
-	"""animator = ButteredSausageAnimator.new(self, panel_container, buttered_sausage_config)
-	match severity:
-		ButteredSausageDisplay.Severity.SUCCESS:
-			animator.configure(ButteredSausageAnimator.Axis.VERTICAL, ButteredSausageAnimator.OpenDirection.POSITIVE, buttered_sausage_config) \
-				.with_speed(0.4) \
-				.with_fade() 
-		ButteredSausageDisplay.Severity.INFO:
-			animator.configure(ButteredSausageAnimator.Axis.VERTICAL, ButteredSausageAnimator.OpenDirection.POSITIVE, buttered_sausage_config) \
-				.with_speed(0.4)
-		ButteredSausageDisplay.Severity.WARNING:
-			animator.configure(ButteredSausageAnimator.Axis.VERTICAL, ButteredSausageAnimator.OpenDirection.POSITIVE, buttered_sausage_config) \
-				.with_speed(1.4)
-		ButteredSausageDisplay.Severity.ERROR:
-			animator.configure(ButteredSausageAnimator.Axis.VERTICAL, ButteredSausageAnimator.OpenDirection.POSITIVE, buttered_sausage_config) \
-				.with_scale(Vector2(0.3, 1)) \
-				.with_rotation_pivot_center() \
-				.with_rotation(0, 360)"""
-	
-		
 func configure() -> void:
 	var severity: ButteredSausageDisplay.Severity = panel_config.severity
 	if !cached_styles.has(severity):
@@ -73,100 +47,99 @@ func configure() -> void:
 	margin_container.add_theme_constant_override("margin_left", panel_config.margin_left)
 	margin_container.add_theme_constant_override("margin_top", panel_config.margin_top)
 	margin_container.add_theme_constant_override("margin_right", panel_config.margin_right)
-	margin_container.add_theme_constant_override("margin_bottom", panel_config.margin_bottom)			
-	
-"""## Applies severity-specific background color to the panel.[br][br]
-##
-## @param sev - The severity level determining the panel color
-func apply_style(sev: int) -> void:
-	if not cached_styles.has(sev):
-		var style_box = StyleBoxFlat.new()
-		style_box.corner_radius_top_left = config.corner_radius
-		style_box.corner_radius_top_right = config.corner_radius
-		style_box.corner_radius_bottom_left = config.corner_radius
-		style_box.corner_radius_bottom_right = config.corner_radius
-		style_box.border_width_bottom = config.border_width_bottom
-		style_box.border_width_left = config.border_width_left
-		cached_styles[sev] = style_box
-		match sev:
-			ButteredSausageDisplay.Severity.SUCCESS:
-				style_box.bg_color = config.success_color
-				style_box.border_color = config.success_border_color
-			ButteredSausageDisplay.Severity.INFO:
-				style_box.bg_color = config.info_color
-				style_box.border_color = config.info_border_color
-			ButteredSausageDisplay.Severity.WARNING:
-				style_box.bg_color = config.warning_color
-				style_box.border_color = config.warning_border_color
-			ButteredSausageDisplay.Severity.ERROR:
-				style_box.bg_color = config.error_color
-				style_box.border_color = config.error_border_color
-	panel_container.add_theme_stylebox_override(PANEL_THEME, cached_styles[sev])"""
-	
-	
-## Returns the auto-dismiss timeout duration based on severity.[br]
-## Default: SUCCESS: 3s, WARNING: 4s, INFO: 6s, ERROR: 6s[br][br]
-##
-## @param sev - The severity level[br]
-## @return The timeout duration in seconds
-func get_dismiss_time(sev: int) -> float:
-	match sev:
-		ButteredSausageDisplay.Severity.SUCCESS:
-			return panel_config.duration
-		ButteredSausageDisplay.Severity.WARNING:
-			return panel_config.duration
-		ButteredSausageDisplay.Severity.INFO:
-			return panel_config.duration
-		ButteredSausageDisplay.Severity.ERROR:
-			return panel_config.duration
-		_:
-			return panel_config.duration
-	
-	
-## Initializes the panel with message, severity, styling, animations, and auto-dismiss timer.[br][br]
+	margin_container.add_theme_constant_override("margin_bottom", panel_config.margin_bottom)
+
+
+## Initializes the panel with message, styling, and auto-dismiss timer.[br][br]
 ##
 ## @param msg - The message text to display[br]
-## @param sev - The severity level[br]
-## @param auto_dismiss - If true, panel will auto-close after a timeout[br]
-## @param config - Optional configuration dictionary with colors, timings, and styling
-func setup(msg: String, sev: int, config: ButteredSausagePanelConfig, auto_dismiss: bool = false) -> void:
+## @param config - Panel configuration resource
+func setup(msg: String, config: ButteredSausagePanelConfig) -> void:
 	message_label.text = msg
-	severity = sev
 	panel_config = config
 	configure()
-	apply_animations(sev)
-	if auto_dismiss:
+
+	# Start auto-dismiss timer immediately if enabled in config
+	if panel_config.auto_dismiss:
 		auto_dismiss_timer = Timer.new()
 		auto_dismiss_timer.one_shot = true
-		auto_dismiss_timer.timeout.connect(slide_closed)
+		auto_dismiss_timer.timeout.connect(_on_auto_dismiss_timeout)
 		add_child(auto_dismiss_timer)
-		auto_dismiss_timer.start(get_dismiss_time(sev))
+		auto_dismiss_timer.start(panel_config.duration)
 
 
-## Animates the panel sliding into view. ERROR panels also shake after opening.
+## Animates the panel into view using the configured animation chain with optional looping.
 func slide_open() -> void:
-	await animator.slide_open()
-	if severity == ButteredSausageDisplay.Severity.ERROR:
-		animator.shake()
+	# If no animations configured, just show panel
+	if panel_config.animation_chain.is_empty():
+		panel_container.show()
+		return
+
+	# Play entire animation chain once and detect if any want to loop
+	var has_looping_animations: bool = false
+	for anim_config in panel_config.animation_chain:
+		if anim_config.loop_animation:
+			has_looping_animations = true
+		animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
+		await animator.play()
+
+	# Loop only animations marked for looping
+	if has_looping_animations:
+		while not is_closing:
+			for anim_config in panel_config.animation_chain:
+				if not anim_config.loop_animation:
+					continue  # Skip animations not marked for looping
+				animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
+				await animator.play()
+				if is_closing:
+					break  # Exit immediately if panel is closing
 		
 		
-## Closes the panel, optionally with a slide-out animation, then frees it from memory.[br][br]
+## Closes the panel, optionally with animation, then frees it from memory.[br][br]
 ##
-## @param slide - If true, animates the panel sliding out before closing
-func close(slide: bool = false) -> void:
+## @param animate - If true, animates the panel closing before freeing
+func close(animate: bool = false) -> void:
 	if is_closing:
 		return
 	is_closing = true
 	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer) and auto_dismiss_timer.time_left > 0:
 		auto_dismiss_timer.stop()
-	if slide:
-		await animator.slide_close()
+	if animate:
+		await slide_closed()
 	queue_free()
 
-## Closes the panel with a slide-out animation.
+## Animates the panel closing based on configuration.[br]
+## Priority: 1) close_animation_chain, 2) mirror full open chain, 3) reverse first animation
 func slide_closed() -> void:
+	# If no animations configured at all, just hide
+	if panel_config.animation_chain.is_empty():
+		panel_container.hide()
+		return
+
+	# Priority 1: Use custom close animation chain if provided
+	if not panel_config.close_animation_chain.is_empty():
+		for anim_config in panel_config.close_animation_chain:
+			animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
+			await animator.play()
+
+	# Priority 2: Mirror the full open chain in reverse
+	elif panel_config.mirror_full_open_chain_on_close:
+		for i in range(panel_config.animation_chain.size() - 1, -1, -1):
+			animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[i])
+			await animator.reverse()
+
+	# Priority 3: Default - reverse just the first animation
+	else:
+		animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[0])
+		await animator.reverse()
+
+	panel_container.hide()
+	
+	
+## Called when auto-dismiss timer expires
+func _on_auto_dismiss_timeout() -> void:
 	close(true)
-	
-	
+
+
 func _on_close_pressed() -> void:
-	slide_closed()
+	close(true)

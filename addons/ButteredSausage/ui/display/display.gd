@@ -73,14 +73,13 @@ func clear_all_panels() -> void:
 	hide()
 	
 	
-## Creates and displays a message panel with specified severity and auto-dismiss behavior.[br][br]
+## Creates and displays a message panel with specified severity.[br][br]
 ##
 ## @param msg - The message text to display[br]
-## @param severity - The severity level (use Severity enum)[br]
-## @param auto_dismiss - If true, message will automatically close after a timeout[br]
-func create_message(msg: String, severity: int, auto_dismiss: bool) -> void:
+## @param severity - The severity level (use Severity enum)
+func create_message(msg: String, severity: int) -> void:
 	if not stacking_enabled and current_panel != null and is_instance_valid(current_panel):
-		if current_panel.severity == severity:
+		if current_panel.panel_config.severity == severity:
 			current_panel.update_message(msg)
 			return
 		else:
@@ -101,13 +100,13 @@ func create_message(msg: String, severity: int, auto_dismiss: bool) -> void:
 		content_container.add_child(panel)
 		match severity:
 			ButteredSausageDisplay.Severity.SUCCESS:
-				panel.setup(msg, severity, global_config.success_config, auto_dismiss)
+				panel.setup(msg, global_config.success_config)
 			ButteredSausageDisplay.Severity.ERROR:
-				panel.setup(msg, severity, global_config.error_config, auto_dismiss)
+				panel.setup(msg, global_config.error_config)
 			ButteredSausageDisplay.Severity.WARNING:
-				panel.setup(msg, severity, global_config.warning_config, auto_dismiss)
+				panel.setup(msg, global_config.warning_config)
 			ButteredSausageDisplay.Severity.INFO:
-				panel.setup(msg, severity, global_config.info_config, auto_dismiss)
+				panel.setup(msg, global_config.info_config)
 		panel.slide_open()
 		if not stacking_enabled:
 			current_panel = panel
@@ -121,9 +120,9 @@ func create_message(msg: String, severity: int, auto_dismiss: bool) -> void:
 ## @param result - The SSDMResult containing message and details to display
 func populate_from_result(result: ButteredSausage) -> void:
 	if stacking_enabled:
-		create_message(result.message, result.severity, result.severity != Severity.ERROR)
+		create_message(result.message, result.severity)
 		for detail in result.details:
-			create_message(detail["message"], detail["severity"], detail["severity"] != Severity.ERROR)
+			create_message(detail["message"], detail["severity"])
 	else:
 		var highest_severity = result.severity
 		var highest_message = result.message
@@ -131,36 +130,36 @@ func populate_from_result(result: ButteredSausage) -> void:
 			if _get_severity_priority(detail["severity"]) > _get_severity_priority(highest_severity):
 				highest_severity = detail["severity"]
 				highest_message = detail["message"]
-		create_message(highest_message, highest_severity, highest_severity != Severity.ERROR)
+		create_message(highest_message, highest_severity)
 	show()
 		
 					
-## Shows an error message that does not auto-dismiss.[br][br]
+## Shows an error message.[br][br]
 ##
 ## @param message - The error message to display
 func show_error(message: String) -> void:
-	create_message(message, Severity.ERROR, false)
+	create_message(message, Severity.ERROR)
 
 
-## Shows a success message that auto-dismisses after a timeout.[br][br]
+## Shows a success message.[br][br]
 ##
 ## @param message - The success message to display
 func show_success(message: String) -> void:
-	create_message(message, Severity.SUCCESS, true)
+	create_message(message, Severity.SUCCESS)
 
 
-## Shows a warning message that auto-dismisses after a timeout.[br][br]
+## Shows a warning message.[br][br]
 ##
 ## @param message - The warning message to display
 func show_warning(message: String) -> void:
-	create_message(message, Severity.WARNING, true)
+	create_message(message, Severity.WARNING)
 
 
-## Shows an info message that auto-dismisses after a timeout.[br][br]
+## Shows an info message.[br][br]
 ##
 ## @param message - The info message to display
 func show_info(message: String) -> void:
-	create_message(message, Severity.INFO, true)
+	create_message(message, Severity.INFO)
 			
 
 func _get_severity_priority(severity: int) -> int:
@@ -178,4 +177,10 @@ func _get_severity_priority(severity: int) -> int:
 
 func _ready() -> void:
 	hide()
-	global_config.set_panel_width()
+	# Propagate panel_width from global config to all animator configs
+	for severity_config in [global_config.success_config, global_config.error_config,
+							global_config.warning_config, global_config.info_config]:
+		for anim_config in severity_config.animation_chain:
+			anim_config.panel_width = global_config.panel_width
+		for anim_config in severity_config.close_animation_chain:
+			anim_config.panel_width = global_config.panel_width

@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bs3n77hol642f" path="res://addons/ButteredSausage/ui/images/icons/StatusError.svg" id="2_l83wf"]
 [ext_resource type="Texture2D" uid="uid://djcgf5qjk0rwx" path="res://addons/ButteredSausage/ui/images/icons/Close.svg" id="2_qo6hd"]
 [ext_resource type="Resource" uid="uid://cuj6w06hgu6ff" path="res://addons/ButteredSausage/config/resource/animation/simple_slide_out.tres" id="2_uxe4k"]
-[ext_resource type="Resource" uid="uid://bwqtj6xwvx35d" path="res://addons/ButteredSausage/config/resource/animation/slide_out_and_shake.tres" id="3_eicaw"]
+[ext_resource type="Resource" uid="uid://bwqtj6xwvx35d" path="res://addons/ButteredSausage/config/resource/animation/shake.tres" id="3_eicaw"]
 
 [resource]
 script = ExtResource("2_axh03")
