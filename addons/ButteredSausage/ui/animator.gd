@@ -60,6 +60,16 @@ func _get_pivot_offset(node: Control) -> Vector2:
 	return Vector2.ZERO
 
 
+## Returns true if any animations are configured (excluding shake which returns early).
+func _has_animations() -> bool:
+	return (animator_config.animate_size or
+			animator_config.animate_scale or
+			animator_config.animate_rotation or
+			animator_config.animate_position or
+			animator_config.animate_color or
+			animator_config.animate_fade)
+
+
 ## Animates the panel into view with all configured effects. Starts monitoring panel size changes.
 func play() -> void:
 	if not wrapper or not panel:
@@ -69,6 +79,20 @@ func play() -> void:
 		slide_tween.kill()
 	if animator_config.animate_shake:
 		await shake()
+		return
+
+	# If no animations are configured, just show the wrapper and return
+	if not _has_animations():
+		wrapper.show()
+		await wrapper.get_tree().process_frame
+		if animator_config.axis == Axis.VERTICAL:
+			wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
+			wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if animator_config.open_direction == OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+		else:
+			wrapper.custom_minimum_size.x = animator_config.panel_width
+			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if animator_config.open_direction == OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+		is_open = true
+		start_monitoring()
 		return
 
 	var property_name: String
@@ -170,6 +194,15 @@ func reverse() -> void:
 	if slide_tween:
 		slide_tween.kill()
 	if not wrapper.visible:
+		return
+
+	# If no animations are configured, just hide immediately
+	if not _has_animations():
+		wrapper.hide()
+		if animator_config.axis == Axis.VERTICAL:
+			wrapper.custom_minimum_size.y = 0
+		else:
+			wrapper.custom_minimum_size.x = 0
 		return
 
 	var property_name: String

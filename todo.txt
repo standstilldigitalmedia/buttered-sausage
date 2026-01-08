@@ -18,9 +18,6 @@ Additonal note: I think this is partially implemented. Display has a panel conta
 I just set Mouse -> filter to Pass(Propagate Up) on the panel container. Not sure if we even need the margin
 container anymore. Size and placement isn't curently configurable#
 
-#if an animation in the chain has no animations configured, Godot starts throwing errors because there is 
-nothing to tween.#
-
 #We need to add a warning in README about the string comparison in create_message in ButteredSausageDisplay. 
 People might be tempted to return an error like "The name: " + name_line_edit.text + " is invalid." This will 
 cause validation messages to spam because each returned error will be different if they are listening for 

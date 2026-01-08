@@ -216,10 +216,6 @@ func _apply_position_preset() -> void:
 		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_RIGHT
 	]
 
-	print("ButteredSausageDisplay: Applied position preset: ", global_config.position_preset)
-	print("  Width: ", width)
-	print("  Anchor to bottom: ", _anchor_to_bottom)
-
 	# Set flag BEFORE calling update so it doesn't return early
 	_positioning_applied = true
 
@@ -238,17 +234,6 @@ func _update_position() -> void:
 	# Use get_parent_area_size() to get the actual available space
 	var parent_size: Vector2 = get_parent_area_size()
 	var container_height: float = content_container.size.y
-
-	# Debug output - show whenever container size changes
-	var should_debug = _debug_counter < 20
-	if should_debug:
-		_debug_counter += 1
-		print("_update_position called (#", _debug_counter, "):")
-		print("  Parent area size: ", parent_size)
-		print("  ContentContainer size: ", content_container.size)
-		print("  Panel width: ", width)
-		print("  Margin: ", margin)
-
 	var pos: Vector2 = Vector2.ZERO
 
 	match global_config.position_preset:
@@ -278,20 +263,6 @@ func _update_position() -> void:
 
 		ButteredSausageGlobalConfig.PositionPreset.BOTTOM_RIGHT:
 			pos = Vector2(parent_size.x - width - margin, parent_size.y - container_height - margin)
-
-	# Debug output
-	if should_debug:
-		print("  Calculated position: ", pos)
-		print("  ContentContainer.pivot_offset: ", content_container.pivot_offset)
-		print("  ContentContainer.size: ", content_container.size)
-		print("  ContentContainer.custom_minimum_size: ", content_container.custom_minimum_size)
-		print("  ContentContainer global_position will be: ", global_position + pos)
-		print("  Display root global_position: ", global_position)
-		print("  Display root size: ", size)
-		print("  Would place ContentContainer at: x=[", pos.x, " to ", pos.x + width, "], y=[", pos.y, " to ", pos.y + container_height, "]")
-		print("  Parent area bounds: x=[0 to ", parent_size.x, "], y=[0 to ", parent_size.y, "]")
-		if pos.x < 0 or pos.y < 0 or pos.x + width > parent_size.x or pos.y + container_height > parent_size.y:
-			print("  WARNING: ContentContainer is outside parent bounds!")
 
 	content_container.position = pos
 

@@ -12,5 +12,6 @@ background_color = Color(0.9063318, 0.48452926, 0.48452926, 0.90200007)
 icon = ExtResource("2_l83wf")
 close_button_icon = ExtResource("2_qo6hd")
 border_color = Color(0.85430586, 0.3491902, 0.3491902, 0.90200007)
+auto_dismiss = false
 animation_chain = Array[ExtResource("1_8jhoh")]([ExtResource("2_uxe4k")])
 severity = 3
