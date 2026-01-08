@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://buuml2eayrxv5"]
+[gd_scene load_steps=7 format=3 uid="uid://buuml2eayrxv5"]
 
 [ext_resource type="Script" uid="uid://yeyrlw2i3mt8" path="res://addons/ButteredSausage/demo/buttered_sausage_demo.gd" id="1_demo"]
-[ext_resource type="Texture2D" uid="uid://casfr5tmrd37y" path="res://addons/ButteredSausage/ui/images/standstill_logo.png" id="2_5jgn0"]
+[ext_resource type="Texture2D" uid="uid://csugofyougpoh" path="res://addons/ButteredSausage/ui/images/butteres_sausage_logo.png" id="2_07jf3"]
 [ext_resource type="PackedScene" uid="uid://c4u8l5ya7yuh0" path="res://addons/ButteredSausage/ui/display/display.tscn" id="2_error_display"]
+[ext_resource type="Texture2D" uid="uid://casfr5tmrd37y" path="res://addons/ButteredSausage/ui/images/standstill_logo.png" id="4_07jf3"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5jgn0"]
 bg_color = Color(0, 0, 0, 1)
@@ -209,13 +210,26 @@ text = "Run Demo Scenarios"
 [node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-texture = ExtResource("2_5jgn0")
+texture = ExtResource("2_07jf3")
 expand_mode = 2
 stretch_mode = 5
 
 [node name="ButteredSausageDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect" instance=ExtResource("2_error_display")]
 unique_name_in_owner = true
 layout_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -200.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("4_07jf3")
 
 [connection signal="value_changed" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/MaxPanelsSpinBox" to="." method="_on_max_panels_value_changed"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/ShowSuccess" to="." method="_on_show_success_pressed"]

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_0hp22"]
 [ext_resource type="Script" uid="uid://dxekb6n68o6ls" path="res://addons/ButteredSausage/config/scripts/panel_config.gd" id="2_3t3um"]
 [ext_resource type="Texture2D" uid="uid://djcgf5qjk0rwx" path="res://addons/ButteredSausage/ui/images/icons/Close.svg" id="2_bro5q"]
-[ext_resource type="Resource" uid="uid://cuj6w06hgu6ff" path="res://addons/ButteredSausage/config/resource/animation/simple_slide_out.tres" id="2_xqju0"]
+[ext_resource type="Resource" uid="uid://jkal2q278h44" path="res://addons/ButteredSausage/config/resource/animation/simple_rotate.tres" id="2_xqju0"]
 [ext_resource type="Texture2D" uid="uid://c4a5hkt5e5is0" path="res://addons/ButteredSausage/ui/images/icons/StatusWarning.svg" id="3_xqju0"]
 
 [resource]

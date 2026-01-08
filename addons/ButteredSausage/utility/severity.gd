@@ -6,7 +6,8 @@
 class_name ButteredSausageSeverity
 extends RefCounted
 
-enum Level {
+enum Level 
+{
 	SUCCESS,  ## Operation completed successfully
 	INFO,     ## Informational message
 	WARNING,  ## Warning message - operation succeeded with caveats

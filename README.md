@@ -64,12 +64,10 @@ var result := ButteredSausage.success("Operation completed!")
 2. Go to **AssetLib** tab
 3. Search for "Buttered Sausage"
 4. Click **Download** → **Install**
-5. Enable the plugin in **Project Settings → Plugins**
 
 ### Manual Installation
 1. Download the latest release
 2. Copy the `addons/ButteredSausage/` folder to your project's `addons/` directory
-3. Enable the plugin in **Project Settings → Plugins**
 
 ## Quick Start
 
@@ -434,11 +432,8 @@ MIT License - See LICENSE file for details
 
 Developed by [Standstill Digital Media](https://github.com/standstilldigitalmedia/)
 
-## Contributing
-
-Issues and pull requests welcome! Visit the [GitHub repository](https://github.com/standstilldigitalmedia/buttered-sausage) to contribute.
-
 ## Support
 
 Report bugs via [Github Issues](https://github.com/standstilldigitalmedia/buttered-sausage/issues)
+
 Ask questions in [Github Discussions](https://github.com/standstilldigitalmedia/buttered-sausage/discussions)

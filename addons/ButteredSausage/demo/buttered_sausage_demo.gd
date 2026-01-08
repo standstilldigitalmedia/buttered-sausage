@@ -10,16 +10,19 @@ extends Control
 @export var buttered_sausage_display: ButteredSausageDisplay
 
 
-func _ready() -> void:
-	main_message.text = "File processing completed"
-	warning_1.text = "Skipped locked file: document.txt"
-	warning_2.text = "Failed to delete temporary cache"
-	info_1.text = "Processed 47 files in 2.3 seconds"
-	info_2.text = "Found 3 duplicate entries"
-	max_panels_spinbox.value = 0  # Unlimited by default
-	buttered_sausage_display.global_config.max_visible_panels = 0
-
-
+func _add_details(result: ButteredSausage) -> void:
+	if not warning_1.text.is_empty():
+		result.with_warning(warning_1.text)
+	if not warning_2.text.is_empty():
+		result.with_warning(warning_2.text)
+	if not warning_3.text.is_empty():
+		result.with_warning(warning_3.text)
+	if not info_1.text.is_empty():
+		result.with_info(info_1.text)
+	if not info_2.text.is_empty():
+		result.with_info(info_2.text)
+		
+		
 func _on_show_success_pressed() -> void:
 	var result = ButteredSausage.success(main_message.text)
 	_add_details(result)
@@ -83,14 +86,11 @@ func _on_demo_scenarios_pressed() -> void:
 	buttered_sausage_display.populate_from_result(result3)
 
 
-func _add_details(result: ButteredSausage) -> void:
-	if not warning_1.text.is_empty():
-		result.with_warning(warning_1.text)
-	if not warning_2.text.is_empty():
-		result.with_warning(warning_2.text)
-	if not warning_3.text.is_empty():
-		result.with_warning(warning_3.text)
-	if not info_1.text.is_empty():
-		result.with_info(info_1.text)
-	if not info_2.text.is_empty():
-		result.with_info(info_2.text)
+func _ready() -> void:
+	main_message.text = "File processing completed"
+	warning_1.text = "Skipped locked file: document.txt"
+	warning_2.text = "Failed to delete temporary cache"
+	info_1.text = "Processed 47 files in 2.3 seconds"
+	info_2.text = "Found 3 duplicate entries"
+	max_panels_spinbox.value = 0  # Unlimited by default
+	buttered_sausage_display.global_config.max_visible_panels = 0

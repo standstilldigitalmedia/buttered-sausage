@@ -123,20 +123,6 @@ func slide_open() -> void:
 				if is_closing:
 					break  # Exit immediately if panel is closing
 		
-		
-## Closes the panel, optionally with animation, then frees it from memory.[br][br]
-##
-## @param animate - If true, animates the panel closing before freeing
-func close(animate: bool = false) -> void:
-	if is_closing:
-		return
-	is_closing = true
-	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer):
-		auto_dismiss_timer.stop()
-		timer_paused = false
-	if animate:
-		await slide_closed()
-	queue_free()
 
 ## Animates the panel closing based on configuration.[br]
 ## Priority: 1) close_animation_chain (if provided), 2) close_behavior setting
@@ -173,8 +159,23 @@ func slide_closed() -> void:
 				var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[0])
 				await animator.reverse()
 				panel_container.hide()
-	
-	
+				
+					
+## Closes the panel, optionally with animation, then frees it from memory.[br][br]
+##
+## @param animate - If true, animates the panel closing before freeing
+func close(animate: bool = false) -> void:
+	if is_closing:
+		return
+	is_closing = true
+	if auto_dismiss_timer and is_instance_valid(auto_dismiss_timer):
+		auto_dismiss_timer.stop()
+		timer_paused = false
+	if animate:
+		await slide_closed()
+	queue_free()
+
+
 ## Called when auto-dismiss timer expires.[br]
 ## Closes the panel with animation.[br][br]
 func _on_auto_dismiss_timeout() -> void:

@@ -6,5 +6,6 @@
 script = ExtResource("1_npyxg")
 animate_size = false
 animate_color = true
-color_to = Color(0, 0, 0, 1)
+color_from = Color(1, 0, 0, 0.11764706)
+color_to = Color(1, 0, 0, 1)
 loop_animation = true

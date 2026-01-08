@@ -17,12 +17,55 @@ var _anchor_to_bottom: bool = false
 var _debug_counter: int = 0
 
 
+## Populates the display with messages from a ButteredSausage result object.[br]
+## Shows the main message and all detail messages.[br][br]
+##
+## @param result - The ButteredSausage result containing message and details to display
+func populate_from_result(result: ButteredSausage) -> void:
+	create_message(result.message, result.severity)
+	for detail in result.details:
+		create_message(detail["message"], detail["severity"])
+		
+		
 ## Closes all message panels and hides the display.[br][br]
 func clear_all_panels() -> void:
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
 			child.close()
 	hide()
+	
+	
+## Immediately removes a panel from the tree and frees it.[br]
+## Stops timers and animations before removal.[br][br]
+##
+## @param panel - The panel to remove[br]
+func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
+	# Stop any timers and mark as closing to stop looping animations
+	panel.is_closing = true
+	if panel.auto_dismiss_timer and is_instance_valid(panel.auto_dismiss_timer):
+		panel.auto_dismiss_timer.stop()
+	# Remove from tree immediately to prevent any further processing
+	content_container.remove_child(panel)
+	# Queue for deletion
+	panel.queue_free()
+	
+	
+## Returns the priority value for a given severity level.[br]
+## Used for single panel mode to determine which panel to keep.[br][br]
+##
+## @param severity - The severity level[br]
+## @return The priority value from global config[br]
+func _get_severity_priority(severity: int) -> int:
+	match severity:
+		ButteredSausageSeverity.Level.ERROR:
+			return global_config.error_priority
+		ButteredSausageSeverity.Level.SUCCESS:
+			return global_config.success_priority
+		ButteredSausageSeverity.Level.WARNING:
+			return global_config.warning_priority
+		ButteredSausageSeverity.Level.INFO:
+			return global_config.info_priority
+	return 0
 
 
 ## Enforces max_visible_panels limit by closing panels.[br]
@@ -64,23 +107,87 @@ func _enforce_panel_limit(new_severity: int) -> bool:
 		panels.remove_at(0)
 
 	return true  # Always create for limited mode
+	
 
+## Updates content container position based on preset and current parent size.[br]
+## Called every frame to keep position correct as container size changes.[br][br]
+func _update_position() -> void:
+	if not _positioning_applied:
+		return
 
-## Immediately removes a panel from the tree and frees it.[br]
-## Stops timers and animations before removal.[br][br]
-##
-## @param panel - The panel to remove[br]
-func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
-	# Stop any timers and mark as closing to stop looping animations
-	panel.is_closing = true
-	if panel.auto_dismiss_timer and is_instance_valid(panel.auto_dismiss_timer):
-		panel.auto_dismiss_timer.stop()
-	# Remove from tree immediately to prevent any further processing
-	content_container.remove_child(panel)
-	# Queue for deletion
-	panel.queue_free()
+	var margin: float = global_config.margin_from_edge
+	var width: float = global_config.panel_width
+
+	# Use get_parent_area_size() to get the actual available space
+	var parent_size: Vector2 = get_parent_area_size()
+	var container_height: float = content_container.size.y
+	var pos: Vector2 = Vector2.ZERO
+
+	match global_config.position_preset:
+		ButteredSausageDisplayConfig.PositionPreset.TOP_LEFT:
+			pos = Vector2(margin, margin)
+
+		ButteredSausageDisplayConfig.PositionPreset.TOP_CENTER:
+			pos = Vector2((parent_size.x - width) / 2.0, margin)
+
+		ButteredSausageDisplayConfig.PositionPreset.TOP_RIGHT:
+			pos = Vector2(parent_size.x - width - margin, margin)
+
+		ButteredSausageDisplayConfig.PositionPreset.CENTER_LEFT:
+			pos = Vector2(margin, (parent_size.y - container_height) / 2.0)
+
+		ButteredSausageDisplayConfig.PositionPreset.CENTER:
+			pos = Vector2((parent_size.x - width) / 2.0, (parent_size.y - container_height) / 2.0)
+
+		ButteredSausageDisplayConfig.PositionPreset.CENTER_RIGHT:
+			pos = Vector2(parent_size.x - width - margin, (parent_size.y - container_height) / 2.0)
+
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT:
+			pos = Vector2(margin, parent_size.y - container_height - margin)
+
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER:
+			pos = Vector2((parent_size.x - width) / 2.0, parent_size.y - container_height - margin)
+
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT:
+			pos = Vector2(parent_size.x - width - margin, parent_size.y - container_height - margin)
+
+	content_container.position = pos
 	
 	
+## Applies the position preset from global config to the content container.[br]
+## Sets up positioning mode and flags, then updates position.[br][br]
+func _apply_position_preset() -> void:
+	if _positioning_applied:
+		return
+
+	var margin: float = global_config.margin_from_edge
+	var width: float = global_config.panel_width
+
+	# Use layout_mode 0 (unmanaged positioning) - simplest approach
+	content_container.set("layout_mode", 0)
+
+	# Set width
+	content_container.custom_minimum_size.x = width
+	content_container.custom_minimum_size.y = 0
+
+	# Set size flags
+	content_container.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	content_container.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+
+	# Determine if this preset needs bottom anchoring
+	_anchor_to_bottom = global_config.position_preset in [
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT,
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER,
+		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT
+	]
+
+	# Set flag BEFORE calling update so it doesn't return early
+	_positioning_applied = true
+
+	# Initial position (will be updated every frame for bottom positioning)
+	_update_position()
+	
+		
 ## Creates and displays a message panel with specified severity.[br][br]
 ##
 ## @param msg - The message text to display[br]
@@ -126,17 +233,7 @@ func create_message(msg: String, severity: int) -> void:
 		panel.slide_open()
 
 	show()
-
-
-## Populates the display with messages from a ButteredSausage result object.[br]
-## Shows the main message and all detail messages.[br][br]
-##
-## @param result - The ButteredSausage result containing message and details to display
-func populate_from_result(result: ButteredSausage) -> void:
-	create_message(result.message, result.severity)
-	for detail in result.details:
-		create_message(detail["message"], detail["severity"])
-		
+	
 					
 ## Shows an error message.[br][br]
 ##
@@ -164,104 +261,7 @@ func show_warning(message: String) -> void:
 ## @param message - The info message to display[br]
 func show_info(message: String) -> void:
 	create_message(message, ButteredSausageSeverity.Level.INFO)
-
-
-## Returns the priority value for a given severity level.[br]
-## Used for single panel mode to determine which panel to keep.[br][br]
-##
-## @param severity - The severity level[br]
-## @return The priority value from global config[br]
-func _get_severity_priority(severity: int) -> int:
-	match severity:
-		ButteredSausageSeverity.Level.ERROR:
-			return global_config.error_priority
-		ButteredSausageSeverity.Level.SUCCESS:
-			return global_config.success_priority
-		ButteredSausageSeverity.Level.WARNING:
-			return global_config.warning_priority
-		ButteredSausageSeverity.Level.INFO:
-			return global_config.info_priority
-	return 0
-
-
-## Applies the position preset from global config to the content container.[br]
-## Sets up positioning mode and flags, then updates position.[br][br]
-func _apply_position_preset() -> void:
-	if _positioning_applied:
-		return
-
-	var margin: float = global_config.margin_from_edge
-	var width: float = global_config.panel_width
-
-	# Use layout_mode 0 (unmanaged positioning) - simplest approach
-	content_container.set("layout_mode", 0)
-
-	# Set width
-	content_container.custom_minimum_size.x = width
-	content_container.custom_minimum_size.y = 0
-
-	# Set size flags
-	content_container.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	content_container.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-
-	# Determine if this preset needs bottom anchoring
-	_anchor_to_bottom = global_config.position_preset in [
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT,
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER,
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT
-	]
-
-	# Set flag BEFORE calling update so it doesn't return early
-	_positioning_applied = true
-
-	# Initial position (will be updated every frame for bottom positioning)
-	_update_position()
-
-
-## Updates content container position based on preset and current parent size.[br]
-## Called every frame to keep position correct as container size changes.[br][br]
-func _update_position() -> void:
-	if not _positioning_applied:
-		return
-
-	var margin: float = global_config.margin_from_edge
-	var width: float = global_config.panel_width
-
-	# Use get_parent_area_size() to get the actual available space
-	var parent_size: Vector2 = get_parent_area_size()
-	var container_height: float = content_container.size.y
-	var pos: Vector2 = Vector2.ZERO
-
-	match global_config.position_preset:
-		ButteredSausageDisplayConfig.PositionPreset.TOP_LEFT:
-			pos = Vector2(margin, margin)
-
-		ButteredSausageDisplayConfig.PositionPreset.TOP_CENTER:
-			pos = Vector2((parent_size.x - width) / 2.0, margin)
-
-		ButteredSausageDisplayConfig.PositionPreset.TOP_RIGHT:
-			pos = Vector2(parent_size.x - width - margin, margin)
-
-		ButteredSausageDisplayConfig.PositionPreset.CENTER_LEFT:
-			pos = Vector2(margin, (parent_size.y - container_height) / 2.0)
-
-		ButteredSausageDisplayConfig.PositionPreset.CENTER:
-			pos = Vector2((parent_size.x - width) / 2.0, (parent_size.y - container_height) / 2.0)
-
-		ButteredSausageDisplayConfig.PositionPreset.CENTER_RIGHT:
-			pos = Vector2(parent_size.x - width - margin, (parent_size.y - container_height) / 2.0)
-
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT:
-			pos = Vector2(margin, parent_size.y - container_height - margin)
-
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER:
-			pos = Vector2((parent_size.x - width) / 2.0, parent_size.y - container_height - margin)
-
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT:
-			pos = Vector2(parent_size.x - width - margin, parent_size.y - container_height - margin)
-
-	content_container.position = pos
-
+	
 
 ## Updates position every frame to keep panels positioned correctly.[br][br]
 ##

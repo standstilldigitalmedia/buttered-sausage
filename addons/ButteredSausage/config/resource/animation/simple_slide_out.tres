@@ -4,11 +4,3 @@
 
 [resource]
 script = ExtResource("1_phkx2")
-animate_size = false
-animate_scale = true
-scale_from = Vector2(0.1, 0.1)
-scale_pivot_preset = 3
-rotation_to_degrees = 360.0
-position_offset = Vector2(10, 10)
-color_from = Color(1, 0, 0, 1)
-color_to = Color(0, 0, 1, 1)
