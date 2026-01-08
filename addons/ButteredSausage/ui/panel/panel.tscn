@@ -5,7 +5,8 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
 bg_color = Color(1, 1, 1, 0.078431375)
 
-[node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("panel_container", "margin_container", "icon_texture_rect", "message_label", "close_button")]
+[node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 16.0
@@ -15,9 +16,11 @@ size_flags_vertical = 4
 script = ExtResource("1_astwa")
 panel_container = NodePath("PanelContainer")
 margin_container = NodePath("PanelContainer/MarginContainer")
-icon_texture_rect = NodePath("PanelContainer/MarginContainer/HBoxContainer/IconTextureRect")
+icon_texture_control = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control2")
+icon_texture_rect = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control2/IconTextureRect")
 message_label = NodePath("PanelContainer/MarginContainer/HBoxContainer/MessageLabel")
-close_button = NodePath("PanelContainer/MarginContainer/HBoxContainer/CloseButton")
+close_button_control = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control3")
+close_button = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -37,8 +40,19 @@ theme_override_constants/margin_bottom = 6
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="IconTextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="IconTextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/HBoxContainer/Control2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="MessageLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
@@ -49,8 +63,23 @@ text = "Error message will appear here"
 fit_content = true
 scroll_active = false
 
-[node name="CloseButton" type="Button" parent="PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control3" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
-tooltip_text = "Close message"
 
-[connection signal="pressed" from="PanelContainer/MarginContainer/HBoxContainer/CloseButton" to="." method="_on_close_pressed"]
+[node name="CloseButton" type="Button" parent="PanelContainer/MarginContainer/HBoxContainer/Control3"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Close message"
+icon_alignment = 1
+
+[connection signal="pressed" from="PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton" to="." method="_on_close_pressed"]

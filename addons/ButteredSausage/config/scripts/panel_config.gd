@@ -21,10 +21,14 @@ enum Alignment {Left, Center, Right, Justify}
 @export_group("Icon")
 @export var hide_icon: bool = false
 @export var icon: Texture2D
+@export var icon_width: float = 24
+@export var icon_height: float = 24
 
 @export_group("Close Button")
 @export var hide_close_button: bool = false
 @export var close_button_icon: Texture2D
+@export var close_button_width: float = 24
+@export var close_button_height: float = 24
 
 @export_group("Border")
 @export var border_color: Color = Color(0.1, 0.5, 0.1, 0.9)

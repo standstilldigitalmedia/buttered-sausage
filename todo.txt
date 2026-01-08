@@ -1,9 +1,5 @@
 BUTTERED SAUSAGE - CODE IMPROVEMENT TODO LIST
 ==============================================
-#panel_width does nothing#
-
-#why does Display only work in the demo project when it is contained within a VBox? It I put it in a TextureRect
-or MarginContainer, everything goes wonky.#
 
 #size and placement of panels needs to be configurable. Horizontal stack almost never makes sense unless we
 turn the text on its side and then its hard to read. Probably won't include a horizontal stack option. 

@@ -8,8 +8,10 @@ const PANEL_THEME: String = "panel"
 
 @export var panel_container: PanelContainer
 @export var margin_container: MarginContainer
+@export var icon_texture_control: Control
 @export var icon_texture_rect: TextureRect
 @export var message_label: RichTextLabel
+@export var close_button_control: Control
 @export var close_button: Button
 
 var panel_config: ButteredSausagePanelConfig
@@ -48,7 +50,15 @@ func configure() -> void:
 	margin_container.add_theme_constant_override("margin_top", panel_config.margin_top)
 	margin_container.add_theme_constant_override("margin_right", panel_config.margin_right)
 	margin_container.add_theme_constant_override("margin_bottom", panel_config.margin_bottom)
-
+	icon_texture_control.custom_minimum_size.x = panel_config.icon_width
+	icon_texture_control.custom_minimum_size.y = panel_config.icon_height
+	close_button_control.custom_minimum_size.x = panel_config.close_button_width
+	close_button_control.custom_minimum_size.y = panel_config.close_button_height
+	
+	icon_texture_rect.custom_minimum_size.x = panel_config.icon_width
+	icon_texture_rect.custom_minimum_size.y = panel_config.icon_height
+	close_button.custom_minimum_size.x = panel_config.close_button_width
+	close_button.custom_minimum_size.y = panel_config.close_button_height
 
 ## Initializes the panel with message, styling, and auto-dismiss timer.[br][br]
 ##

@@ -243,7 +243,7 @@ See the included demo scene at `demo/error_display_demo.tscn` for interactive ex
 
 ## Part of the AWOC Ecosystem
 
-This addon was developed as part of [AWOC (Avatar Wardrobe Organizer and Colorer)](https://github.com/standstill-interactive/awoc), a comprehensive avatar customization system for Godot. Check out AWOC if you need:
+This addon was developed as part of [AWOC (Avatar Wardrobe Organizer and Colorer)](https://github.com/standstilldigitalmedia/AWOC), a comprehensive avatar customization system for Godot. Check out AWOC if you need:
 - Advanced avatar customization
 - Wardrobe management
 - Color palette systems
@@ -259,9 +259,4 @@ Developed by [Standstill Digital Media](https://standstilldigitalmedia.com)
 
 ## Contributing
 
-Issues and pull requests welcome! Visit the [GitHub repository](https://github.com/standstill-interactive/ssdm-error-display) to contribute.
-
-## Support
-
-- Report bugs via [GitHub Issues](https://github.com/standstill-interactive/ssdm-error-display/issues)
-- Ask questions in [GitHub Discussions](https://github.com/standstill-interactive/ssdm-error-display/discussions)
+Issues and pull requests welcome! Visit the [GitHub repository](https://github.com/standstilldigitalmedia/buttered-sausage) to contribute.
