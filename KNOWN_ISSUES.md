@@ -1,71 +1,63 @@
 # Known Issues
 
-## Rotation Animation Not Playing on Panel Entry
+## Rotation Animation Incompatible with Size Animation
 
 **Severity:** Medium
 **Component:** `ButteredSausageAnimator` (rotation animation)
-**Status:** Help Wanted
+**Status:** Workaround Available
 
 ### Description
 
-Rotation animations configured in `ButteredSausageAnimatorConfig` do not play when a panel first appears (entry animation). The animation only plays during the exit/dismissal phase.
+Rotation animations conflict with size animations when both are enabled simultaneously on the same AnimatorConfig. The rotation pivot point becomes unstable as the container dimensions change during the size animation, causing erratic or non-functional rotation behavior.
+
+### Root Cause
+
+When `animate_size = true` and `animate_rotation = true` are both enabled:
+- The size animation changes the wrapper Control's dimensions frame-by-frame
+- This causes the rotation pivot point to shift during the animation
+- The rotation tween becomes unstable or fails to play correctly
 
 ### Steps to Reproduce
 
-1. Open the demo scene: `addons/ButteredSausage/demo/buttered_sausage_demo.tscn`
-2. Click "Show Warning" button (which uses the rotate animation)
-3. **Expected:** Panel should rotate smoothly as it appears
-4. **Actual:** Panel appears instantly without rotation
-5. Wait for auto-dismiss or click close button
-6. **Observed:** Panel rotates correctly during exit animation
+1. Create a `ButteredSausageAnimatorConfig` with:
+   - `animate_size = true`
+   - `animate_rotation = true`
+   - `rotation_from_degrees = 0.0`
+   - `rotation_to_degrees = 360.0`
+2. Add this config to a panel's animation chain
+3. **Expected:** Panel should slide and rotate simultaneously
+4. **Actual:** Rotation does not play correctly or appears erratic
 
-### Configuration Details
+### Workaround (Confirmed Working)
 
-**Animation Config:** `res://addons/ButteredSausage/config/resource/animation/simple_rotate.tres`
+**Set `animate_size = false` when using rotation animations:**
+
 ```gdscript
-animate_size = false
-animate_rotation = true
+# Working rotation config
+animate_size = false        # Must be false
+animate_rotation = true     # Rotation works perfectly when size is fixed
 rotation_from_degrees = 0.0
 rotation_to_degrees = 360.0
 ```
 
-**Panel Config:** `res://addons/ButteredSausage/config/resource/panel/warning_config.tres`
-- Uses `simple_rotate.tres` in its `animation_chain`
-- `close_behavior = REVERSE_FIRST_ANIMATION` (default)
+With a fixed-size container, rotation animations work flawlessly. You can still combine rotation with other animation types:
+- ✅ Rotation + Fade
+- ✅ Rotation + Scale
+- ✅ Rotation + Position
+- ✅ Rotation + Color
+- ❌ Rotation + Size (known conflict)
 
-### Technical Details
+### Future Plans
 
-The issue appears to be related to Godot's angle normalization in the tween system. Several approaches have been attempted:
+We haven't given up on making rotation and size animations work together. This is on the roadmap for a future update, but it requires deeper investigation into the interaction between container resizing and rotation pivot calculations. If you have expertise in this area and want to contribute a fix, we'd love your help!
 
-1. **Using `.from()` with explicit values** - Godot normalizes 360° (2π) to 0°, making from/to the same value
-2. **Using `.as_relative()`** - Doesn't trigger the animation on entry
-3. **Calculating current + delta** - Still subject to normalization
-4. **Using Godot's TAU constant** - Tried using TAU (2π) directly instead of deg_to_rad(360), but tween still doesn't animate
+### Alternative Approaches
 
-**Current Implementation:** `addons/ButteredSausage/ui/animator.gd:216-226` (forward) and `287-298` (reverse)
-
-### Observations
-
-- Exit/reverse animation works correctly
-- Animation works for non-full-rotation values (e.g., 300°), but displays the final rotated state immediately, then animates in reverse on exit
-- Other animation types (scale, fade, position, etc.) work as expected
-- The rotation initial state setup (lines 178-186) appears correct
-
-### Looking for Help
-
-If you have experience with Godot's Tween system and rotation animations, we'd appreciate your insight! This is likely a simple fix for someone familiar with the nuances of angle interpolation in Godot 4.x.
-
-**Ways to Help:**
-- Review `addons/ButteredSausage/ui/animator.gd` (specifically the `play()` and `reverse()` methods)
-- Test with different Godot 4.x versions
-- Suggest alternative approaches for handling rotation tweens
-- Submit a PR with a fix
-
-### Workarounds
-
-For now, if you need rotation animations:
-1. Consider using scale + position animations as an alternative effect
-2. Use the rotation animation only in `close_animation_chain` where it works correctly
+If you specifically need both sliding (size change) AND rotation effects:
+1. Use two separate AnimationStep entries in your chain:
+   - Step 1: Size animation (slide in/out)
+   - Step 2: Rotation animation with `animate_size = false`
+2. Consider using scale + position animations as an alternative visual effect
 
 ---
 

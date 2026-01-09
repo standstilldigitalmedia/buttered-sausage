@@ -305,6 +305,7 @@ Each config can enable multiple effects simultaneously:
 - `rotation_orbit` - True for orbital rotation, false for spinning in place
 - `rotation_pivot_preset` - Pivot point (CENTER, TOP_LEFT, BOTTOM_RIGHT, etc.)
 - `rotation_pivot_custom` - Custom pivot point if using CUSTOM preset
+- ⚠️ **Note:** Set `animate_size = false` when using rotation. Combining rotation with size animation causes conflicts. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details.
 
 **Position Animation:**
 - `animate_position` - Enable position offset effect
@@ -421,7 +422,7 @@ See the included demo scene at `addons/ButteredSausage/demo/buttered_sausage_dem
 
 ## Known Issues
 
-**Rotation Animation:** Currently, rotation animations do not play when panels first appear (entry animation). They work correctly during exit/dismissal. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details and how you can help fix it.
+**Rotation + Size Animation Conflict:** Rotation animations conflict with size animations when both are enabled on the same AnimatorConfig. **Workaround:** Set `animate_size = false` when using rotation - it works perfectly with a fixed-size container. Rotation can still be combined with fade, scale, position, and color animations. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details and future plans to resolve this.
 
 Other animation types (slide, scale, fade, position, color, shake) work as expected.
 
