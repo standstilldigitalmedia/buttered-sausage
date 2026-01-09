@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ButteredSausageDisplayConfig" load_steps=6 format=3 uid="uid://cf322dwg8y7oa"]
+
+[ext_resource type="Resource" uid="uid://dlk0s3aow7ob8" path="res://addons/ButteredSausage/config/resource/panel/error_config.tres" id="1_bg4uk"]
+[ext_resource type="Resource" uid="uid://bbqyrx4tafifj" path="res://addons/ButteredSausage/config/resource/panel/info_config.tres" id="2_kvjwf"]
+[ext_resource type="Script" uid="uid://cxavv8b2o6lf8" path="res://addons/ButteredSausage/config/scripts/global_config.gd" id="3_c2umw"]
+[ext_resource type="Resource" uid="uid://bs30vg84up3es" path="res://addons/ButteredSausage/config/resource/panel/success_config.tres" id="4_v7stq"]
+[ext_resource type="Resource" uid="uid://dxva4j2oy3ewe" path="res://addons/ButteredSausage/config/resource/panel/warning_config.tres" id="5_bpeuh"]
+
+[resource]
+script = ExtResource("3_c2umw")
+panel_width = 200.0
+position_preset = 4
+margin_from_edge = 0.0
+success_config = ExtResource("4_v7stq")
+error_config = ExtResource("1_bg4uk")
+warning_config = ExtResource("5_bpeuh")
+info_config = ExtResource("2_kvjwf")
+max_visible_panels = 1
+error_priority = 1
+warning_priority = 3
+info_priority = 4

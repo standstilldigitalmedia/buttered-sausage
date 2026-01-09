@@ -14,5 +14,4 @@ close_button_icon = ExtResource("2_7s8hq")
 border_color = Color(0.3491902, 0.5847179, 0.8548469, 0.5)
 duration = 5.0
 animation_chain = Array[ExtResource("1_irkix")]([ExtResource("2_2ew84")])
-close_behavior = 2
 severity = 1

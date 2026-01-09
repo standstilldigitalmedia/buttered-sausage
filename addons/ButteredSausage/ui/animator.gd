@@ -191,6 +191,8 @@ func play() -> void:
 		wrapper.modulate.a = animator_config.fade_from
 	wrapper.show()
 	await wrapper.get_tree().process_frame
+	if not is_instance_valid(wrapper) or not is_instance_valid(panel):
+		return  # Objects were freed during await
 
 	# Set pivot offset to center for in-place scaling (now that panel.size is known)
 	if animator_config.animate_scale:

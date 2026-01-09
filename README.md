@@ -28,6 +28,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 - Fluent builder API for accumulating warnings and info messages
 - State conversion (success → failure, etc.) while preserving details
 - Merge results from nested operations
+- Consistent return pattern for functions with data payload
 - Type-safe with full autocomplete support
 - Standalone - can be used without the UI/display components
 
@@ -203,7 +204,7 @@ This is especially important when validating text input in real-time (e.g., list
 
 ### Display Setup
 
-The `ButteredSausageDisplay` node comes pre-configured with all necessary resources. To customize the display, open `res://addons/ButteredSausage/config/resource/main/global_config.tres` in the Inspector. This file contains a `ButteredSausageDisplayConfig` resource with sensible defaults and references to all severity-specific panel configurations.
+The `ButteredSausageDisplay` node comes pre-configured with all necessary resources. To customize the display, open `res://addons/ButteredSausage/config/resource/display/display_config.tres` in the Inspector. This file contains a `ButteredSausageDisplayConfig` resource with sensible defaults and references to all severity-specific panel configurations.
 
 **ButteredSausageDisplayConfig** properties:
 - `panel_width` - Width of all message panels (default: 400)
@@ -220,19 +221,19 @@ The `max_visible_panels` setting controls how many panels can be displayed simul
 
 **Unlimited Mode** (default) - Show all messages:
 ```gdscript
-# In Inspector: set global_config.max_visible_panels = 0
+# In Inspector: set display_config.max_visible_panels = 0
 ```
 
 **Single Panel Mode** - Show only the highest priority message:
 ```gdscript
-# In Inspector: set global_config.max_visible_panels = 1
-# Uses priority values from global_config (default: ERROR=3, SUCCESS=2, WARNING=1, INFO=0)
+# In Inspector: set display_config.max_visible_panels = 1
+# Uses priority values from display_config (default: ERROR=3, SUCCESS=2, WARNING=1, INFO=0)
 # In case of tie, most recent message wins
 ```
 
 **Limited Mode** - Show up to N messages:
 ```gdscript
-# In Inspector: set global_config.max_visible_panels = 5
+# In Inspector: set display_config.max_visible_panels = 5
 # When limit is reached, oldest panels are automatically dismissed (FIFO)
 ```
 
@@ -362,7 +363,7 @@ These components can be used independently without the full display system:
 
 **ButteredSausage** - Result pattern class
 - **Dependencies:** `ButteredSausageSeverity`
-- **Usage:** Encapsulate operation results with messages, errors, and accumulated details
+- **Usage:** Encapsulate operation results with messages, errors, data payload and accumulated details
 
 **ButteredSausageAnimator** - Control animation system
 - **Dependencies:** `ButteredSausageAnimatorConfig`

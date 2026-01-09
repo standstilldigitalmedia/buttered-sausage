@@ -85,25 +85,49 @@ func _enforce_panel_limit(new_severity: int) -> bool:
 	# Only create new panel if it has higher or equal priority than existing
 	if global_config.max_visible_panels == 1:
 		var new_priority = _get_severity_priority(new_severity)
-		var should_create = true
+		var highest_existing_priority = -1
+		var highest_priority_panel: ButteredSausagePanel = null
 
+		# Find the panel with the highest priority
 		for panel in panels:
+			if not panel.panel_config:
+				continue
 			var panel_priority = _get_severity_priority(panel.panel_config.severity)
-			if panel_priority > new_priority:
-				# Existing panel has higher priority, don't create new one
-				should_create = false
-			else:
-				# New panel has higher or equal priority, remove existing
-				_remove_panel_immediately(panel)
+			if panel_priority > highest_existing_priority:
+				highest_existing_priority = panel_priority
+				highest_priority_panel = panel
 
-		return should_create
+		# If new panel has higher priority than the best existing panel, replace all
+		# If equal priority, new panel wins (most recent behavior)
+		if new_priority >= highest_existing_priority:
+			# Remove all existing panels
+			for panel in panels:
+				_remove_panel_immediately(panel)
+			return true
+		else:
+			# Existing panel has higher priority, don't create new one
+			# But still remove any other lower priority panels to ensure only one remains
+			for panel in panels:
+				if panel != highest_priority_panel:
+					_remove_panel_immediately(panel)
+			return false
 
 	# For max_visible_panels > 1: Remove oldest panels (FIFO) until under limit
 	# We want to stay at (max - 1) to make room for the new panel about to be added
 	while panels.size() >= global_config.max_visible_panels:
-		var oldest_panel = panels[0]  # First panel is oldest (FIFO)
+		# Determine which panel is oldest based on reverse_panel_order setting
+		var oldest_panel: ButteredSausagePanel
+		if global_config.reverse_panel_order:
+			# When reverse order is enabled, new panels are inserted at index 0
+			# So the oldest panel is at the END of the array
+			oldest_panel = panels[panels.size() - 1]
+			panels.remove_at(panels.size() - 1)
+		else:
+			# Default order: new panels are added at the end
+			# So the oldest panel is at index 0
+			oldest_panel = panels[0]
+			panels.remove_at(0)
 		_remove_panel_immediately(oldest_panel)
-		panels.remove_at(0)
 
 	return true  # Always create for limited mode
 	
