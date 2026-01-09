@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_75je4")
 animate_shake = true
+panel_width = 200.0

@@ -7,3 +7,4 @@ script = ExtResource("1_hj2rb")
 animate_size = false
 animate_rotation = true
 rotation_to_degrees = 360.0
+panel_width = 200.0

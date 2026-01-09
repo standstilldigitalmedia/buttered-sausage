@@ -8,8 +8,7 @@
 
 [resource]
 script = ExtResource("3_c2umw")
-panel_width = 200.0
-position_preset = 4
+position_preset = 0
 margin_from_edge = 0.0
 success_config = ExtResource("4_v7stq")
 error_config = ExtResource("1_bg4uk")

@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1_gwtc4")
+panel_width = 200.0
