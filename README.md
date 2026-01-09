@@ -58,7 +58,7 @@ All classes use the `ButteredSausage` prefix to avoid naming conflicts with othe
 var result := ButteredSausage.success("Operation completed!")
 ```
 
-**Curious about the name?** This addon was originally developed as part of the [AWOC (Avatar Wardrobe Organizer and Colorer)](https://github.com/standstilldigitalmedia/AWOC) system, where robust error handling and user feedback were essential. The original prefix was "SSDM" (Standstill Digital Media), but has been rebranded to Buttered Sausage for wider release.
+**About the name:** I asked my wife, Liz, to help name a "result and toast addon." She was probably thinking about breakfast when she blurted out "Buttered Sausage." We looked at each other and just started giggling. The name stuck. It's silly, memorable, and avoids namespace collisions. That's it - just harmless fun, not meant to be anything else.
 
 ## Installation
 
