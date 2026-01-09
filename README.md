@@ -44,7 +44,7 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 - Standalone animator (`ButteredSausageAnimator` + `ButteredSausageAnimatorConfig`) can be used to animate any Control node
 
 ### Configuration System
-- **ButteredSausageDisplayConfig** - Global positioning, panel width, and per-severity configurations
+- **ButteredSausageDisplayConfig** - Display positioning, panel width, and per-severity configurations
 - **ButteredSausagePanelConfig** - Colors, fonts, icons, borders, timing, and animation chains
 - **ButteredSausageAnimatorConfig** - Individual animation effects with full customization
 - All configurations are Resources editable in the Inspector
@@ -271,7 +271,7 @@ Each severity level has its own pre-configured `ButteredSausagePanelConfig` reso
 
 ### Animation Configuration
 
-Unlike the global and panel configurations (which are pre-created), you'll create your own `ButteredSausageAnimatorConfig` resources for custom animations. To create one:
+Unlike the display and panel configurations (which are pre-created), you'll create your own `ButteredSausageAnimatorConfig` resources for custom animations. To create one:
 
 1. Right-click in the FileSystem panel → **New Resource**
 2. Select **Resource** (empty resource)
