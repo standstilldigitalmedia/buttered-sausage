@@ -173,8 +173,7 @@ func play() -> void:
 	# Setup initial states for animations
 	if animator_config.animate_scale:
 		panel.scale = animator_config.scale_from
-		# Set pivot offset for scale (will be overridden by rotation if both are enabled)
-		panel.pivot_offset = _get_scale_pivot_offset(panel)
+		# Pivot offset will be set to center after layout for in-place scaling
 	if animator_config.animate_rotation:
 		if animator_config.rotation_orbit:
 			# Orbital rotation: rotate the panel around a pivot (creates sweeping circular motion)
@@ -192,6 +191,10 @@ func play() -> void:
 		wrapper.modulate.a = animator_config.fade_from
 	wrapper.show()
 	await wrapper.get_tree().process_frame
+
+	# Set pivot offset to center for in-place scaling (now that panel.size is known)
+	if animator_config.animate_scale:
+		panel.pivot_offset = panel.size / 2.0
 
 	# Set or recalculate size after frame
 	if animator_config.animate_size:
@@ -214,10 +217,16 @@ func play() -> void:
 	if animator_config.animate_scale:
 		slide_tween.tween_property(panel, SCALE_PROPERTY, animator_config.scale_to, anim_speed)
 	if animator_config.animate_rotation:
+		# Calculate absolute rotation values to ensure animation plays
+		var from_radians = deg_to_rad(animator_config.rotation_from_degrees)
+		var to_radians = deg_to_rad(animator_config.rotation_to_degrees)
+		# For 360° rotations, use TAU (2*PI) to ensure full rotation is visible
+		if animator_config.rotation_to_degrees == 360.0 and animator_config.rotation_from_degrees == 0.0:
+			to_radians = TAU
 		if animator_config.rotation_orbit:
-			slide_tween.tween_property(panel, ROTATION_PROPERTY, deg_to_rad(animator_config.rotation_to_degrees), anim_speed)
+			slide_tween.tween_property(panel, ROTATION_PROPERTY, to_radians, anim_speed).from(from_radians)
 		else:
-			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, deg_to_rad(animator_config.rotation_to_degrees), anim_speed)
+			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, to_radians, anim_speed).from(from_radians)
 	if animator_config.animate_position:
 		slide_tween.tween_property(panel, POSITION_PROPERTY, Vector2.ZERO, anim_speed)
 	if animator_config.animate_color:
@@ -279,16 +288,17 @@ func reverse() -> void:
 	if animator_config.animate_scale:
 		slide_tween.tween_property(panel, SCALE_PROPERTY, animator_config.scale_from, anim_speed)
 	if animator_config.animate_rotation:
-		# Calculate the reverse rotation target
-		# If rotating a full 360 degrees (or multiple), we need to rotate backwards by that amount
-		# to avoid the issue where Godot normalizes 360° to 0°, making from and to the same value
-		var rotation_delta = animator_config.rotation_to_degrees - animator_config.rotation_from_degrees
-		var reverse_target_degrees = animator_config.rotation_from_degrees - rotation_delta
+		# Calculate absolute rotation values for reverse animation
+		var from_radians = deg_to_rad(animator_config.rotation_from_degrees)
+		var to_radians = deg_to_rad(animator_config.rotation_to_degrees)
+		# For 360° rotations, use TAU to match the forward animation
+		if animator_config.rotation_to_degrees == 360.0 and animator_config.rotation_from_degrees == 0.0:
+			to_radians = TAU
 
 		if animator_config.rotation_orbit:
-			slide_tween.tween_property(panel, ROTATION_PROPERTY, deg_to_rad(reverse_target_degrees), anim_speed)
+			slide_tween.tween_property(panel, ROTATION_PROPERTY, from_radians, anim_speed).from(to_radians)
 		else:
-			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, deg_to_rad(reverse_target_degrees), anim_speed)
+			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, from_radians, anim_speed).from(to_radians)
 	if animator_config.animate_position:
 		slide_tween.tween_property(panel, POSITION_PROPERTY, animator_config.position_offset, anim_speed)
 	if animator_config.animate_color:
