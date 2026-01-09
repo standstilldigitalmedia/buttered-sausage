@@ -422,7 +422,7 @@ See the included demo scene at `addons/ButteredSausage/demo/buttered_sausage_dem
 
 ## Known Issues
 
-**Rotation + Size Animation Conflict:** Rotation animations conflict with size animations when both are enabled on the same AnimatorConfig. **Workaround:** Set `animate_size = false` when using rotation - it works perfectly with a fixed-size container. Rotation can still be combined with fade, scale, position, and color animations. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details and future plans to resolve this.
+**Rotation Animation Conflicts:** Rotation animations conflict with size and position animations when enabled simultaneously on the same AnimatorConfig. **Workaround:** Set `animate_size = false` and `animate_position = false` when using rotation - it works perfectly with a stable container. Rotation can be combined with fade, scale, and color animations. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details and future plans to resolve this.
 
 Other animation types (slide, scale, fade, position, color, shake) work as expected.
 

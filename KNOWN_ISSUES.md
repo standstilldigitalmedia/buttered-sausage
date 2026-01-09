@@ -1,6 +1,6 @@
 # Known Issues
 
-## Rotation Animation Incompatible with Size Animation
+## Rotation Animation Incompatible with Size and Position Animations
 
 **Severity:** Medium
 **Component:** `ButteredSausageAnimator` (rotation animation)
@@ -8,56 +8,58 @@
 
 ### Description
 
-Rotation animations conflict with size animations when both are enabled simultaneously on the same AnimatorConfig. The rotation pivot point becomes unstable as the container dimensions change during the size animation, causing erratic or non-functional rotation behavior.
+Rotation animations conflict with size and position animations when enabled simultaneously on the same AnimatorConfig. The rotation pivot point becomes unstable as the container dimensions or position change during the animation, causing erratic or non-functional rotation behavior.
 
 ### Root Cause
 
-When `animate_size = true` and `animate_rotation = true` are both enabled:
-- The size animation changes the wrapper Control's dimensions frame-by-frame
-- This causes the rotation pivot point to shift during the animation
+When rotation is combined with size or position animations:
+- Size animation changes the wrapper Control's dimensions frame-by-frame
+- Position animation moves the Control, affecting rotation calculations
+- Either causes the rotation pivot point to shift during the animation
 - The rotation tween becomes unstable or fails to play correctly
 
 ### Steps to Reproduce
 
 1. Create a `ButteredSausageAnimatorConfig` with:
-   - `animate_size = true`
+   - `animate_size = true` OR `animate_position = true`
    - `animate_rotation = true`
    - `rotation_from_degrees = 0.0`
    - `rotation_to_degrees = 360.0`
 2. Add this config to a panel's animation chain
-3. **Expected:** Panel should slide and rotate simultaneously
+3. **Expected:** Panel should slide/move and rotate simultaneously
 4. **Actual:** Rotation does not play correctly or appears erratic
 
 ### Workaround (Confirmed Working)
 
-**Set `animate_size = false` when using rotation animations:**
+**Disable size and position animations when using rotation:**
 
 ```gdscript
 # Working rotation config
 animate_size = false        # Must be false
-animate_rotation = true     # Rotation works perfectly when size is fixed
+animate_position = false    # Must be false
+animate_rotation = true     # Rotation works perfectly when container is stable
 rotation_from_degrees = 0.0
 rotation_to_degrees = 360.0
 ```
 
-With a fixed-size container, rotation animations work flawlessly. You can still combine rotation with other animation types:
+With a stable container (no size or position changes), rotation animations work flawlessly. You can still combine rotation with other animation types:
 - ✅ Rotation + Fade
 - ✅ Rotation + Scale
-- ✅ Rotation + Position
 - ✅ Rotation + Color
 - ❌ Rotation + Size (known conflict)
+- ❌ Rotation + Position (known conflict)
 
 ### Future Plans
 
-We haven't given up on making rotation and size animations work together. This is on the roadmap for a future update, but it requires deeper investigation into the interaction between container resizing and rotation pivot calculations. If you have expertise in this area and want to contribute a fix, we'd love your help!
+We haven't given up on making rotation work with size and position animations. This is on the roadmap for a future update, but it requires deeper investigation into the interaction between container transformations and rotation pivot calculations. If you have expertise in this area and want to contribute a fix, we'd love your help!
 
 ### Alternative Approaches
 
-If you specifically need both sliding (size change) AND rotation effects:
+If you specifically need sliding/moving AND rotation effects:
 1. Use two separate AnimationStep entries in your chain:
-   - Step 1: Size animation (slide in/out)
-   - Step 2: Rotation animation with `animate_size = false`
-2. Consider using scale + position animations as an alternative visual effect
+   - Step 1: Size or position animation (slide/move in/out)
+   - Step 2: Rotation animation with `animate_size = false` and `animate_position = false`
+2. Consider combining rotation with scale + fade for dynamic visual effects
 
 ---
 
