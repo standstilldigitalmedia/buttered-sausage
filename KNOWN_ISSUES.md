@@ -74,4 +74,4 @@ For now, if you need rotation animations:
 - `addons/ButteredSausage/config/scripts/animator_config.gd` - Configuration structure
 - `addons/ButteredSausage/config/resource/animation/simple_rotate.tres` - Example rotation config
 
-**Discussion:** [Link to issue when created]
+**Discussion:** [GitHub Issue #2](https://github.com/standstilldigitalmedia/buttered-sausage/issues/2)
