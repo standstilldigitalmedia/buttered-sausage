@@ -416,6 +416,12 @@ See the included demo scene at `addons/ButteredSausage/demo/buttered_sausage_dem
 - Validation with multiple errors
 - Various animation configurations
 
+## Known Issues
+
+**Rotation Animation:** Currently, rotation animations do not play when panels first appear (entry animation). They work correctly during exit/dismissal. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details and how you can help fix it.
+
+Other animation types (slide, scale, fade, position, color, shake) work as expected.
+
 ## Part of the AWOC Ecosystem
 
 This addon was developed as part of [AWOC (Avatar Wardrobe Organizer and Colorer)](https://github.com/standstilldigitalmedia/AWOC), a comprehensive avatar customization system for Godot. Check out AWOC if you need:
@@ -431,6 +437,12 @@ MIT License - See LICENSE file for details
 ## Credits
 
 Developed by [Standstill Digital Media](https://github.com/standstilldigitalmedia/)
+
+## Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+**Help Wanted:** We especially need help with the rotation animation bug. If you have Godot Tween expertise, check out [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 ## Support
 
