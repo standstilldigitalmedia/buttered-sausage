@@ -4,6 +4,14 @@ A visual error/message display system for Godot 4.x with integrated Result patte
 
 ![Buttered Sausage in Action](screenshots/buttered_sausge_animation.gif)
 
+### Screenshots
+
+![Message Display](screenshots/display1.png)
+*Multiple severity levels with auto-dismiss and manual close options*
+
+![Configuration](screenshots/config.png)
+*Fully customizable via inspector-editable Resource files*
+
 ## Overview
 
 Buttered Sausage provides a complete solution for displaying operation results and messages in your Godot applications. It combines:

@@ -21,3 +21,9 @@
 *.txt text eol=lf
 *.json text eol=lf
 *.cfg text eol=lf
+
+# Asset Library Export Settings
+# Only export the addon folder, exclude everything else
+/** export-ignore
+/addons !export-ignore
+/addons/** !export-ignore
