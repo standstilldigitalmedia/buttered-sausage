@@ -21,6 +21,7 @@ const POSITION_X_PROPERTY: String = "position:x"
 
 var wrapper: Control
 var panel: Control
+var rotation_container: Control  # Middle layer for rotation isolation
 var slide_tween: Tween
 var is_open: bool = false
 var _monitoring: bool = false
@@ -175,14 +176,10 @@ func play() -> void:
 		panel.scale = animator_config.scale_from
 		# Pivot offset will be set to center after layout for in-place scaling
 	if animator_config.animate_rotation:
-		if animator_config.rotation_orbit:
-			# Orbital rotation: rotate the panel around a pivot (creates sweeping circular motion)
-			panel.rotation = deg_to_rad(animator_config.rotation_from_degrees)
-			panel.pivot_offset = _get_pivot_offset(panel)
-		else:
-			# Spin in place: rotate the wrapper (panel spins without moving position)
-			wrapper.rotation = deg_to_rad(animator_config.rotation_from_degrees)
-			wrapper.pivot_offset = _get_pivot_offset(wrapper)
+		# Use rotation_container if it exists (when combined with scale/position)
+		var rotation_target = rotation_container if rotation_container else (panel if animator_config.rotation_orbit else wrapper)
+		rotation_target.rotation = deg_to_rad(animator_config.rotation_from_degrees)
+		rotation_target.pivot_offset = _get_pivot_offset(rotation_target)
 	if animator_config.animate_position:
 		panel.position = animator_config.position_offset
 	if animator_config.animate_color:
@@ -194,9 +191,10 @@ func play() -> void:
 	if not is_instance_valid(wrapper) or not is_instance_valid(panel):
 		return  # Objects were freed during await
 
-	# Set pivot offset to center for in-place scaling (now that panel.size is known)
+	# Set pivot offset for in-place scaling (now that panel.size is known)
+	# When rotation_container exists, scale and rotation use different nodes - no conflict
 	if animator_config.animate_scale:
-		panel.pivot_offset = panel.size / 2.0
+		panel.pivot_offset = _get_scale_pivot_offset(panel)
 
 	# Set or recalculate size after frame
 	if animator_config.animate_size:
@@ -225,10 +223,9 @@ func play() -> void:
 		# For 360° rotations, use TAU (2*PI) to ensure full rotation is visible
 		if animator_config.rotation_to_degrees == 360.0 and animator_config.rotation_from_degrees == 0.0:
 			to_radians = TAU
-		if animator_config.rotation_orbit:
-			slide_tween.tween_property(panel, ROTATION_PROPERTY, to_radians, anim_speed).from(from_radians)
-		else:
-			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, to_radians, anim_speed).from(from_radians)
+		# Use rotation_container if it exists (isolates rotation from scale/position)
+		var rotation_target = rotation_container if rotation_container else (panel if animator_config.rotation_orbit else wrapper)
+		slide_tween.tween_property(rotation_target, ROTATION_PROPERTY, to_radians, anim_speed).from(from_radians)
 	if animator_config.animate_position:
 		slide_tween.tween_property(panel, POSITION_PROPERTY, Vector2.ZERO, anim_speed)
 	if animator_config.animate_color:
@@ -296,11 +293,9 @@ func reverse() -> void:
 		# For 360° rotations, use TAU to match the forward animation
 		if animator_config.rotation_to_degrees == 360.0 and animator_config.rotation_from_degrees == 0.0:
 			to_radians = TAU
-
-		if animator_config.rotation_orbit:
-			slide_tween.tween_property(panel, ROTATION_PROPERTY, from_radians, anim_speed).from(to_radians)
-		else:
-			slide_tween.tween_property(wrapper, ROTATION_PROPERTY, from_radians, anim_speed).from(to_radians)
+		# Use rotation_container if it exists (isolates rotation from scale/position)
+		var rotation_target = rotation_container if rotation_container else (panel if animator_config.rotation_orbit else wrapper)
+		slide_tween.tween_property(rotation_target, ROTATION_PROPERTY, from_radians, anim_speed).from(to_radians)
 	if animator_config.animate_position:
 		slide_tween.tween_property(panel, POSITION_PROPERTY, animator_config.position_offset, anim_speed)
 	if animator_config.animate_color:
@@ -321,8 +316,11 @@ func reverse() -> void:
 	if animator_config.animate_scale:
 		panel.scale = Vector2.ONE
 	if animator_config.animate_rotation:
-		panel.rotation = 0.0
-		wrapper.rotation = 0.0
+		if rotation_container:
+			rotation_container.rotation = 0.0
+		else:
+			panel.rotation = 0.0
+			wrapper.rotation = 0.0
 	if animator_config.animate_position:
 		panel.position = Vector2.ZERO
 	if animator_config.animate_color:
@@ -354,8 +352,11 @@ func close_immediate() -> void:
 		if animator_config.animate_scale:
 			panel.scale = Vector2.ONE
 		if animator_config.animate_rotation:
-			panel.rotation = 0.0
-			wrapper.rotation = 0.0
+			if rotation_container:
+				rotation_container.rotation = 0.0
+			else:
+				panel.rotation = 0.0
+				wrapper.rotation = 0.0
 		if animator_config.animate_position:
 			wrapper.position = Vector2.ZERO
 		if animator_config.animate_color:
@@ -421,3 +422,27 @@ func _init(panel_wrapper: Control, panel_container: Control, config: ButteredSau
 	wrapper = panel_wrapper
 	panel = panel_container
 	animator_config = config
+
+	# If rotation + (scale OR position), create isolation layer
+	if animator_config.animate_rotation and (animator_config.animate_scale or animator_config.animate_position):
+		var panel_parent = panel.get_parent()
+
+		# Check if rotation container already exists from a previous animation
+		if panel_parent and panel_parent.name == "RotationIsolationLayer":
+			rotation_container = panel_parent
+		else:
+			# Create transparent rotation container
+			rotation_container = Control.new()
+			rotation_container.name = "RotationIsolationLayer"
+			rotation_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			rotation_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+			# Reparent panel under rotation container
+			if panel_parent:
+				var panel_index = panel.get_index()
+				panel_parent.remove_child(panel)
+				panel_parent.add_child(rotation_container)
+				panel_parent.move_child(rotation_container, panel_index)
+				rotation_container.add_child(panel)
+				# Panel fills the rotation container
+				panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
