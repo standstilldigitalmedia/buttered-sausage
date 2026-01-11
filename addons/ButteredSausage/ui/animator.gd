@@ -423,26 +423,8 @@ func _init(panel_wrapper: Control, panel_container: Control, config: ButteredSau
 	panel = panel_container
 	animator_config = config
 
-	# If rotation + (scale OR position), create isolation layer
+	# If rotation + (scale OR position), use the rotation container from the scene
 	if animator_config.animate_rotation and (animator_config.animate_scale or animator_config.animate_position):
-		var panel_parent = panel.get_parent()
-
-		# Check if rotation container already exists from a previous animation
-		if panel_parent and panel_parent.name == "RotationIsolationLayer":
-			rotation_container = panel_parent
-		else:
-			# Create transparent rotation container
-			rotation_container = Control.new()
-			rotation_container.name = "RotationIsolationLayer"
-			rotation_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			rotation_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-			# Reparent panel under rotation container
-			if panel_parent:
-				var panel_index = panel.get_index()
-				panel_parent.remove_child(panel)
-				panel_parent.add_child(rotation_container)
-				panel_parent.move_child(rotation_container, panel_index)
-				rotation_container.add_child(panel)
-				# Panel fills the rotation container
-				panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		# Access rotation_container from the wrapper (ButteredSausagePanel)
+		if wrapper.has_method("get") and wrapper.get("rotation_container"):
+			rotation_container = wrapper.get("rotation_container")

@@ -8,6 +8,7 @@ extends Control
 
 const PANEL_THEME: String = "panel"
 
+@export var rotation_container: Control
 @export var panel_container: PanelContainer
 @export var margin_container: MarginContainer
 @export var icon_texture_control: Control

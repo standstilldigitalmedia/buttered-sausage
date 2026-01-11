@@ -5,7 +5,7 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
 bg_color = Color(1, 1, 1, 0.078431375)
 
-[node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
+[node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 3
 anchors_preset = 0
@@ -14,37 +14,47 @@ offset_bottom = 16.0
 size_flags_horizontal = 3
 size_flags_vertical = 4
 script = ExtResource("1_astwa")
-panel_container = NodePath("PanelContainer")
-margin_container = NodePath("PanelContainer/MarginContainer")
-icon_texture_control = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control2")
-icon_texture_rect = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control2/IconTextureRect")
-message_label = NodePath("PanelContainer/MarginContainer/HBoxContainer/MessageLabel")
-close_button_control = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control3")
-close_button = NodePath("PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton")
+rotation_container = NodePath("RotationIsolationLayer")
+panel_container = NodePath("RotationIsolationLayer/PanelContainer")
+margin_container = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer")
+icon_texture_control = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2")
+icon_texture_rect = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2/IconTextureRect")
+message_label = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/MessageLabel")
+close_button_control = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3")
+close_button = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="RotationIsolationLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_astwa")
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 6
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="RotationIsolationLayer/PanelContainer/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Control2" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control2" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="IconTextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/HBoxContainer/Control2"]
+[node name="IconTextureRect" type="TextureRect" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -54,7 +64,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MessageLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/HBoxContainer"]
+[node name="MessageLabel" type="RichTextLabel" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -63,10 +73,10 @@ text = "Error message will appear here"
 fit_content = true
 scroll_active = false
 
-[node name="Control3" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control3" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="CloseButton" type="Button" parent="PanelContainer/MarginContainer/HBoxContainer/Control3"]
+[node name="CloseButton" type="Button" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -82,4 +92,4 @@ grow_vertical = 2
 tooltip_text = "Close message"
 icon_alignment = 1
 
-[connection signal="pressed" from="PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton" to="." method="_on_close_pressed"]
+[connection signal="pressed" from="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton" to="." method="_on_close_pressed"]
