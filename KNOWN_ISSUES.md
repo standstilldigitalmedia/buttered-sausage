@@ -1,71 +1,75 @@
 # Known Issues
 
-## Rotation Animation Incompatible with Size and Position Animations
+## Size Animation Cannot Combine with Other Transform Animations
 
-**Severity:** Medium
-**Component:** `ButteredSausageAnimator` (rotation animation)
-**Status:** Workaround Available
+**Severity:** Low
+**Component:** `ButteredSausageAnimator` (size animation)
+**Status:** Known Limitation
 
 ### Description
 
-Rotation animations conflict with size and position animations when enabled simultaneously on the same AnimatorConfig. The rotation pivot point becomes unstable as the container dimensions or position change during the animation, causing erratic or non-functional rotation behavior.
+Size animation cannot be combined with other transform animations (Rotation, Scale, Position) in the same AnimatorConfig. However, Rotation, Scale, and Position can all work together simultaneously.
 
-### Root Cause
+### Technical Explanation
 
-When rotation is combined with size or position animations:
-- Size animation changes the wrapper Control's dimensions frame-by-frame
-- Position animation moves the Control, affecting rotation calculations
-- Either causes the rotation pivot point to shift during the animation
-- The rotation tween becomes unstable or fails to play correctly
+Size animation changes the wrapper Control's dimensions to create a slide/reveal effect. This is fundamentally different from transform animations (Rotation, Scale, Position) which manipulate nodes in-place without changing container dimensions. The size animation affects the layout system in ways that conflict with transform calculations.
 
-### Steps to Reproduce
+### Working Combinations
 
-1. Create a `ButteredSausageAnimatorConfig` with:
-   - `animate_size = true` OR `animate_position = true`
-   - `animate_rotation = true`
-   - `rotation_from_degrees = 0.0`
-   - `rotation_to_degrees = 360.0`
-2. Add this config to a panel's animation chain
-3. **Expected:** Panel should slide/move and rotate simultaneously
-4. **Actual:** Rotation does not play correctly or appears erratic
+✅ **These work perfectly together:**
+- Rotation + Scale + Position
+- Rotation + Scale
+- Rotation + Position
+- Scale + Position
+- Any transform animation + Fade
+- Any transform animation + Color
 
-### Workaround (Confirmed Working)
+❌ **Size cannot combine with:**
+- Size + Rotation
+- Size + Scale
+- Size + Position
+- Size + any transform animation
 
-**Disable size and position animations when using rotation:**
+✅ **Size works with:**
+- Size + Fade
+- Size + Color
+- Size alone (perfect for slide-out menus)
 
-```gdscript
-# Working rotation config
-animate_size = false        # Must be false
-animate_position = false    # Must be false
-animate_rotation = true     # Rotation works perfectly when container is stable
-rotation_from_degrees = 0.0
-rotation_to_degrees = 360.0
-```
+### Recommended Usage
 
-With a stable container (no size or position changes), rotation animations work flawlessly. You can still combine rotation with other animation types:
-- ✅ Rotation + Fade
-- ✅ Rotation + Scale
-- ✅ Rotation + Color
-- ❌ Rotation + Size (known conflict)
-- ❌ Rotation + Position (known conflict)
+**Size animation** is designed for slide-out panels, drawers, and menu reveals where the container needs to expand/contract.
 
-### Future Plans
-
-We haven't given up on making rotation work with size and position animations. This is on the roadmap for a future update, but it requires deeper investigation into the interaction between container transformations and rotation pivot calculations. If you have expertise in this area and want to contribute a fix, we'd love your help!
+**Transform animations** (Rotation, Scale, Position) are designed for in-place effects where the container stays stable.
 
 ### Alternative Approaches
 
-If you specifically need sliding/moving AND rotation effects:
+If you need both sliding AND transform effects:
 1. Use two separate AnimationStep entries in your chain:
-   - Step 1: Size or position animation (slide/move in/out)
-   - Step 2: Rotation animation with `animate_size = false` and `animate_position = false`
-2. Consider combining rotation with scale + fade for dynamic visual effects
+   - Step 1: Size animation (slide in/out)
+   - Step 2: Transform animations (rotate, scale, position)
+2. This creates a sequential effect: slide in, then transform
+
+### Example Configuration
+
+```gdscript
+# Working: All three transforms together
+animate_size = false
+animate_rotation = true
+animate_scale = true
+animate_position = true
+
+# Working: Size with visual effects
+animate_size = true
+animate_fade = true
+animate_color = true
+
+# Not supported: Size with transforms
+animate_size = true
+animate_rotation = true  # These will conflict
+```
 
 ---
 
 **Related Files:**
 - `addons/ButteredSausage/ui/animator.gd` - Animation logic
 - `addons/ButteredSausage/config/scripts/animator_config.gd` - Configuration structure
-- `addons/ButteredSausage/config/resource/animation/simple_rotate.tres` - Example rotation config
-
-**Discussion:** [GitHub Issue #2](https://github.com/standstilldigitalmedia/buttered-sausage/issues/2)

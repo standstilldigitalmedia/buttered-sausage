@@ -170,15 +170,21 @@ func play() -> void:
 		rotation_target.rotation = deg_to_rad(animator_config.rotation_from_degrees)
 		rotation_target.pivot_offset = _get_pivot_offset(rotation_target)
 	if animator_config.animate_position:
-		panel.position = animator_config.position_offset
+		# Get scene rotation_container to apply position to the right node
+		var scene_rotation_container = wrapper.get("rotation_container") if wrapper.has_method("get") else null
+		# Apply position to rotation_container if it exists, otherwise to panel
+		if scene_rotation_container:
+			scene_rotation_container.position = animator_config.position_offset
+		else:
+			panel.position = animator_config.position_offset
 	if animator_config.animate_color:
 		wrapper.modulate = animator_config.color_from
 	elif animator_config.animate_fade:
 		wrapper.modulate.a = animator_config.fade_from
 
-	# Enable clipping ONLY for size animations (reveal effect)
-	# Don't clip position (offset content would be hidden) or rotation (extends beyond bounds)
-	wrapper.clip_contents = animator_config.animate_size and not animator_config.animate_rotation
+	# Enable clipping for size or position animations (reveal/contain effect)
+	# Don't clip if rotation is active (extends beyond bounds)
+	wrapper.clip_contents = (animator_config.animate_size or animator_config.animate_position) and not animator_config.animate_rotation
 
 	wrapper.show()
 	await wrapper.get_tree().process_frame
@@ -232,7 +238,11 @@ func play() -> void:
 		var rotation_target = panel if animator_config.rotation_orbit else (rotation_container if rotation_container else wrapper)
 		slide_tween.tween_property(rotation_target, ROTATION_PROPERTY, to_radians, anim_speed).from(from_radians)
 	if animator_config.animate_position:
-		slide_tween.tween_property(panel, POSITION_PROPERTY, Vector2.ZERO, anim_speed)
+		# Get scene rotation_container to animate the right node
+		var scene_rotation_container = wrapper.get("rotation_container") if wrapper.has_method("get") else null
+		# Animate position on rotation_container if it exists, otherwise on panel
+		var position_target = scene_rotation_container if scene_rotation_container else panel
+		slide_tween.tween_property(position_target, POSITION_PROPERTY, Vector2.ZERO, anim_speed)
 	if animator_config.animate_color:
 		slide_tween.tween_property(wrapper, MODULATE_PROPERTY, animator_config.color_to, anim_speed)
 	elif animator_config.animate_fade:
@@ -302,7 +312,11 @@ func reverse() -> void:
 		var rotation_target = panel if animator_config.rotation_orbit else (rotation_container if rotation_container else wrapper)
 		slide_tween.tween_property(rotation_target, ROTATION_PROPERTY, from_radians, anim_speed).from(to_radians)
 	if animator_config.animate_position:
-		slide_tween.tween_property(panel, POSITION_PROPERTY, animator_config.position_offset, anim_speed)
+		# Get scene rotation_container to animate the right node
+		var scene_rotation_container = wrapper.get("rotation_container") if wrapper.has_method("get") else null
+		# Animate position on rotation_container if it exists, otherwise on panel
+		var position_target = scene_rotation_container if scene_rotation_container else panel
+		slide_tween.tween_property(position_target, POSITION_PROPERTY, animator_config.position_offset, anim_speed)
 	if animator_config.animate_color:
 		slide_tween.tween_property(wrapper, MODULATE_PROPERTY, animator_config.color_from, anim_speed)
 	elif animator_config.animate_fade:
@@ -328,7 +342,12 @@ func reverse() -> void:
 		else:
 			wrapper.rotation = 0.0
 	if animator_config.animate_position:
-		panel.position = Vector2.ZERO
+		# Get scene rotation_container to reset the right node
+		var scene_rotation_container = wrapper.get("rotation_container") if wrapper.has_method("get") else null
+		if scene_rotation_container:
+			scene_rotation_container.position = Vector2.ZERO
+		else:
+			panel.position = Vector2.ZERO
 	if animator_config.animate_color:
 		wrapper.modulate = Color.WHITE
 	elif animator_config.animate_fade:
@@ -368,7 +387,12 @@ func close_immediate() -> void:
 			else:
 				wrapper.rotation = 0.0
 		if animator_config.animate_position:
-			panel.position = Vector2.ZERO
+			# Get scene rotation_container to reset the right node
+			var scene_rotation_container = wrapper.get("rotation_container") if wrapper.has_method("get") else null
+			if scene_rotation_container:
+				scene_rotation_container.position = Vector2.ZERO
+			else:
+				panel.position = Vector2.ZERO
 		if animator_config.animate_color:
 			wrapper.modulate = Color.WHITE
 		elif animator_config.animate_fade:

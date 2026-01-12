@@ -44,12 +44,14 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 
 ### Animation System
 - Animation chains - sequential series of effects
+- **Transform animations work together:** Rotation, Scale, and Position can all animate simultaneously
 - Multiple simultaneous effects: slide, scale, fade, rotation, color, position
 - Shake effect for emphasis
 - Configurable pivot points for rotation and scale
 - Full control over timing, easing, and transitions
 - Support for looping animations
 - Standalone animator (`ButteredSausageAnimator` + `ButteredSausageAnimatorConfig`) can be used to animate any Control node
+- **Note:** Size animation cannot be combined with transform animations (see KNOWN_ISSUES.md)
 
 ### Configuration System
 - **ButteredSausageDisplayConfig** - Display positioning, panel width, and per-severity configurations
@@ -313,7 +315,7 @@ Each config can enable multiple effects simultaneously:
 - `rotation_orbit` - True for orbital rotation, false for spinning in place
 - `rotation_pivot_preset` - Pivot point (CENTER, TOP_LEFT, BOTTOM_RIGHT, etc.)
 - `rotation_pivot_custom` - Custom pivot point if using CUSTOM preset
-- ⚠️ **Note:** Set `animate_size = false` when using rotation. Combining rotation with size animation causes conflicts. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details.
+- ⚠️ **Note:** Rotation works perfectly with Scale and Position. However, Size animation cannot be combined with transform animations. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details.
 
 **Position Animation:**
 - `animate_position` - Enable position offset effect
@@ -430,9 +432,9 @@ See the included demo scene at `addons/ButteredSausage/demo/buttered_sausage_dem
 
 ## Known Issues
 
-**Rotation Animation Conflicts:** Rotation animations conflict with size and position animations when enabled simultaneously on the same AnimatorConfig. **Workaround:** Set `animate_size = false` and `animate_position = false` when using rotation - it works perfectly with a stable container. Rotation can be combined with fade, scale, and color animations. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details and future plans to resolve this.
+**Size Animation Limitation:** Size animation cannot be combined with transform animations (Rotation, Scale, Position) in the same AnimatorConfig. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for technical details.
 
-Other animation types (slide, scale, fade, position, color, shake) work as expected.
+**Good news:** Rotation, Scale, and Position all work together perfectly! You can combine all three for complex transform effects.
 
 ## Part of the AWOC Ecosystem
 
@@ -444,7 +446,9 @@ This addon was developed as part of [AWOC (Avatar Wardrobe Organizer and Colorer
 
 ## License
 
-MIT License - See LICENSE file for details
+BSD Zero Clause License - See LICENSE file for details
+
+This means you can do whatever you want with this software. No attribution required, no restrictions.
 
 ## Credits
 
@@ -453,8 +457,6 @@ Developed by [Standstill Digital Media](https://github.com/standstilldigitalmedi
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-**Help Wanted:** We especially need help with the rotation animation bug. If you have Godot Tween expertise, check out [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 ## Support
 
