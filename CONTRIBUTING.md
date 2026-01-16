@@ -71,13 +71,7 @@ Thank you for your interest in contributing! This addon was developed with care 
 
 ## Priority Areas for Help
 
-### 🔥 High Priority: Rotation Animation Bug
-
-The rotation animation currently doesn't play when panels first appear. This is a tricky Godot tween issue we haven't cracked yet. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details.
-
-**Ideal Contributor:** Someone with deep knowledge of Godot's Tween system and angle interpolation
-
-### Other Areas
+### Areas for Contribution
 
 - **Animation Presets:** More pre-configured animation resources
 - **Documentation:** Tutorials, examples, video guides
@@ -113,7 +107,7 @@ addons/ButteredSausage/
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be dedicated to the public domain under CC0 1.0 Universal.
 
 ---
 

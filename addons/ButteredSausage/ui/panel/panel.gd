@@ -42,8 +42,8 @@ func configure() -> void:
 	panel_container.add_theme_stylebox_override(PANEL_THEME, cached_styles[severity])
 	if panel_config.font:
 		message_label.add_theme_font_override("normal_font", panel_config.font)
-	message_label.add_theme_color_override("normal_font", panel_config.font_color)
-	message_label.add_theme_font_size_override("normal_font", panel_config.font_size)
+	message_label.add_theme_color_override("default_color", panel_config.font_color)
+	message_label.add_theme_font_size_override("normal_font_size", panel_config.font_size)
 	message_label.horizontal_alignment = panel_config.label_text_alignment as int
 	if panel_config.hide_icon:
 		icon_texture_rect.hide()
@@ -107,8 +107,10 @@ func slide_open() -> void:
 		if anim_config.loop_animation:
 			has_looping_animations = true
 		if anim_config.animate_color:
-			var stylebox = StyleBoxFlat.new()
-			stylebox.bg_color = Color(1.0, 1.0, 1.0, 1.0)
+			# Create a stylebox with all the configured styling (corners, borders, etc.)
+			# Animator will tween the bg_color property directly
+			var stylebox = panel_config.create_stylebox()
+			stylebox.bg_color = anim_config.color_from
 			panel_container.add_theme_stylebox_override(PANEL_THEME, stylebox)
 		var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
 		await animator.play()

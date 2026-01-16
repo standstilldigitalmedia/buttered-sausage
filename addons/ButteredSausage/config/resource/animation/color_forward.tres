@@ -1,12 +1,10 @@
-[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://1r45vqkbmg4l"]
+[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://dxrkmlgbm7xee"]
 
-[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_w6f05"]
+[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_dsij5"]
 
 [resource]
-script = ExtResource("1_w6f05")
-animate_size = false
+script = ExtResource("1_dsij5")
 animate_color = true
 color_from = Color(1, 0, 0, 1)
 color_to = Color(1, 0, 0, 0.11764706)
-panel_width = 200.0
 loop_animation = true

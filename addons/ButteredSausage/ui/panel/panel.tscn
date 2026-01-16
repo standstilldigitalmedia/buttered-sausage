@@ -6,10 +6,9 @@
 bg_color = Color(1, 1, 1, 0.078431375)
 
 [node name="ButteredSausagePanel" type="Control" node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
-custom_minimum_size = Vector2(300, 0)
 layout_mode = 3
 anchors_preset = 0
-offset_right = 300.0
+offset_right = 40.0
 offset_bottom = 40.0
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -25,15 +24,20 @@ close_button = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/H
 
 [node name="RotationIsolationLayer" type="Control" parent="."]
 layout_mode = 1
-anchors_preset = 0
-offset_right = 300.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer"]
-layout_mode = 0
-offset_right = 300.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_astwa")
 
 [node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer"]

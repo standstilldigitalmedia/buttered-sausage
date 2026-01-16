@@ -2,7 +2,7 @@
 
 A visual error/message display system for Godot 4.x with integrated Result pattern for fluent error handling.
 
-![Buttered Sausage in Action](screenshots/buttered_sausge_animation.gif)
+![Buttered Sausage in Action](screenshots/buttered_sausage_animation.gif)
 
 ### Screenshots
 
@@ -213,6 +213,44 @@ error_display.show_error("Invalid name format")
 This is especially important when validating text input in real-time (e.g., listening to `text_changed` signals). Use generic, static messages to avoid panel spam.
 
 ## Configuration
+
+### Best Practices for Custom Configurations
+
+**IMPORTANT:** To preserve your custom configurations when upgrading Buttered Sausage, follow these best practices:
+
+1. **Create your own resource files OUTSIDE the addon folder:**
+   - Create a folder in your project: `res://config/buttered_sausage/`
+   - Copy the default `.tres` files from `res://addons/ButteredSausage/config/resource/` to your project folder
+   - Modify your copies, not the originals in the addon folder
+
+2. **Reference your custom resources in your scenes:**
+   - Select your `ButteredSausageDisplay` node
+   - In the Inspector, click the `display_config` property
+   - Select "Load" and choose your custom config from `res://config/buttered_sausage/`
+
+3. **Treat addon files as read-only:**
+   - The files in `addons/ButteredSausage/` are templates and will be overwritten during upgrades
+   - Your custom configs outside the addon folder will be preserved
+
+**Why this matters:** When you upgrade to a new version by extracting the addon over the old one, all files in `addons/ButteredSausage/` are replaced. Any modifications you made to files inside the addon folder will be lost.
+
+### Upgrading from 1.0.0 to 1.0.1
+
+If you modified the default resource files in `addons/ButteredSausage/config/resource/` during 1.0.0:
+
+1. **Before upgrading:** Copy your modified `.tres` files to a safe location outside the addon folder
+2. **Upgrade:** Extract 1.0.1 over your existing installation
+3. **After upgrading:** Your custom `.tres` files outside the addon are safe. If you modified files inside the addon, re-apply your changes by:
+   - Opening your saved copies
+   - Comparing them to the new defaults
+   - Recreating your custom configs in your project folder (not in the addon folder)
+
+**What changed in 1.0.1:**
+- Added comprehensive Inspector tooltips (hover over any property for detailed help)
+- Fixed resource caching issues
+- Fixed color animation styling preservation
+- Fixed font color/size configuration
+- No breaking API changes - existing scenes and scripts work without modification
 
 ### Display Setup
 
@@ -446,9 +484,9 @@ This addon was developed as part of [AWOC (Avatar Wardrobe Organizer and Colorer
 
 ## License
 
-BSD Zero Clause License - See LICENSE file for details
+CC0 1.0 Universal (Public Domain Dedication) - See LICENSE file for details
 
-This means you can do whatever you want with this software. No attribution required, no restrictions.
+This means you can do whatever you want with this software. No attribution required, no restrictions, no copyright.
 
 ## Credits
 

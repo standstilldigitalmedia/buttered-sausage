@@ -5,16 +5,40 @@ All notable changes to Buttered Sausage will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1] - 2026-01-12
+## [1.0.1] - 2026-01-15
+
+### Migration Notes
+
+**Upgrading from 1.0.0:**
+
+This release contains no breaking API changes. Existing scenes and scripts work without modification.
+
+**IMPORTANT - Configuration Preservation:**
+If you modified resource files (`.tres`) inside `addons/ButteredSausage/config/resource/`, those changes will be overwritten when you upgrade. To preserve custom configurations:
+
+1. **Before upgrading:** Copy your custom `.tres` files to a folder OUTSIDE the addon (e.g., `res://config/buttered_sausage/`)
+2. **Upgrade:** Extract 1.0.1 over your installation
+3. **After upgrading:** Update your scenes to reference your custom config files instead of the defaults
+
+**Best Practice:** Always create custom resource files in your project folders, not inside the addon folder. Treat addon files as read-only templates. See README.md "Best Practices for Custom Configurations" section for details.
 
 ### Fixed
 - Rotation, Scale, and Position animations now work simultaneously without conflicts
 - Size animation now works correctly when used alone
 - Scene hierarchy restructured to use RotationIsolationLayer with proper layout modes
+- Resource caching issues that prevented configuration changes from applying
+- Color animations now preserve corner radius, border width, and border color styling
+- Font color and font size configuration now apply correctly to RichTextLabel
+- Font color no longer changes during color animations (animation now affects only background)
+- Static style cache is now properly cleared on display initialization
+- Demo script property reference corrected from `global_config` to `display_config`
 
 ### Changed
-- License changed from WTFPL to BSD Zero Clause License for broader compatibility
+- License changed to CC0 1.0 Universal (Public Domain Dedication) for maximum freedom and recognition
 - Updated documentation to reflect animation compatibility
+- Removed `@tool` decorator from resource scripts to improve configuration reliability
+- Color animations now tween stylebox `bg_color` property directly instead of modulating entire panel
+- Resource script default values updated to be user-friendly
 
 ### Known Limitations
 - Size animation cannot be combined with other transform animations (Rotation, Scale, Position)

@@ -168,7 +168,7 @@ func play() -> void:
 		# Use rotation_container for isolation (except in orbit mode where we rotate panel content)
 		var rotation_target = panel if animator_config.rotation_orbit else (rotation_container if rotation_container else wrapper)
 		rotation_target.rotation = deg_to_rad(animator_config.rotation_from_degrees)
-		rotation_target.pivot_offset = _get_pivot_offset(rotation_target)
+		# Pivot offset will be set after layout when size is known
 	if animator_config.animate_position:
 		# Get scene rotation_container to apply position to the right node
 		var scene_rotation_container = wrapper.get("rotation_container") if wrapper.has_method("get") else null
@@ -178,7 +178,10 @@ func play() -> void:
 		else:
 			panel.position = animator_config.position_offset
 	if animator_config.animate_color:
-		wrapper.modulate = animator_config.color_from
+		# Get the stylebox and set initial color
+		var stylebox = panel.get_theme_stylebox("panel")
+		if stylebox:
+			stylebox.bg_color = animator_config.color_from
 	elif animator_config.animate_fade:
 		wrapper.modulate.a = animator_config.fade_from
 
@@ -195,6 +198,11 @@ func play() -> void:
 	# When rotation_container exists, scale and rotation use different nodes - no conflict
 	if animator_config.animate_scale:
 		panel.pivot_offset = _get_scale_pivot_offset(panel)
+
+	# Set pivot offset for rotation (now that node size is known)
+	if animator_config.animate_rotation:
+		var rotation_target = panel if animator_config.rotation_orbit else (rotation_container if rotation_container else wrapper)
+		rotation_target.pivot_offset = _get_pivot_offset(rotation_target)
 
 	# Set or recalculate size after frame
 	if animator_config.animate_size:
@@ -244,7 +252,10 @@ func play() -> void:
 		var position_target = scene_rotation_container if scene_rotation_container else panel
 		slide_tween.tween_property(position_target, POSITION_PROPERTY, Vector2.ZERO, anim_speed)
 	if animator_config.animate_color:
-		slide_tween.tween_property(wrapper, MODULATE_PROPERTY, animator_config.color_to, anim_speed)
+		# Tween the stylebox bg_color directly instead of modulating
+		var stylebox = panel.get_theme_stylebox("panel")
+		if stylebox:
+			slide_tween.tween_property(stylebox, "bg_color", animator_config.color_to, anim_speed)
 	elif animator_config.animate_fade:
 		slide_tween.tween_property(wrapper, MODULATE_A_PROPERTY, animator_config.fade_to, anim_speed * 0.75)
 	await slide_tween.finished
@@ -318,7 +329,10 @@ func reverse() -> void:
 		var position_target = scene_rotation_container if scene_rotation_container else panel
 		slide_tween.tween_property(position_target, POSITION_PROPERTY, animator_config.position_offset, anim_speed)
 	if animator_config.animate_color:
-		slide_tween.tween_property(wrapper, MODULATE_PROPERTY, animator_config.color_from, anim_speed)
+		# Tween the stylebox bg_color directly instead of modulating
+		var stylebox = panel.get_theme_stylebox("panel")
+		if stylebox:
+			slide_tween.tween_property(stylebox, "bg_color", animator_config.color_from, anim_speed)
 	elif animator_config.animate_fade:
 		slide_tween.tween_property(wrapper, MODULATE_A_PROPERTY, animator_config.fade_from, anim_speed)
 	await slide_tween.finished
@@ -349,7 +363,10 @@ func reverse() -> void:
 		else:
 			panel.position = Vector2.ZERO
 	if animator_config.animate_color:
-		wrapper.modulate = Color.WHITE
+		# Reset stylebox color after animation
+		var stylebox = panel.get_theme_stylebox("panel")
+		if stylebox:
+			stylebox.bg_color = animator_config.color_to
 	elif animator_config.animate_fade:
 		wrapper.modulate.a = 1.0
 
@@ -394,7 +411,10 @@ func close_immediate() -> void:
 			else:
 				panel.position = Vector2.ZERO
 		if animator_config.animate_color:
-			wrapper.modulate = Color.WHITE
+			# Reset stylebox color
+			var stylebox = panel.get_theme_stylebox("panel")
+			if stylebox:
+				stylebox.bg_color = animator_config.color_to
 		elif animator_config.animate_fade:
 			wrapper.modulate.a = 1.0
 

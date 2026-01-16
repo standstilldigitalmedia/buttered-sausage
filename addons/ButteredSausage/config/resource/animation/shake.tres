@@ -1,8 +1,7 @@
-[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://bwqtj6xwvx35d"]
+[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://cuxql2cakujj8"]
 
 [ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_75je4"]
 
 [resource]
 script = ExtResource("1_75je4")
 animate_shake = true
-panel_width = 200.0
