@@ -319,7 +319,17 @@ Each severity level has its own pre-configured `ButteredSausagePanelConfig` reso
 
 ### Animation Configuration
 
-Unlike the display and panel configurations (which are pre-created), you'll create your own `ButteredSausageAnimatorConfig` resources for custom animations. To create one:
+Unlike the display and panel configurations (which are pre-created), you'll create your own `ButteredSausageAnimatorConfig` resources for custom animations.
+
+**Recommended Method - Duplicate an Existing Config:**
+
+1. Navigate to `res://addons/ButteredSausage/config/resource/animation/`
+2. Right-click on a config file similar to what you want to create → **Duplicate**
+3. Enter a new name and click **OK**
+4. Move the new config to a folder outside the addon directory (e.g., `res://config/buttered_sausage/`)
+5. Modify and save
+
+**Alternative Method - Create from Scratch:**
 
 1. Right-click in the FileSystem panel → **New Resource**
 2. Select **Resource** (empty resource)
