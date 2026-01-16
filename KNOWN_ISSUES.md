@@ -1,71 +1,120 @@
 # Known Issues
 
-## Rotation Animation Incompatible with Size and Position Animations
+## Size Animation Cannot Combine with Other Transform Animations
 
-**Severity:** Medium
-**Component:** `ButteredSausageAnimator` (rotation animation)
-**Status:** Workaround Available
+**Severity:** Low
+**Component:** `ButteredSausageAnimator` (size animation)
+**Status:** Known Limitation
 
 ### Description
 
-Rotation animations conflict with size and position animations when enabled simultaneously on the same AnimatorConfig. The rotation pivot point becomes unstable as the container dimensions or position change during the animation, causing erratic or non-functional rotation behavior.
+Size animation cannot be combined with other transform animations (Rotation, Scale, Position) in the same AnimatorConfig. However, Rotation, Scale, and Position can all work together simultaneously.
 
-### Root Cause
+### Technical Explanation
 
-When rotation is combined with size or position animations:
-- Size animation changes the wrapper Control's dimensions frame-by-frame
-- Position animation moves the Control, affecting rotation calculations
-- Either causes the rotation pivot point to shift during the animation
-- The rotation tween becomes unstable or fails to play correctly
+Size animation changes the wrapper Control's dimensions to create a slide/reveal effect. This is fundamentally different from transform animations (Rotation, Scale, Position) which manipulate nodes in-place without changing container dimensions. The size animation affects the layout system in ways that conflict with transform calculations.
 
-### Steps to Reproduce
+### Working Combinations
 
-1. Create a `ButteredSausageAnimatorConfig` with:
-   - `animate_size = true` OR `animate_position = true`
-   - `animate_rotation = true`
-   - `rotation_from_degrees = 0.0`
-   - `rotation_to_degrees = 360.0`
-2. Add this config to a panel's animation chain
-3. **Expected:** Panel should slide/move and rotate simultaneously
-4. **Actual:** Rotation does not play correctly or appears erratic
+✅ **These work perfectly together:**
+- Rotation + Scale + Position
+- Rotation + Scale
+- Rotation + Position
+- Scale + Position
+- Any transform animation + Fade
+- Any transform animation + Color
 
-### Workaround (Confirmed Working)
+❌ **Size cannot combine with:**
+- Size + Rotation
+- Size + Scale
+- Size + Position
+- Size + any transform animation
 
-**Disable size and position animations when using rotation:**
+✅ **Size works with:**
+- Size + Fade
+- Size + Color
+- Size alone (perfect for slide-out menus)
 
-```gdscript
-# Working rotation config
-animate_size = false        # Must be false
-animate_position = false    # Must be false
-animate_rotation = true     # Rotation works perfectly when container is stable
-rotation_from_degrees = 0.0
-rotation_to_degrees = 360.0
-```
+### Recommended Usage
 
-With a stable container (no size or position changes), rotation animations work flawlessly. You can still combine rotation with other animation types:
-- ✅ Rotation + Fade
-- ✅ Rotation + Scale
-- ✅ Rotation + Color
-- ❌ Rotation + Size (known conflict)
-- ❌ Rotation + Position (known conflict)
+**Size animation** is designed for slide-out panels, drawers, and menu reveals where the container needs to expand/contract.
 
-### Future Plans
-
-We haven't given up on making rotation work with size and position animations. This is on the roadmap for a future update, but it requires deeper investigation into the interaction between container transformations and rotation pivot calculations. If you have expertise in this area and want to contribute a fix, we'd love your help!
+**Transform animations** (Rotation, Scale, Position) are designed for in-place effects where the container stays stable.
 
 ### Alternative Approaches
 
-If you specifically need sliding/moving AND rotation effects:
+If you need both sliding AND transform effects:
 1. Use two separate AnimationStep entries in your chain:
-   - Step 1: Size or position animation (slide/move in/out)
-   - Step 2: Rotation animation with `animate_size = false` and `animate_position = false`
-2. Consider combining rotation with scale + fade for dynamic visual effects
+   - Step 1: Size animation (slide in/out)
+   - Step 2: Transform animations (rotate, scale, position)
+2. This creates a sequential effect: slide in, then transform
+
+### Example Configuration
+
+```gdscript
+# Working: All three transforms together
+animate_size = false
+animate_rotation = true
+animate_scale = true
+animate_position = true
+
+# Working: Size with visual effects
+animate_size = true
+animate_fade = true
+animate_color = true
+
+# Not supported: Size with transforms
+animate_size = true
+animate_rotation = true  # These will conflict
+```
 
 ---
 
 **Related Files:**
 - `addons/ButteredSausage/ui/animator.gd` - Animation logic
 - `addons/ButteredSausage/config/scripts/animator_config.gd` - Configuration structure
-- `addons/ButteredSausage/config/resource/animation/simple_rotate.tres` - Example rotation config
 
-**Discussion:** [GitHub Issue #2](https://github.com/standstilldigitalmedia/buttered-sausage/issues/2)
+---
+
+## Panel Container Does Not Dynamically Reposition When Panels Close
+
+**Severity:** Low
+**Component:** `ButteredSausageDisplay` (positioning system)
+**Status:** Known Limitation
+
+### Description
+
+When panels are removed (via auto-dismiss or manual close), the panel container maintains its original size and position. For bottom-anchored positions (BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT), remaining panels do not "fall down" to stay at the anchor point - they stay where they were when all panels were visible.
+
+### Example Scenario
+
+1. Set position_preset to BOTTOM_RIGHT
+2. Display 5 panels (container grows upward from bottom-right)
+3. 4 panels auto-dismiss
+4. The remaining panel stays at the "top" of where the container was
+5. It does not move down to the bottom-right corner
+
+### Technical Explanation
+
+The display system uses `layout_mode = 0` (unmanaged positioning) for the VBoxContainer to allow precise positioning via the 9-position preset system. With unmanaged layout, Godot does not automatically recalculate the container's size when children are removed. The container size must be manually managed, which would require:
+
+1. Calculating total height of remaining children
+2. Setting custom_minimum_size explicitly
+3. Forcing layout updates at the right time
+4. Handling this across all position presets correctly
+
+This requires architectural changes to the layout system and proper testing across all 9 position presets.
+
+### Workaround
+
+For bottom-anchored layouts where dynamic repositioning is important:
+- Use `max_visible_panels = 1` so only one panel is ever shown
+- Or use top-anchored positions (TOP_LEFT, TOP_CENTER, TOP_RIGHT) where this behavior is less noticeable
+
+### Planned Fix
+
+This will be addressed in version 1.0.2 with a proper architectural solution for container size management in unmanaged layout mode.
+
+**Related Files:**
+- `addons/ButteredSausage/ui/display/display.gd` - Display positioning logic
+- `addons/ButteredSausage/config/scripts/display_config.gd` - Position preset configuration

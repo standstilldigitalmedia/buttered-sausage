@@ -2,7 +2,7 @@
 
 A visual error/message display system for Godot 4.x with integrated Result pattern for fluent error handling.
 
-![Buttered Sausage in Action](screenshots/buttered_sausge_animation.gif)
+![Buttered Sausage in Action](screenshots/buttered_sausage_animation.gif)
 
 ### Screenshots
 
@@ -44,12 +44,14 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 
 ### Animation System
 - Animation chains - sequential series of effects
+- **Transform animations work together:** Rotation, Scale, and Position can all animate simultaneously
 - Multiple simultaneous effects: slide, scale, fade, rotation, color, position
 - Shake effect for emphasis
 - Configurable pivot points for rotation and scale
 - Full control over timing, easing, and transitions
 - Support for looping animations
 - Standalone animator (`ButteredSausageAnimator` + `ButteredSausageAnimatorConfig`) can be used to animate any Control node
+- **Note:** Size animation cannot be combined with transform animations (see KNOWN_ISSUES.md)
 
 ### Configuration System
 - **ButteredSausageDisplayConfig** - Display positioning, panel width, and per-severity configurations
@@ -212,6 +214,44 @@ This is especially important when validating text input in real-time (e.g., list
 
 ## Configuration
 
+### Best Practices for Custom Configurations
+
+**IMPORTANT:** To preserve your custom configurations when upgrading Buttered Sausage, follow these best practices:
+
+1. **Create your own resource files OUTSIDE the addon folder:**
+   - Create a folder in your project: `res://config/buttered_sausage/`
+   - Copy the default `.tres` files from `res://addons/ButteredSausage/config/resource/` to your project folder
+   - Modify your copies, not the originals in the addon folder
+
+2. **Reference your custom resources in your scenes:**
+   - Select your `ButteredSausageDisplay` node
+   - In the Inspector, click the `display_config` property
+   - Select "Load" and choose your custom config from `res://config/buttered_sausage/`
+
+3. **Treat addon files as read-only:**
+   - The files in `addons/ButteredSausage/` are templates and will be overwritten during upgrades
+   - Your custom configs outside the addon folder will be preserved
+
+**Why this matters:** When you upgrade to a new version by extracting the addon over the old one, all files in `addons/ButteredSausage/` are replaced. Any modifications you made to files inside the addon folder will be lost.
+
+### Upgrading from 1.0.0 to 1.0.1
+
+If you modified the default resource files in `addons/ButteredSausage/config/resource/` during 1.0.0:
+
+1. **Before upgrading:** Copy your modified `.tres` files to a safe location outside the addon folder
+2. **Upgrade:** Extract 1.0.1 over your existing installation
+3. **After upgrading:** Your custom `.tres` files outside the addon are safe. If you modified files inside the addon, re-apply your changes by:
+   - Opening your saved copies
+   - Comparing them to the new defaults
+   - Recreating your custom configs in your project folder (not in the addon folder)
+
+**What changed in 1.0.1:**
+- Added comprehensive Inspector tooltips (hover over any property for detailed help)
+- Fixed resource caching issues
+- Fixed color animation styling preservation
+- Fixed font color/size configuration
+- No breaking API changes - existing scenes and scripts work without modification
+
 ### Display Setup
 
 The `ButteredSausageDisplay` node comes pre-configured with all necessary resources. To customize the display, open `res://addons/ButteredSausage/config/resource/display/display_config.tres` in the Inspector. This file contains a `ButteredSausageDisplayConfig` resource with sensible defaults and references to all severity-specific panel configurations.
@@ -279,7 +319,17 @@ Each severity level has its own pre-configured `ButteredSausagePanelConfig` reso
 
 ### Animation Configuration
 
-Unlike the display and panel configurations (which are pre-created), you'll create your own `ButteredSausageAnimatorConfig` resources for custom animations. To create one:
+Unlike the display and panel configurations (which are pre-created), you'll create your own `ButteredSausageAnimatorConfig` resources for custom animations.
+
+**Recommended Method - Duplicate an Existing Config:**
+
+1. Navigate to `res://addons/ButteredSausage/config/resource/animation/`
+2. Right-click on a config file similar to what you want to create → **Duplicate**
+3. Enter a new name and click **OK**
+4. Move the new config to a folder outside the addon directory (e.g., `res://config/buttered_sausage/`)
+5. Modify and save
+
+**Alternative Method - Create from Scratch:**
 
 1. Right-click in the FileSystem panel → **New Resource**
 2. Select **Resource** (empty resource)
@@ -313,7 +363,7 @@ Each config can enable multiple effects simultaneously:
 - `rotation_orbit` - True for orbital rotation, false for spinning in place
 - `rotation_pivot_preset` - Pivot point (CENTER, TOP_LEFT, BOTTOM_RIGHT, etc.)
 - `rotation_pivot_custom` - Custom pivot point if using CUSTOM preset
-- ⚠️ **Note:** Set `animate_size = false` when using rotation. Combining rotation with size animation causes conflicts. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details.
+- ⚠️ **Note:** Rotation works perfectly with Scale and Position. However, Size animation cannot be combined with transform animations. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details.
 
 **Position Animation:**
 - `animate_position` - Enable position offset effect
@@ -430,9 +480,9 @@ See the included demo scene at `addons/ButteredSausage/demo/buttered_sausage_dem
 
 ## Known Issues
 
-**Rotation Animation Conflicts:** Rotation animations conflict with size and position animations when enabled simultaneously on the same AnimatorConfig. **Workaround:** Set `animate_size = false` and `animate_position = false` when using rotation - it works perfectly with a stable container. Rotation can be combined with fade, scale, and color animations. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details and future plans to resolve this.
+**Size Animation Limitation:** Size animation cannot be combined with transform animations (Rotation, Scale, Position) in the same AnimatorConfig. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for technical details.
 
-Other animation types (slide, scale, fade, position, color, shake) work as expected.
+**Good news:** Rotation, Scale, and Position all work together perfectly! You can combine all three for complex transform effects.
 
 ## Part of the AWOC Ecosystem
 
@@ -444,7 +494,9 @@ This addon was developed as part of [AWOC (Avatar Wardrobe Organizer and Colorer
 
 ## License
 
-MIT License - See LICENSE file for details
+CC0 1.0 Universal (Public Domain Dedication) - See LICENSE file for details
+
+This means you can do whatever you want with this software. No attribution required, no restrictions, no copyright.
 
 ## Credits
 
@@ -453,8 +505,6 @@ Developed by [Standstill Digital Media](https://github.com/standstilldigitalmedi
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-**Help Wanted:** We especially need help with the rotation animation bug. If you have Godot Tween expertise, check out [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 ## Support
 

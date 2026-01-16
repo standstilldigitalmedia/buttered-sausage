@@ -9,11 +9,12 @@ extends Control
 
 @export var message_panel_scene: PackedScene
 @export var content_container: VBoxContainer
-@export var global_config: ButteredSausageDisplayConfig
+@export var display_config: ButteredSausageDisplayConfig
 
 var _positioning_applied: bool = false
 var _target_position: Vector2 = Vector2.ZERO
 var _anchor_to_bottom: bool = false
+var _creating_panel: bool = false  # Prevents race conditions when creating multiple panels
 
 
 ## Populates the display with messages from a ButteredSausage result object.[br]
@@ -53,17 +54,17 @@ func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
 ## Used for single panel mode to determine which panel to keep.[br][br]
 ##
 ## @param severity - The severity level[br]
-## @return The priority value from global config[br]
+## @return The priority value from display config[br]
 func _get_severity_priority(severity: int) -> int:
 	match severity:
 		ButteredSausageSeverity.Level.ERROR:
-			return global_config.error_priority
+			return display_config.error_priority
 		ButteredSausageSeverity.Level.SUCCESS:
-			return global_config.success_priority
+			return display_config.success_priority
 		ButteredSausageSeverity.Level.WARNING:
-			return global_config.warning_priority
+			return display_config.warning_priority
 		ButteredSausageSeverity.Level.INFO:
-			return global_config.info_priority
+			return display_config.info_priority
 	return 0
 
 
@@ -73,25 +74,30 @@ func _get_severity_priority(severity: int) -> int:
 ## @param new_severity - The severity of the panel about to be created[br]
 ## @return True if the new panel should be created, false otherwise[br]
 func _enforce_panel_limit(new_severity: int) -> bool:
-	if global_config.max_visible_panels <= 0:
+	if display_config.max_visible_panels <= 0:
 		return true  # Unlimited panels, always create
 
 	var panels: Array[ButteredSausagePanel] = []
 	for child in content_container.get_children():
 		if child is ButteredSausagePanel:
+			# Skip panels that are closing or don't have config yet
+			if child.is_closing or not child.panel_config:
+				continue
 			panels.append(child)
 
 	# Special case: max_visible_panels = 1 (single panel mode)
 	# Only create new panel if it has higher or equal priority than existing
-	if global_config.max_visible_panels == 1:
+	if display_config.max_visible_panels == 1:
+		# If no valid existing panels, allow creation
+		if panels.is_empty():
+			return true
+
 		var new_priority = _get_severity_priority(new_severity)
 		var highest_existing_priority = -1
 		var highest_priority_panel: ButteredSausagePanel = null
 
 		# Find the panel with the highest priority
 		for panel in panels:
-			if not panel.panel_config:
-				continue
 			var panel_priority = _get_severity_priority(panel.panel_config.severity)
 			if panel_priority > highest_existing_priority:
 				highest_existing_priority = panel_priority
@@ -114,10 +120,10 @@ func _enforce_panel_limit(new_severity: int) -> bool:
 
 	# For max_visible_panels > 1: Remove oldest panels (FIFO) until under limit
 	# We want to stay at (max - 1) to make room for the new panel about to be added
-	while panels.size() >= global_config.max_visible_panels:
+	while panels.size() >= display_config.max_visible_panels:
 		# Determine which panel is oldest based on reverse_panel_order setting
 		var oldest_panel: ButteredSausagePanel
-		if global_config.reverse_panel_order:
+		if display_config.reverse_panel_order:
 			# When reverse order is enabled, new panels are inserted at index 0
 			# So the oldest panel is at the END of the array
 			oldest_panel = panels[panels.size() - 1]
@@ -138,15 +144,15 @@ func _update_position() -> void:
 	if not _positioning_applied:
 		return
 
-	var margin: float = global_config.margin_from_edge
-	var width: float = global_config.panel_width
+	var margin: float = display_config.margin_from_edge
+	var width: float = display_config.panel_width
 
 	# Use get_parent_area_size() to get the actual available space
 	var parent_size: Vector2 = get_parent_area_size()
 	var container_height: float = content_container.size.y
 	var pos: Vector2 = Vector2.ZERO
 
-	match global_config.position_preset:
+	match display_config.position_preset:
 		ButteredSausageDisplayConfig.PositionPreset.TOP_LEFT:
 			pos = Vector2(margin, margin)
 
@@ -177,14 +183,14 @@ func _update_position() -> void:
 	content_container.position = pos
 	
 	
-## Applies the position preset from global config to the content container.[br]
+## Applies the position preset from display config to the content container.[br]
 ## Sets up positioning mode and flags, then updates position.[br][br]
 func _apply_position_preset() -> void:
 	if _positioning_applied:
 		return
 
-	var margin: float = global_config.margin_from_edge
-	var width: float = global_config.panel_width
+	var margin: float = display_config.margin_from_edge
+	var width: float = display_config.panel_width
 
 	# Use layout_mode 0 (unmanaged positioning) - simplest approach
 	content_container.set("layout_mode", 0)
@@ -198,7 +204,7 @@ func _apply_position_preset() -> void:
 	content_container.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 
 	# Determine if this preset needs bottom anchoring
-	_anchor_to_bottom = global_config.position_preset in [
+	_anchor_to_bottom = display_config.position_preset in [
 		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT,
 		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER,
 		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT
@@ -216,7 +222,12 @@ func _apply_position_preset() -> void:
 ## @param msg - The message text to display[br]
 ## @param severity - The severity level (use Severity enum)
 func create_message(msg: String, severity: int) -> void:
-	# Apply positioning FIRST if not yet applied
+	# Acquire lock FIRST to prevent race conditions with simultaneous messages
+	while _creating_panel:
+		await get_tree().process_frame
+	_creating_panel = true
+
+	# Apply positioning if not yet applied
 	if not _positioning_applied:
 		show()  # Must be visible for sizing
 		await get_tree().process_frame  # Wait for layout
@@ -229,30 +240,52 @@ func create_message(msg: String, severity: int) -> void:
 			if child.message_label.text == msg:
 				found = true
 				break
-	if !found:
-		# Enforce panel limit before creating new panel
+
+	if found:
+		# Duplicate message found, release lock and exit
+		_creating_panel = false
+		show()
+		return
+
+	# No duplicate found, proceed to create panel
+	if true:
+		# Check limit before creating
 		if not _enforce_panel_limit(severity):
+			_creating_panel = false
 			return  # Don't create panel, existing higher priority panel takes precedence
 
 		var panel = message_panel_scene.instantiate()
 		if !message_panel_scene:
 			push_error("message_panel_scene must be set on buttered_sausage_display.tscn in the inspector")
+			_creating_panel = false
 			return
+
+		# Set panel_config early so subsequent messages can see this panel's config
+		var panel_config: ButteredSausagePanelConfig
+		match severity:
+			ButteredSausageSeverity.Level.SUCCESS:
+				panel_config = display_config.success_config
+			ButteredSausageSeverity.Level.ERROR:
+				panel_config = display_config.error_config
+			ButteredSausageSeverity.Level.WARNING:
+				panel_config = display_config.warning_config
+			ButteredSausageSeverity.Level.INFO:
+				panel_config = display_config.info_config
+		panel.panel_config = panel_config
+
+		# Add to tree so subsequent messages can see it
 		content_container.add_child(panel)
 
 		# If reverse order is enabled, move new panel to the top (index 0)
-		if global_config.reverse_panel_order:
+		if display_config.reverse_panel_order:
 			content_container.move_child(panel, 0)
 
-		match severity:
-			ButteredSausageSeverity.Level.SUCCESS:
-				panel.setup(msg, global_config.success_config)
-			ButteredSausageSeverity.Level.ERROR:
-				panel.setup(msg, global_config.error_config)
-			ButteredSausageSeverity.Level.WARNING:
-				panel.setup(msg, global_config.warning_config)
-			ButteredSausageSeverity.Level.INFO:
-				panel.setup(msg, global_config.info_config)
+		# Setup the panel (after it's in tree so timer can start)
+		panel.setup(msg, panel_config)
+
+		# Release the lock so other messages can proceed
+		_creating_panel = false
+
 		panel.slide_open()
 
 	show()
@@ -298,10 +331,14 @@ func _process(_delta: float) -> void:
 func _ready() -> void:
 	hide()
 
-	# Propagate panel_width from global config to all animator configs
-	for severity_config in [global_config.success_config, global_config.error_config,
-							global_config.warning_config, global_config.info_config]:
+	# Clear static style cache to ensure fresh styleboxes are created
+	# This prevents stale cached styles from persisting across editor reloads
+	ButteredSausagePanel.cached_styles.clear()
+
+	# Propagate panel_width from display config to all animator configs
+	for severity_config in [display_config.success_config, display_config.error_config,
+							display_config.warning_config, display_config.info_config]:
 		for anim_config in severity_config.animation_chain:
-			anim_config.panel_width = global_config.panel_width
+			anim_config.panel_width = display_config.panel_width
 		for anim_config in severity_config.close_animation_chain:
-			anim_config.panel_width = global_config.panel_width
+			anim_config.panel_width = display_config.panel_width

@@ -52,7 +52,7 @@ func _on_clear_display_pressed() -> void:
 
 
 func _on_max_panels_value_changed(value: float) -> void:
-	buttered_sausage_display.global_config.max_visible_panels = int(value)
+	buttered_sausage_display.display_config.max_visible_panels = int(value)
 
 
 func _on_demo_scenarios_pressed() -> void:
@@ -92,5 +92,3 @@ func _ready() -> void:
 	warning_2.text = "Failed to delete temporary cache"
 	info_1.text = "Processed 47 files in 2.3 seconds"
 	info_2.text = "Found 3 duplicate entries"
-	max_panels_spinbox.value = 0  # Unlimited by default
-	buttered_sausage_display.global_config.max_visible_panels = 0

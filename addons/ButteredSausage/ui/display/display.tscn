@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cmhyd4ksy6v3r" path="res://addons/ButteredSausage/ui/display/display.gd" id="1_4271g"]
 [ext_resource type="PackedScene" uid="uid://b3icksrw00gko" path="res://addons/ButteredSausage/ui/panel/panel.tscn" id="2_m168a"]
-[ext_resource type="Resource" uid="uid://cf322dwg8y7oa" path="res://addons/ButteredSausage/config/resource/display/display_config.tres" id="3_c2gbu"]
+[ext_resource type="Resource" uid="uid://2b273vt5lmlb" path="res://addons/ButteredSausage/config/resource/display/display_config.tres" id="3_c2gbu"]
 
 [node name="ButteredSausageDisplay" type="Control" node_paths=PackedStringArray("content_container")]
 visible = false
@@ -16,7 +16,7 @@ mouse_filter = 1
 script = ExtResource("1_4271g")
 message_panel_scene = ExtResource("2_m168a")
 content_container = NodePath("ContentContainer")
-global_config = ExtResource("3_c2gbu")
+display_config = ExtResource("3_c2gbu")
 
 [node name="ContentContainer" type="VBoxContainer" parent="."]
 layout_mode = 0

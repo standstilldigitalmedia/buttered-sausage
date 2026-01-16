@@ -4,7 +4,5 @@
 
 [resource]
 script = ExtResource("1_wvw5c")
-animate_size = false
 animate_scale = true
 scale_from = Vector2(0.1, 0.1)
-panel_width = 200.0
