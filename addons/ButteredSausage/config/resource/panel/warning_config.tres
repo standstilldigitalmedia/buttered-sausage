@@ -1,18 +1,22 @@
-[gd_resource type="Resource" script_class="ButteredSausagePanelConfig" load_steps=6 format=3 uid="uid://fq7gayl7ua4"]
+[gd_resource type="Resource" script_class="ButteredSausagePanelConfig" load_steps=7 format=3 uid="uid://fq7gayl7ua4"]
 
-[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_ret6q"]
-[ext_resource type="Resource" uid="uid://k3ret6an5n1y" path="res://addons/ButteredSausage/config/resource/animation/rotate.tres" id="2_j2c3a"]
-[ext_resource type="Script" uid="uid://dxekb6n68o6ls" path="res://addons/ButteredSausage/config/scripts/panel_config.gd" id="2_u4pew"]
-[ext_resource type="Texture2D" uid="uid://djcgf5qjk0rwx" path="res://addons/ButteredSausage/ui/images/icons/Close.svg" id="3_slrb2"]
-[ext_resource type="Texture2D" uid="uid://c4a5hkt5e5is0" path="res://addons/ButteredSausage/ui/images/icons/StatusWarning.svg" id="4_mmqun"]
+[ext_resource type="Script" uid="uid://dxekb6n68o6ls" path="res://addons/buttered-sausage/config/scripts/panel_config.gd" id="1_panel"]
+[ext_resource type="Script" uid="uid://doi0u0skoa80r" path="res://addons/buttered-sausage/config/scripts/animation_step.gd" id="2_step"]
+[ext_resource type="Resource" uid="uid://k3ret6an5n1y" path="res://addons/buttered-sausage/config/resource/animation/rotate.tres" id="3_rotate"]
+[ext_resource type="Texture2D" uid="uid://djcgf5qjk0rwx" path="res://addons/buttered-sausage/ui/images/icons/Close.svg" id="4_close"]
+[ext_resource type="Texture2D" uid="uid://c4a5hkt5e5is0" path="res://addons/buttered-sausage/ui/images/icons/StatusWarning.svg" id="5_icon"]
+
+[sub_resource type="Resource" id="step_rotate"]
+script = ExtResource("2_step")
+animation = ExtResource("3_rotate")
 
 [resource]
-script = ExtResource("2_u4pew")
+script = ExtResource("1_panel")
 background_color = Color(0.9063318, 0.7977378, 0.3491902, 0.90200007)
 font_color = Color(1, 1, 1, 1)
-icon = ExtResource("4_mmqun")
-close_button_icon = ExtResource("3_slrb2")
+icon = ExtResource("5_icon")
+close_button_icon = ExtResource("4_close")
 border_color = Color(0.85430586, 0.735357, 0, 0.90200007)
 duration = 4.0
-animation_chain = Array[ExtResource("1_ret6q")]([ExtResource("2_j2c3a")])
+entrance_animation_chain = Array[ExtResource("2_step")]([SubResource("step_rotate")])
 severity = 2

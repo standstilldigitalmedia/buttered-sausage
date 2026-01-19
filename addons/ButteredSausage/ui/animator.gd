@@ -100,7 +100,7 @@ func _get_scale_pivot_offset(node: Control) -> Vector2:
 ##
 ## @return True if any animation is enabled[br]
 func _has_animations() -> bool:
-	return (animator_config.animate_size or
+	return (animator_config.animate_slide_out or
 			animator_config.animate_scale or
 			animator_config.animate_rotation or
 			animator_config.animate_position or
@@ -141,7 +141,7 @@ func play() -> void:
 	var anim_speed: float = animator_config.animation_speed
 
 	# Setup size - either animate it or set immediately
-	if animator_config.animate_size:
+	if animator_config.animate_slide_out:
 		if animator_config.axis == Axis.VERTICAL:
 			property_name = Y_PROPERTY
 			# Always get size from panel (PanelContainer), not rotation container
@@ -187,7 +187,7 @@ func play() -> void:
 
 	# Enable clipping for size or position animations (reveal/contain effect)
 	# Don't clip if rotation is active (extends beyond bounds)
-	wrapper.clip_contents = (animator_config.animate_size or animator_config.animate_position) and not animator_config.animate_rotation
+	wrapper.clip_contents = (animator_config.animate_slide_out or animator_config.animate_position) and not animator_config.animate_rotation
 
 	wrapper.show()
 	await wrapper.get_tree().process_frame
@@ -205,7 +205,7 @@ func play() -> void:
 		rotation_target.pivot_offset = _get_pivot_offset(rotation_target)
 
 	# Set or recalculate size after frame
-	if animator_config.animate_size:
+	if animator_config.animate_slide_out:
 		if animator_config.axis == Axis.VERTICAL:
 			# Always use panel's size directly
 			target_size = panel.get_combined_minimum_size().y
@@ -229,7 +229,7 @@ func play() -> void:
 	slide_tween.set_trans(animator_config.transition_type)
 
 	# Animate size if enabled
-	if animator_config.animate_size:
+	if animator_config.animate_slide_out:
 		slide_tween.tween_property(wrapper, property_name, target_size, anim_speed).from(0)
 
 	# Animate other effects
@@ -289,7 +289,7 @@ func reverse() -> void:
 	var anim_speed: float = animator_config.animation_speed
 
 	# Setup size animation if enabled
-	if animator_config.animate_size:
+	if animator_config.animate_slide_out:
 		if animator_config.axis == Axis.VERTICAL:
 			property_name = Y_PROPERTY
 			current_size = wrapper.custom_minimum_size.y if wrapper.custom_minimum_size.y > 0 else wrapper.size.y
@@ -306,7 +306,7 @@ func reverse() -> void:
 	slide_tween.set_trans(animator_config.transition_type)
 
 	# Animate size if enabled
-	if animator_config.animate_size:
+	if animator_config.animate_slide_out:
 		slide_tween.tween_property(wrapper, property_name, 0, anim_speed).from(current_size)
 
 	# Animate other effects (reversed)
@@ -339,7 +339,7 @@ func reverse() -> void:
 	wrapper.hide()
 
 	# Reset size if it was animated
-	if animator_config.animate_size:
+	if animator_config.animate_slide_out:
 		if animator_config.axis == Axis.VERTICAL:
 			wrapper.custom_minimum_size.y = 0
 		else:

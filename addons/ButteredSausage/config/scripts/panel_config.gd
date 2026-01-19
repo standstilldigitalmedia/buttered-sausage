@@ -35,8 +35,8 @@ enum Alignment {
 }
 
 enum CloseBehavior {
-	REVERSE_FIRST_ANIMATION,  ## Play only the first animation from animation_chain in reverse when closing. Quick and clean.
-	MIRROR_FULL_CHAIN,        ## Play all animations from animation_chain in reverse order when closing. Symmetrical open/close.
+	REVERSE_FIRST_ANIMATION,  ## Play only the first animation from entrance_animation_chain in reverse when closing. Quick and clean.
+	MIRROR_FULL_CHAIN,        ## Play all animations from entrance_animation_chain in reverse order when closing. Symmetrical open/close.
 	NO_ANIMATION              ## Panel disappears instantly without any closing animation. Use for urgent dismissals.
 }
 
@@ -54,12 +54,15 @@ enum CloseBehavior {
 @export_group("Icon")
 @export var hide_icon: bool = false  ## If true, no icon is displayed on the panel. If false, shows the icon texture on the left side.
 @export var icon: Texture2D  ## Texture displayed as an icon on the left side of the panel (e.g., checkmark for success, X for error).
+@export var icon_modulate: Color = Color.WHITE  ## Color modulation applied to the icon. Use to tint or colorize the icon texture.
 @export var icon_width: float = 24  ## Width of the icon display area in pixels.
 @export var icon_height: float = 24  ## Height of the icon display area in pixels.
 
 @export_group("Close Button")
 @export var hide_close_button: bool = false  ## If true, removes the manual close button. Panel can only be dismissed via auto-dismiss timer.
+@export var close_button_text: String = ""  ## If set, shows text instead of icon for close button (e.g., "X" or "Close").
 @export var close_button_icon: Texture2D  ## Texture for the close button (typically an X icon). Appears on the right side of the panel.
+@export var close_button_modulate: Color = Color.WHITE  ## Color modulation applied to the close button icon or text background.
 @export var close_button_width: float = 24  ## Width of the close button in pixels.
 @export var close_button_height: float = 24  ## Height of the close button in pixels.
 
@@ -86,13 +89,13 @@ enum CloseBehavior {
 @export var auto_dismiss: bool = true  ## If true, panel automatically closes after duration seconds. If false, panel stays until manually closed.
 @export var duration: float = 3.0  ## How long in seconds before the panel auto-dismisses. Timer pauses when mouse hovers over panel.
 
-@export_group("Animation Chain")
-@export var animation_chain: Array[ButteredSausageAnimatorConfig] = []  ## Sequence of animations played when panel opens. Animations play in array order. Leave empty for instant appearance.
-@export var close_animation_chain: Array[ButteredSausageAnimatorConfig] = []  ## Custom animations for closing. If empty, uses close_behavior instead.
-@export var close_behavior: CloseBehavior = CloseBehavior.REVERSE_FIRST_ANIMATION  ## How to animate closing when close_animation_chain is empty. Can reverse first animation, mirror full chain, or skip animation.
+@export_group("Animation Chains")
+@export var entrance_animation_chain: Array[ButteredSausageAnimationStep] = []  ## Sequence of animation steps played when panel opens. Each step wraps an AnimatorConfig with optional reverse, loop, and delay. Leave empty for instant appearance.
+@export var exit_animation_chain: Array[ButteredSausageAnimationStep] = []  ## Custom animation steps for closing. If empty, uses close_behavior instead.
+@export var close_behavior: CloseBehavior = CloseBehavior.REVERSE_FIRST_ANIMATION  ## How to animate closing when exit_animation_chain is empty. Can reverse first animation, mirror full chain, or skip animation.
 
 @export_group("Severity")
-@export var severity: ButteredSausageSeverity.Level = ButteredSausageSeverity.Level.SUCCESS  ## Severity level this config applies to (SUCCESS, INFO, WARNING, or ERROR). Used for caching styleboxes and priority sorting.
+@export var severity: SSDMSeverity.Level = SSDMSeverity.Level.SUCCESS  ## Severity level this config applies to (SUCCESS, INFO, WARNING, or ERROR). Used for caching styleboxes and priority sorting.
 
 
 ## Creates a StyleBoxFlat from the configured visual properties.[br][br]

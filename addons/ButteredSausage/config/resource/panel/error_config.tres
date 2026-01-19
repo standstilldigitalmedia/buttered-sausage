@@ -1,21 +1,39 @@
-[gd_resource type="Resource" script_class="ButteredSausagePanelConfig" load_steps=9 format=3 uid="uid://dn4536n2drpa3"]
+[gd_resource type="Resource" script_class="ButteredSausagePanelConfig" load_steps=13 format=3 uid="uid://dn4536n2drpa3"]
 
-[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/ButteredSausage/config/scripts/animator_config.gd" id="1_kvvc7"]
-[ext_resource type="Resource" uid="uid://dc00x0lye2dlu" path="res://addons/ButteredSausage/config/resource/animation/slide.tres" id="2_14b1r"]
-[ext_resource type="Script" uid="uid://dxekb6n68o6ls" path="res://addons/ButteredSausage/config/scripts/panel_config.gd" id="2_pser1"]
-[ext_resource type="Resource" uid="uid://cuxql2cakujj8" path="res://addons/ButteredSausage/config/resource/animation/shake.tres" id="3_kml7o"]
-[ext_resource type="Resource" uid="uid://dxrkmlgbm7xee" path="res://addons/ButteredSausage/config/resource/animation/color_forward.tres" id="4_8181f"]
-[ext_resource type="Resource" uid="uid://ywb373qw50p8" path="res://addons/ButteredSausage/config/resource/animation/color_back.tres" id="5_2ifbs"]
-[ext_resource type="Texture2D" uid="uid://djcgf5qjk0rwx" path="res://addons/ButteredSausage/ui/images/icons/Close.svg" id="6_8181f"]
-[ext_resource type="Texture2D" uid="uid://bs3n77hol642f" path="res://addons/ButteredSausage/ui/images/icons/StatusError.svg" id="7_2ifbs"]
+[ext_resource type="Script" uid="uid://dxekb6n68o6ls" path="res://addons/buttered-sausage/config/scripts/panel_config.gd" id="1_panel"]
+[ext_resource type="Script" uid="uid://doi0u0skoa80r" path="res://addons/buttered-sausage/config/scripts/animation_step.gd" id="2_step"]
+[ext_resource type="Resource" uid="uid://dc00x0lye2dlu" path="res://addons/buttered-sausage/config/resource/animation/slide.tres" id="3_slide"]
+[ext_resource type="Resource" uid="uid://cuxql2cakujj8" path="res://addons/buttered-sausage/config/resource/animation/shake.tres" id="4_shake"]
+[ext_resource type="Resource" uid="uid://dxrkmlgbm7xee" path="res://addons/buttered-sausage/config/resource/animation/color_forward.tres" id="5_color_fwd"]
+[ext_resource type="Resource" uid="uid://ywb373qw50p8" path="res://addons/buttered-sausage/config/resource/animation/color_back.tres" id="6_color_back"]
+[ext_resource type="Texture2D" uid="uid://djcgf5qjk0rwx" path="res://addons/buttered-sausage/ui/images/icons/Close.svg" id="7_close"]
+[ext_resource type="Texture2D" uid="uid://bs3n77hol642f" path="res://addons/buttered-sausage/ui/images/icons/StatusError.svg" id="8_icon"]
+
+[sub_resource type="Resource" id="step_slide"]
+script = ExtResource("2_step")
+animation = ExtResource("3_slide")
+
+[sub_resource type="Resource" id="step_shake"]
+script = ExtResource("2_step")
+animation = ExtResource("4_shake")
+
+[sub_resource type="Resource" id="step_color_fwd"]
+script = ExtResource("2_step")
+animation = ExtResource("5_color_fwd")
+loop = true
+
+[sub_resource type="Resource" id="step_color_back"]
+script = ExtResource("2_step")
+animation = ExtResource("6_color_back")
+loop = true
 
 [resource]
-script = ExtResource("2_pser1")
+script = ExtResource("1_panel")
 background_color = Color(0.9063318, 0.48452926, 0.48452926, 0.90200007)
 font_color = Color(1, 1, 1, 1)
-icon = ExtResource("7_2ifbs")
-close_button_icon = ExtResource("6_8181f")
+icon = ExtResource("8_icon")
+close_button_icon = ExtResource("7_close")
 border_color = Color(0.85430586, 0.3491902, 0.3491902, 0.90200007)
 auto_dismiss = false
-animation_chain = Array[ExtResource("1_kvvc7")]([ExtResource("2_14b1r"), ExtResource("3_kml7o"), ExtResource("4_8181f"), ExtResource("5_2ifbs")])
+entrance_animation_chain = Array[ExtResource("2_step")]([SubResource("step_slide"), SubResource("step_shake"), SubResource("step_color_fwd"), SubResource("step_color_back")])
 severity = 3

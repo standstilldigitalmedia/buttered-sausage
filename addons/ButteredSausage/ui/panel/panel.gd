@@ -35,7 +35,7 @@ func update_message(message: String) -> void:
 ## Applies the panel configuration to all UI elements.[br]
 ## Sets styling, fonts, colors, icons, margins, and mouse filters.[br][br]
 func configure() -> void:
-	var severity: ButteredSausageSeverity.Level = panel_config.severity
+	var severity: SSDMSeverity.Level = panel_config.severity
 	if !cached_styles.has(severity):
 		var style_box = panel_config.create_stylebox()
 		cached_styles[severity] = style_box
@@ -49,10 +49,23 @@ func configure() -> void:
 		icon_texture_rect.hide()
 	else:
 		icon_texture_rect.texture = panel_config.icon
+		icon_texture_rect.modulate = panel_config.icon_modulate
 	if panel_config.hide_close_button:
 		close_button.hide()
 	else:
-		close_button.icon = panel_config.close_button_icon
+		# Handle text vs icon mode
+		if panel_config.close_button_text != "":
+			close_button.text = panel_config.close_button_text
+			close_button.icon = null
+			# For text mode, set button background color
+			var button_style = StyleBoxFlat.new()
+			button_style.bg_color = panel_config.close_button_modulate
+			close_button.add_theme_stylebox_override("normal", button_style)
+		else:
+			close_button.icon = panel_config.close_button_icon
+			close_button.text = ""
+			# For icon mode, modulate the icon
+			close_button.modulate = panel_config.close_button_modulate
 	margin_container.add_theme_constant_override("margin_left", panel_config.margin_left)
 	margin_container.add_theme_constant_override("margin_top", panel_config.margin_top)
 	margin_container.add_theme_constant_override("margin_right", panel_config.margin_right)
@@ -96,45 +109,88 @@ func setup(msg: String, config: ButteredSausagePanelConfig) -> void:
 ## Animates the panel into view using the configured animation chain.[br]
 ## Supports optional animation looping until panel closes.[br][br]
 func slide_open() -> void:
-	# If no animations configured, just show panel
-	if panel_config.animation_chain.is_empty():
+	# If no animations configured, just show panel without animation
+	if panel_config.entrance_animation_chain.is_empty():
 		panel_container.show()
+		show()
+		# Need to wait for layout to calculate panel size
+		await get_tree().process_frame
+		# Set wrapper size to match panel content
+		custom_minimum_size.y = panel_container.get_combined_minimum_size().y
+		size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		return
 
 	# Play entire animation chain once and detect if any want to loop
 	var has_looping_animations: bool = false
-	for anim_config in panel_config.animation_chain:
-		if anim_config.loop_animation:
+	for step in panel_config.entrance_animation_chain:
+		# Skip steps with no animation assigned
+		if not step.animation:
+			continue
+
+		if step.loop:
 			has_looping_animations = true
-		if anim_config.animate_color:
+
+		# Apply delay before this step
+		if step.delay_before > 0.0:
+			await get_tree().create_timer(step.delay_before).timeout
+			if is_closing:
+				break
+
+		if step.animation.animate_color:
 			# Create a stylebox with all the configured styling (corners, borders, etc.)
 			# Animator will tween the bg_color property directly
 			var stylebox = panel_config.create_stylebox()
-			stylebox.bg_color = anim_config.color_from
+			stylebox.bg_color = step.animation.color_from
 			panel_container.add_theme_stylebox_override(PANEL_THEME, stylebox)
-		var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
-		await animator.play()
+
+		var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
+		if step.reverse:
+			await animator.reverse()
+		else:
+			await animator.play()
 
 	# Loop only animations marked for looping
 	if has_looping_animations:
 		while not is_closing:
-			for anim_config in panel_config.animation_chain:
-				if not anim_config.loop_animation:
-					continue  # Skip animations not marked for looping
-				var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
-				await animator.play()
+			for step in panel_config.entrance_animation_chain:
+				# Skip steps with no animation or not marked for looping
+				if not step.animation or not step.loop:
+					continue
+
+				# Apply delay before this step
+				if step.delay_before > 0.0:
+					await get_tree().create_timer(step.delay_before).timeout
+					if is_closing:
+						break
+
+				var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
+				if step.reverse:
+					await animator.reverse()
+				else:
+					await animator.play()
 				if is_closing:
 					break  # Exit immediately if panel is closing
 		
 
 ## Animates the panel closing based on configuration.[br]
-## Priority: 1) close_animation_chain (if provided), 2) close_behavior setting
+## Priority: 1) exit_animation_chain (if provided), 2) close_behavior setting
 func slide_closed() -> void:
-	# Priority 1: Use custom close animation chain if provided
-	if not panel_config.close_animation_chain.is_empty():
-		for anim_config in panel_config.close_animation_chain:
-			var animator = ButteredSausageAnimator.new(self, panel_container, anim_config)
-			await animator.play()
+	# Priority 1: Use custom exit animation chain if provided
+	if not panel_config.exit_animation_chain.is_empty():
+		for step in panel_config.exit_animation_chain:
+			# Skip steps with no animation assigned
+			if not step.animation:
+				continue
+
+			# Apply delay before this step
+			if step.delay_before > 0.0:
+				await get_tree().create_timer(step.delay_before).timeout
+
+			var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
+			if step.reverse:
+				await animator.reverse()
+			else:
+				await animator.play()
 		panel_container.hide()
 		return
 
@@ -146,21 +202,47 @@ func slide_closed() -> void:
 
 		ButteredSausagePanelConfig.CloseBehavior.MIRROR_FULL_CHAIN:
 			# Reverse entire animation chain in reverse order
-			if panel_config.animation_chain.is_empty():
+			if panel_config.entrance_animation_chain.is_empty():
 				panel_container.hide()
 			else:
-				for i in range(panel_config.animation_chain.size() - 1, -1, -1):
-					var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[i])
-					await animator.reverse()
+				for i in range(panel_config.entrance_animation_chain.size() - 1, -1, -1):
+					var step = panel_config.entrance_animation_chain[i]
+
+					# Skip steps with no animation assigned
+					if not step.animation:
+						continue
+
+					# Apply delay before this step
+					if step.delay_before > 0.0:
+						await get_tree().create_timer(step.delay_before).timeout
+
+					var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
+					# Invert the reverse flag when mirroring
+					if step.reverse:
+						await animator.play()
+					else:
+						await animator.reverse()
 				panel_container.hide()
 
 		ButteredSausagePanelConfig.CloseBehavior.REVERSE_FIRST_ANIMATION:
 			# Default - reverse just the first animation
-			if panel_config.animation_chain.is_empty():
+			if panel_config.entrance_animation_chain.is_empty():
 				panel_container.hide()
 			else:
-				var animator = ButteredSausageAnimator.new(self, panel_container, panel_config.animation_chain[0])
-				await animator.reverse()
+				var step = panel_config.entrance_animation_chain[0]
+
+				# Only reverse if animation is assigned
+				if step.animation:
+					# Apply delay before this step
+					if step.delay_before > 0.0:
+						await get_tree().create_timer(step.delay_before).timeout
+
+					var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
+					# Invert the reverse flag when reversing
+					if step.reverse:
+						await animator.play()
+					else:
+						await animator.reverse()
 				panel_container.hide()
 				
 					

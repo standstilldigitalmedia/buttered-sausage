@@ -21,7 +21,7 @@ var _creating_panel: bool = false  # Prevents race conditions when creating mult
 ## Shows the main message and all detail messages.[br][br]
 ##
 ## @param result - The ButteredSausage result containing message and details to display
-func populate_from_result(result: ButteredSausage) -> void:
+func populate_from_result(result: SSDMResult) -> void:
 	create_message(result.message, result.severity)
 	for detail in result.details:
 		create_message(detail["message"], detail["severity"])
@@ -57,13 +57,13 @@ func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
 ## @return The priority value from display config[br]
 func _get_severity_priority(severity: int) -> int:
 	match severity:
-		ButteredSausageSeverity.Level.ERROR:
+		SSDMSeverity.Level.ERROR:
 			return display_config.error_priority
-		ButteredSausageSeverity.Level.SUCCESS:
+		SSDMSeverity.Level.SUCCESS:
 			return display_config.success_priority
-		ButteredSausageSeverity.Level.WARNING:
+		SSDMSeverity.Level.WARNING:
 			return display_config.warning_priority
-		ButteredSausageSeverity.Level.INFO:
+		SSDMSeverity.Level.INFO:
 			return display_config.info_priority
 	return 0
 
@@ -149,7 +149,7 @@ func _update_position() -> void:
 
 	# Use get_parent_area_size() to get the actual available space
 	var parent_size: Vector2 = get_parent_area_size()
-	var container_height: float = content_container.size.y
+	var container_height: float = content_container.get_combined_minimum_size().y
 	var pos: Vector2 = Vector2.ZERO
 
 	match display_config.position_preset:
@@ -263,13 +263,13 @@ func create_message(msg: String, severity: int) -> void:
 		# Set panel_config early so subsequent messages can see this panel's config
 		var panel_config: ButteredSausagePanelConfig
 		match severity:
-			ButteredSausageSeverity.Level.SUCCESS:
+			SSDMSeverity.Level.SUCCESS:
 				panel_config = display_config.success_config
-			ButteredSausageSeverity.Level.ERROR:
+			SSDMSeverity.Level.ERROR:
 				panel_config = display_config.error_config
-			ButteredSausageSeverity.Level.WARNING:
+			SSDMSeverity.Level.WARNING:
 				panel_config = display_config.warning_config
-			ButteredSausageSeverity.Level.INFO:
+			SSDMSeverity.Level.INFO:
 				panel_config = display_config.info_config
 		panel.panel_config = panel_config
 
@@ -295,28 +295,28 @@ func create_message(msg: String, severity: int) -> void:
 ##
 ## @param message - The error message to display[br]
 func show_error(message: String) -> void:
-	create_message(message, ButteredSausageSeverity.Level.ERROR)
+	create_message(message, SSDMSeverity.Level.ERROR)
 
 
 ## Shows a success message.[br][br]
 ##
 ## @param message - The success message to display[br]
 func show_success(message: String) -> void:
-	create_message(message, ButteredSausageSeverity.Level.SUCCESS)
+	create_message(message, SSDMSeverity.Level.SUCCESS)
 
 
 ## Shows a warning message.[br][br]
 ##
 ## @param message - The warning message to display[br]
 func show_warning(message: String) -> void:
-	create_message(message, ButteredSausageSeverity.Level.WARNING)
+	create_message(message, SSDMSeverity.Level.WARNING)
 
 
 ## Shows an info message.[br][br]
 ##
 ## @param message - The info message to display[br]
 func show_info(message: String) -> void:
-	create_message(message, ButteredSausageSeverity.Level.INFO)
+	create_message(message, SSDMSeverity.Level.INFO)
 	
 
 ## Updates position every frame to keep panels positioned correctly.[br][br]
@@ -338,7 +338,9 @@ func _ready() -> void:
 	# Propagate panel_width from display config to all animator configs
 	for severity_config in [display_config.success_config, display_config.error_config,
 							display_config.warning_config, display_config.info_config]:
-		for anim_config in severity_config.animation_chain:
-			anim_config.panel_width = display_config.panel_width
-		for anim_config in severity_config.close_animation_chain:
-			anim_config.panel_width = display_config.panel_width
+		for step in severity_config.entrance_animation_chain:
+			if step.animation:
+				step.animation.panel_width = display_config.panel_width
+		for step in severity_config.exit_animation_chain:
+			if step.animation:
+				step.animation.panel_width = display_config.panel_width

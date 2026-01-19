@@ -29,12 +29,12 @@ enum RotationPivot {
 	CUSTOM           ## Use custom pivot coordinates set in rotation_pivot_custom or scale_pivot_custom properties.
 }
 
-@export_group("Transform Animations")
-@export_subgroup("Size")
-@export var animate_size: bool = false  ## Enable size animation (slide/reveal effect). WARNING: Cannot combine with Scale, Rotation, or Position animations.
+@export_group("Slide Out")
+@export var animate_slide_out: bool = false  ## Enable size animation (slide/reveal effect). WARNING: Cannot combine with Scale, Rotation, or Position animations.
 @export var axis: Axis = Axis.VERTICAL  ## Direction of size animation. VERTICAL = slides down/up, HORIZONTAL = slides left/right.
 @export var open_direction: OpenDirection = OpenDirection.POSITIVE  ## Which way the panel slides. POSITIVE = down/right, NEGATIVE = up/left.
 
+@export_group("Transform Animations")
 @export_subgroup("Scale")
 @export var animate_scale: bool = false  ## Enable scale animation (grow/shrink effect). Can combine with Rotation and Position.
 @export var scale_from: Vector2 = Vector2(0.9, 0.9)  ## Starting scale (1.0 = normal size). Values less than 1.0 start small, greater than 1.0 start large.
@@ -69,9 +69,6 @@ enum RotationPivot {
 @export var animate_shake: bool = false  ## Enable shake animation (vibration effect). Adds random position offsets for emphasis. Safe to combine with other animations.
 @export var shake_amount: float = 3.0  ## Maximum shake distance in pixels. Higher values = more aggressive shaking. Typical range: 2-10 pixels.
 @export var shake_speed: float = 0.05  ## Time between shake updates in seconds. Lower = faster shaking. Typical range: 0.01-0.1 seconds.
-
-@export_group("Loop Behavior")
-@export var loop_animation: bool = false  ## If true, animation repeats continuously until panel closes. Use for attention-grabbing effects like pulsing or color cycling.
 
 @export_group("Timing and Easing")
 @export var animation_speed: float = 1.0  ## Duration of animation in seconds. Lower = faster, higher = slower. Typical range: 0.2-2.0 seconds.

@@ -5,6 +5,26 @@ All notable changes to Buttered Sausage will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased - 2.0.0]
+
+### Added
+- `ButteredSausageAnimationStep` resource for per-step animation control
+  - `reverse` - Play animation backwards
+  - `loop` - Loop animation until panel closes
+  - `delay_before` - Delay in seconds before starting step
+- Icon color customization via `icon_modulate` property
+- Close button text mode via `close_button_text` property
+- Close button color customization via `close_button_modulate` property
+
+### Changed
+- **BREAKING:** `animation_chain` renamed to `entrance_animation_chain`
+- **BREAKING:** `close_animation_chain` renamed to `exit_animation_chain`
+- **BREAKING:** Animation chains now use `Array[ButteredSausageAnimationStep]` instead of `Array[ButteredSausageAnimatorConfig]`
+- Existing panel configs must be recreated with AnimationStep wrappers
+
+### Removed
+- **BREAKING:** `loop_animation` property removed from `ButteredSausageAnimatorConfig` (moved to `ButteredSausageAnimationStep`)
+
 ## [1.0.1] - 2026-01-15
 
 ### Migration Notes

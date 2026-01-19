@@ -1,16 +1,15 @@
 [gd_resource type="Resource" script_class="ButteredSausageDisplayConfig" load_steps=6 format=3 uid="uid://2b273vt5lmlb"]
 
-[ext_resource type="Script" uid="uid://cxavv8b2o6lf8" path="res://addons/ButteredSausage/config/scripts/display_config.gd" id="1_3im2g"]
-[ext_resource type="Resource" uid="uid://6w2lmyff7dud" path="res://addons/ButteredSausage/config/resource/panel/info_config.tres" id="1_bg4uk"]
-[ext_resource type="Resource" uid="uid://fq7gayl7ua4" path="res://addons/ButteredSausage/config/resource/panel/warning_config.tres" id="2_kvjwf"]
-[ext_resource type="Resource" uid="uid://dn4536n2drpa3" path="res://addons/ButteredSausage/config/resource/panel/error_config.tres" id="4_c2umw"]
-[ext_resource type="Resource" uid="uid://clgpi58m71vbo" path="res://addons/ButteredSausage/config/resource/panel/success_config.tres" id="5_v7stq"]
+[ext_resource type="Script" uid="uid://cxavv8b2o6lf8" path="res://addons/buttered-sausage/config/scripts/display_config.gd" id="1_3im2g"]
+[ext_resource type="Resource" uid="uid://6w2lmyff7dud" path="res://addons/buttered-sausage/config/resource/panel/info_config.tres" id="1_bg4uk"]
+[ext_resource type="Resource" uid="uid://fq7gayl7ua4" path="res://addons/buttered-sausage/config/resource/panel/warning_config.tres" id="2_kvjwf"]
+[ext_resource type="Resource" uid="uid://dn4536n2drpa3" path="res://addons/buttered-sausage/config/resource/panel/error_config.tres" id="4_c2umw"]
+[ext_resource type="Resource" uid="uid://clgpi58m71vbo" path="res://addons/buttered-sausage/config/resource/panel/success_config.tres" id="5_v7stq"]
 
 [resource]
 script = ExtResource("1_3im2g")
-position_preset = 8
-dynamic_repositioning = true
-success_config = ExtResource("4_c2umw")
-error_config = ExtResource("1_bg4uk")
-warning_config = ExtResource("5_v7stq")
-info_config = ExtResource("2_kvjwf")
+position_preset = 0
+success_config = ExtResource("5_v7stq")
+error_config = ExtResource("4_c2umw")
+warning_config = ExtResource("2_kvjwf")
+info_config = ExtResource("1_bg4uk")
