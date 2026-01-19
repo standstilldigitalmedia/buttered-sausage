@@ -1,3 +1,8 @@
+## Demo script for Buttered Sausage addon.[br]
+## Demonstrates SSDMResult integration, message display, and various usage patterns.[br][br]
+##
+## This script powers the interactive demo scene at:[br]
+## res://addons/ButteredSausage/demo/buttered_sausage_demo.tscn
 extends Control
 
 @export var main_message: LineEdit
@@ -10,6 +15,9 @@ extends Control
 @export var buttered_sausage_display: ButteredSausageDisplay
 
 
+## Adds warning and info details from the input fields to the result.[br][br]
+##
+## @param result - The SSDMResult to add details to
 func _add_details(result: SSDMResult) -> void:
 	if not warning_1.text.is_empty():
 		result.with_warning(warning_1.text)
@@ -23,38 +31,46 @@ func _add_details(result: SSDMResult) -> void:
 		result.with_info(info_2.text)
 		
 		
+## Creates and displays a success result with the main message and any details.
 func _on_show_success_pressed() -> void:
 	var result = SSDMResult.success(main_message.text)
 	_add_details(result)
 	buttered_sausage_display.populate_from_result(result)
 
 
+## Creates and displays an error/failure result with the main message and any details.
 func _on_show_error_pressed() -> void:
 	var result = SSDMResult.failure(main_message.text)
 	_add_details(result)
 	buttered_sausage_display.populate_from_result(result)
 
 
+## Creates and displays a warning result with the main message and any details.
 func _on_show_warning_pressed() -> void:
 	var result = SSDMResult.warning(main_message.text)
 	_add_details(result)
 	buttered_sausage_display.populate_from_result(result)
 
 
+## Creates and displays an info result with the main message and any details.
 func _on_show_info_pressed() -> void:
 	var result = SSDMResult.info(main_message.text)
 	_add_details(result)
 	buttered_sausage_display.populate_from_result(result)
 
 
+## Clears all panels from the display.
 func _on_clear_display_pressed() -> void:
 	buttered_sausage_display.clear_all_panels()
 
 
+## Updates the max visible panels setting from the spinbox value.
 func _on_max_panels_value_changed(value: float) -> void:
 	buttered_sausage_display.display_config.max_visible_panels = int(value)
 
 
+## Runs through several demo scenarios showing different SSDMResult patterns.[br]
+## Demonstrates: accumulator pattern, state conversion, merge pattern, and validation errors.
 func _on_demo_scenarios_pressed() -> void:
 	await get_tree().create_timer(0.3).timeout
 	var result1 = SSDMResult.success("Deleting user avatar directory...")
@@ -86,6 +102,7 @@ func _on_demo_scenarios_pressed() -> void:
 	buttered_sausage_display.populate_from_result(result3)
 
 
+## Initializes the demo with default message values.
 func _ready() -> void:
 	main_message.text = "File processing completed"
 	warning_1.text = "Skipped locked file: document.txt"

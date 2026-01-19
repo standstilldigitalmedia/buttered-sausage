@@ -72,15 +72,20 @@ var result := ButteredSausage.success("Operation completed!")
 
 ## Installation
 
+### Prerequisites
+
+Buttered Sausage 2.0.0+ requires [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) (SSDM Core). Install it first.
+
 ### Via Asset Library (Recommended)
 1. Open Godot Editor
 2. Go to **AssetLib** tab
-3. Search for "Buttered Sausage"
-4. Click **Download** → **Install**
+3. Search for "Standstill Core" and install it
+4. Search for "Buttered Sausage" and install it
 
 ### Manual Installation
-1. Download the latest release
-2. Copy the `addons/ButteredSausage/` folder to your project's `addons/` directory
+1. Download [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) and copy `addons/SSDMCore/` to your project's `addons/` directory
+2. Download the latest Buttered Sausage release
+3. Copy the `addons/ButteredSausage/` folder to your project's `addons/` directory
 
 ## Quick Start
 
@@ -106,14 +111,14 @@ func _ready() -> void:
 
 ### Using the Result Pattern
 
-The Result pattern (`ButteredSausage` class + `ButteredSausageSeverity` enum) can be used standalone without the display system or integrated with visual feedback.
+The Result pattern (`SSDMResult` class + `SSDMSeverity` enum from [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core)) can be used standalone without the display system or integrated with visual feedback.
 
-**Dependencies:** Only requires `ButteredSausage` and `ButteredSausageSeverity` - no UI components needed.
+**Dependencies:** Requires Standstill Core addon. Only uses `SSDMResult` and `SSDMSeverity` - no UI components needed.
 
 **Standalone Usage:**
 ```gdscript
-func process_data() -> ButteredSausage:
-	var result := ButteredSausage.success("Processing complete")
+func process_data() -> SSDMResult:
+	var result := SSDMResult.success("Processing complete")
 
 	if some_warning:
 		result.with_warning("Minor issue detected")
@@ -135,8 +140,8 @@ func _ready() -> void:
 **Integrated with Display:**
 
 ```gdscript
-func save_file(path: String) -> ButteredSausage:
-	var result := ButteredSausage.success("File saved successfully")
+func save_file(path: String) -> SSDMResult:
+	var result := SSDMResult.success("File saved successfully")
 
 	# Accumulate warnings during operation
 	if not has_write_permission(path):
@@ -160,7 +165,7 @@ func _on_save_pressed() -> void:
 
 **Accumulator Pattern** - Build up messages as you go:
 ```gdscript
-var result := ButteredSausage.success("Batch operation completed")
+var result := SSDMResult.success("Batch operation completed")
 result.with_info("Processed 47 files")
 result.with_warning("Skipped 2 locked files")
 result.with_warning("Failed to delete temporary cache")
@@ -169,7 +174,7 @@ error_display.populate_from_result(result)
 
 **State Conversion** - Change success to failure while keeping details:
 ```gdscript
-var result := ButteredSausage.success("Processing files...")
+var result := SSDMResult.success("Processing files...")
 result.with_info("Loaded config.json")
 result.with_info("Validated 15 entries")
 
@@ -181,7 +186,7 @@ error_display.populate_from_result(result)
 
 **Merge Pattern** - Combine results from nested operations:
 ```gdscript
-var parent_result := ButteredSausage.success("Batch operation in progress")
+var parent_result := SSDMResult.success("Batch operation in progress")
 
 # Sub-operation 1
 var child1 := process_first_batch()
@@ -233,6 +238,58 @@ This is especially important when validating text input in real-time (e.g., list
    - Your custom configs outside the addon folder will be preserved
 
 **Why this matters:** When you upgrade to a new version by extracting the addon over the old one, all files in `addons/ButteredSausage/` are replaced. Any modifications you made to files inside the addon folder will be lost.
+
+### Upgrading from 1.0.x to 2.0.0
+
+**BREAKING CHANGES** - Version 2.0.0 introduces significant changes that require code updates.
+
+**1. Install Standstill Core (New Dependency)**
+
+Buttered Sausage 2.0.0 requires [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core). Install it via the Asset Library or manually before upgrading.
+
+**2. Update Result Pattern References**
+
+The Result pattern classes have moved to Standstill Core:
+
+| Old (1.0.x) | New (2.0.0) |
+|-------------|-------------|
+| `ButteredSausage` | `SSDMResult` |
+| `ButteredSausageSeverity` | `SSDMSeverity.Level` |
+
+Find and replace in your scripts:
+```gdscript
+# Old
+var result := ButteredSausage.success("Done")
+result.with_detail("Info", ButteredSausageSeverity.INFO)
+
+# New
+var result := SSDMResult.success("Done")
+result.with_detail("Info", SSDMSeverity.Level.INFO)
+```
+
+**3. Update Animation Chain Properties**
+
+| Old (1.0.x) | New (2.0.0) |
+|-------------|-------------|
+| `animation_chain` | `entrance_animation_chain` |
+| `close_animation_chain` | `exit_animation_chain` |
+
+**4. Recreate Animation Chains with AnimationStep Wrappers**
+
+Animation chains now use `Array[ButteredSausageAnimationStep]` instead of `Array[ButteredSausageAnimatorConfig]`. Each `ButteredSausageAnimationStep` wraps an `AnimatorConfig` with additional per-step controls:
+
+- `animation` - The `ButteredSausageAnimatorConfig` resource
+- `reverse` - Play animation backwards
+- `loop` - Loop until panel closes (moved from `AnimatorConfig`)
+- `delay_before` - Delay before starting this step
+
+**5. Update Panel Configs**
+
+If you have custom `ButteredSausagePanelConfig` resources, you must recreate them:
+1. Create new `ButteredSausageAnimationStep` resources for each animation
+2. Assign your existing `ButteredSausageAnimatorConfig` to the `animation` property
+3. Set `loop` on the step instead of the config (if using looping)
+4. Update array references from `animation_chain` to `entrance_animation_chain`
 
 ### Upgrading from 1.0.0 to 1.0.1
 
@@ -300,8 +357,11 @@ Each severity level has its own pre-configured `ButteredSausagePanelConfig` reso
 
 **Icons and Buttons:**
 - `icon`, `icon_width`, `icon_height` - Severity icon
+- `icon_modulate` - Icon color tint
 - `hide_icon` - Hide the severity icon
 - `close_button_icon`, `close_button_width`, `close_button_height` - Close button styling
+- `close_button_text` - Use text instead of icon for close button
+- `close_button_modulate` - Close button color tint
 - `hide_close_button` - Hide the close button
 
 **Timing:**
@@ -310,11 +370,11 @@ Each severity level has its own pre-configured `ButteredSausagePanelConfig` reso
 - **Hover-to-Pause:** Auto-dismiss timers automatically pause when the user hovers their mouse over a panel, allowing them time to read longer messages. The timer resumes when the mouse exits the panel.
 
 **Animation Chains:**
-- `animation_chain` - Array of `ButteredSausageAnimatorConfig` for opening animations
-- `close_animation_chain` - Array of `ButteredSausageAnimatorConfig` for custom closing animations
-- `close_behavior` - Default closing behavior when `close_animation_chain` is empty:
-  - `REVERSE_FIRST_ANIMATION` (default) - Reverses the first animation from `animation_chain`
-  - `MIRROR_FULL_CHAIN` - Reverses entire `animation_chain` in reverse order
+- `entrance_animation_chain` - Array of `ButteredSausageAnimationStep` for opening animations
+- `exit_animation_chain` - Array of `ButteredSausageAnimationStep` for custom closing animations
+- `close_behavior` - Default closing behavior when `exit_animation_chain` is empty:
+  - `REVERSE_FIRST_ANIMATION` (default) - Reverses the first animation from `entrance_animation_chain`
+  - `MIRROR_FULL_CHAIN` - Reverses entire `entrance_animation_chain` in reverse order
   - `NO_ANIMATION` - Hides immediately without animation
 
 ### Animation Configuration
@@ -385,30 +445,37 @@ Each config can enable multiple effects simultaneously:
 - `ease_type_close` - Easing for closing (EASE_IN, EASE_IN_OUT, etc.)
 - `animation_speed` - Duration in seconds
 
-**Loop Behavior:**
-- `loop_animation` - Loop this animation after chain completes
+### Animation Steps
+
+Animation chains use `ButteredSausageAnimationStep` resources to wrap `ButteredSausageAnimatorConfig` with per-step control:
+
+**ButteredSausageAnimationStep Properties:**
+- `animation` - The `ButteredSausageAnimatorConfig` to play for this step
+- `reverse` - Play the animation backwards (close-to-open direction)
+- `loop` - Loop this animation continuously until the panel closes
+- `delay_before` - Delay in seconds before starting this animation step
 
 ### Animation Chains
 
-Animation chains allow you to create complex sequential animations. Each config in the chain plays one after another:
+Animation chains allow you to create complex sequential animations. Each step in the chain plays one after another:
 
 ```
 Example chain:
 1. Slide down + fade in (0.3 seconds)
 2. Scale bounce effect (0.2 seconds)
-3. Subtle shake for emphasis (0.4 seconds)
+3. Subtle shake for emphasis (0.4 seconds, looping)
 ```
 
-After creating your animation configs, add them to the `animation_chain` array in your `ButteredSausagePanelConfig` (found in `res://addons/ButteredSausage/config/resource/panels/`). The display will:
-1. Play each animation sequentially
-2. If any animation has `loop_animation = true`, continuously loop those animations
+After creating your animation configs, wrap them in `ButteredSausageAnimationStep` resources and add them to the `entrance_animation_chain` array in your `ButteredSausagePanelConfig` (found in `res://addons/ButteredSausage/config/resource/panels/`). The display will:
+1. Play each animation step sequentially
+2. If any step has `loop = true`, continuously loop those animations
 3. Stop looping when the panel closes
 
 For closing animations, you have multiple options:
-1. **Custom close chain** - Define a `close_animation_chain` with specific closing animations (takes precedence)
-2. **Default behavior** - When `close_animation_chain` is empty, use the `close_behavior` setting:
+1. **Custom exit chain** - Define an `exit_animation_chain` with specific closing animations (takes precedence)
+2. **Default behavior** - When `exit_animation_chain` is empty, use the `close_behavior` setting:
    - `REVERSE_FIRST_ANIMATION` - Reverses only the first animation (default, fastest)
-   - `MIRROR_FULL_CHAIN` - Reverses entire opening chain in reverse order (mirrors open)
+   - `MIRROR_FULL_CHAIN` - Reverses entire entrance chain in reverse order (mirrors open)
    - `NO_ANIMATION` - Hides immediately without animation (instant dismiss)
 
 ## API Reference
@@ -417,13 +484,13 @@ For closing animations, you have multiple options:
 
 These components can be used independently without the full display system:
 
-**ButteredSausageSeverity** - Severity level enum
-- **Dependencies:** None
+**SSDMSeverity** (from [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core)) - Severity level enum
+- **Dependencies:** Standstill Core addon
 - **Usage:** Define message severity levels
-- **Levels:** `SUCCESS`, `INFO`, `WARNING`, `ERROR`
+- **Levels:** `SSDMSeverity.Level.SUCCESS`, `SSDMSeverity.Level.INFO`, `SSDMSeverity.Level.WARNING`, `SSDMSeverity.Level.ERROR`
 
-**ButteredSausage** - Result pattern class
-- **Dependencies:** `ButteredSausageSeverity`
+**SSDMResult** (from [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core)) - Result pattern class
+- **Dependencies:** Standstill Core addon
 - **Usage:** Encapsulate operation results with messages, errors, data payload and accumulated details
 
 **ButteredSausageAnimator** - Control animation system
@@ -439,19 +506,19 @@ These components can be used independently without the full display system:
 - `show_warning(message: String)` - Display warning message (auto-dismiss)
 - `show_info(message: String)` - Display info message (auto-dismiss)
 - `show_error(message: String)` - Display error message (manual dismiss)
-- `populate_from_result(result: ButteredSausage)` - Display all messages from a Result object
+- `populate_from_result(result: SSDMResult)` - Display all messages from a Result object
 - `clear_all_panels()` - Close all message panels
 
-**ButteredSausage (Result Class)**
+**SSDMResult** (from [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core))
 
 **Factory Methods:**
-- `ButteredSausage.success(msg: String, data: Variant = null)` - Create success result
-- `ButteredSausage.failure(msg: String, data: Variant = null, error: Error = FAILED)` - Create failure result
-- `ButteredSausage.warning(msg: String, data: Variant = null)` - Create warning result
-- `ButteredSausage.info(msg: String, data: Variant = null)` - Create info result
+- `SSDMResult.success(msg: String, data: Variant = null)` - Create success result
+- `SSDMResult.failure(msg: String, data: Variant = null, error: Error = FAILED)` - Create failure result
+- `SSDMResult.warning(msg: String, data: Variant = null)` - Create warning result
+- `SSDMResult.info(msg: String, data: Variant = null)` - Create info result
 
 **Builder Methods:**
-- `with_detail(msg: String, severity: Severity)` - Add detail message
+- `with_detail(msg: String, severity: SSDMSeverity.Level)` - Add detail message
 - `with_warning(msg: String)` - Add warning detail
 - `with_info(msg: String)` - Add info detail
 - `with_error(msg: String, err: Error = FAILED)` - Add error detail
@@ -463,7 +530,7 @@ These components can be used independently without the full display system:
 - `to_info(msg: String = "")` - Convert to info
 
 **Utility Methods:**
-- `merge_from(other: ButteredSausage, takeover_message: bool = true)` - Merge another result
+- `merge_from(other: SSDMResult, takeover_message: bool = true)` - Merge another result
 - `has_details() -> bool` - Check if result has detail messages
 - `is_success() -> bool` - Check if result represents success
 

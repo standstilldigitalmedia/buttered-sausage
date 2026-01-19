@@ -7,8 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased - 2.0.0]
 
+### Migration Notes
+
+**BREAKING CHANGES** - This release requires code changes. See README.md "Upgrading from 1.0.x to 2.0.0" for detailed migration steps.
+
+**New Dependency:** [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) is now required. Install it via the Godot Asset Library or manually before upgrading.
+
+**Result Pattern Migration:**
+| Old (1.0.x) | New (2.0.0) |
+|-------------|-------------|
+| `ButteredSausage` | `SSDMResult` (from Standstill Core) |
+| `ButteredSausageSeverity` | `SSDMSeverity.Level` (from Standstill Core) |
+
+**Animation Chain Migration:**
+| Old (1.0.x) | New (2.0.0) |
+|-------------|-------------|
+| `animation_chain` | `entrance_animation_chain` |
+| `close_animation_chain` | `exit_animation_chain` |
+| `Array[ButteredSausageAnimatorConfig]` | `Array[ButteredSausageAnimationStep]` |
+
 ### Added
+- **Dependency:** [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) addon required for `SSDMResult` and `SSDMSeverity`
 - `ButteredSausageAnimationStep` resource for per-step animation control
+  - `animation` - Reference to a `ButteredSausageAnimatorConfig`
   - `reverse` - Play animation backwards
   - `loop` - Loop animation until panel closes
   - `delay_before` - Delay in seconds before starting step
@@ -17,13 +38,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Close button color customization via `close_button_modulate` property
 
 ### Changed
+- **BREAKING:** Result pattern now uses `SSDMResult` and `SSDMSeverity` from Standstill Core
 - **BREAKING:** `animation_chain` renamed to `entrance_animation_chain`
 - **BREAKING:** `close_animation_chain` renamed to `exit_animation_chain`
 - **BREAKING:** Animation chains now use `Array[ButteredSausageAnimationStep]` instead of `Array[ButteredSausageAnimatorConfig]`
 - Existing panel configs must be recreated with AnimationStep wrappers
 
 ### Removed
+- **BREAKING:** `ButteredSausage` class (use `SSDMResult` from Standstill Core)
+- **BREAKING:** `ButteredSausageSeverity` enum (use `SSDMSeverity.Level` from Standstill Core)
 - **BREAKING:** `loop_animation` property removed from `ButteredSausageAnimatorConfig` (moved to `ButteredSausageAnimationStep`)
+- `logic/` folder removed (Result pattern now in Standstill Core)
 
 ## [1.0.1] - 2026-01-15
 

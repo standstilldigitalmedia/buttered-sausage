@@ -385,7 +385,7 @@ func close_immediate() -> void:
 		wrapper.hide()
 
 		# Reset size if it was animated
-		if animator_config.animate_size:
+		if animator_config.animate_slide_out:
 			if animator_config.axis == Axis.VERTICAL:
 				wrapper.custom_minimum_size.y = 0
 				wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if animator_config.open_direction == OpenDirection.POSITIVE else Control.SIZE_SHRINK_END

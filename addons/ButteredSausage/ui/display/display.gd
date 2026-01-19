@@ -1,8 +1,9 @@
 @tool
 ## A visual message display system that shows messages with different severity levels.[br]
 ## Supports configurable panel limits, hover-to-pause auto-dismiss, and customizable animations.[br]
-## Integrates with ButteredSausage result pattern for displaying operation results with details.[br][br]
+## Integrates with SSDMResult (from Standstill Core) for displaying operation results with details.[br][br]
 ##
+## Dependencies: Standstill Core addon (provides SSDMResult and SSDMSeverity).[br]
 ## Configure via ButteredSausageDisplayConfig resource in the inspector.
 class_name ButteredSausageDisplay
 extends Control
@@ -17,10 +18,10 @@ var _anchor_to_bottom: bool = false
 var _creating_panel: bool = false  # Prevents race conditions when creating multiple panels
 
 
-## Populates the display with messages from a ButteredSausage result object.[br]
+## Populates the display with messages from an SSDMResult object.[br]
 ## Shows the main message and all detail messages.[br][br]
 ##
-## @param result - The ButteredSausage result containing message and details to display
+## @param result - The SSDMResult containing message and details to display
 func populate_from_result(result: SSDMResult) -> void:
 	create_message(result.message, result.severity)
 	for detail in result.details:
