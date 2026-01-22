@@ -8,9 +8,44 @@
 class_name ButteredSausageDisplay
 extends Control
 
-@export var message_panel_scene: PackedScene
+enum PositionPreset {
+	TOP_LEFT,        ## Position the panel container at the top-left corner. Panels stack downward from this point.
+	TOP_CENTER,      ## Position the panel container at the top-center. Panels stack downward from this point.
+	TOP_RIGHT,       ## Position the panel container at the top-right corner. Panels stack downward from this point.
+	CENTER_LEFT,     ## Position the panel container at the center-left edge. Container centers vertically at this position.
+	CENTER,          ## Position the panel container at the exact screen center. Container centers both horizontally and vertically.
+	CENTER_RIGHT,    ## Position the panel container at the center-right edge. Container centers vertically at this position.
+	BOTTOM_LEFT,     ## Position the panel container at the bottom-left corner. Panels stack upward from this point.
+	BOTTOM_CENTER,   ## Position the panel container at the bottom-center. Panels stack upward from this point.
+	BOTTOM_RIGHT     ## Position the panel container at the bottom-right corner. Panels stack upward from this point.
+}
+
+@export_group("Positioning")
+@export var panel_width: float = 400.0  ## Width of each message panel in pixels. All panels in the display will use this width.
+@export var position_preset: PositionPreset = PositionPreset.CENTER  ## Screen position where panels appear. Choose from 9 preset positions (corners, edges, center).
+@export var margin_from_edge: float = 20.0  ## Distance in pixels between panels and the screen edge. Applies to all position presets.
+@export var reverse_panel_order: bool = false  ## Stack direction for multiple panels. False = new panels at top, True = new panels at bottom.
+
+@export_group("Panels")
+@export var success_panel: PackedScene  ## Visual styling and behavior for SUCCESS severity panels (green by default)
+@export var error_panel: PackedScene  ## Visual styling and behavior for ERROR severity panels (red by default)
+@export var warning_panel: PackedScene  ## Visual styling and behavior for WARNING severity panels (yellow by default)
+@export var info_panel: PackedScene  ## Visual styling and behavior for INFO severity panels (blue by default)
+
+@export_group("Panel Limits")
+## Maximum number of panels visible at once. 0 = unlimited panels, 1 = single panel mode (uses priority), 2+ = limited mode (FIFO removal when limit reached).
+@export var max_visible_panels: int = 0
+## Priority for ERROR panels in single panel mode (max_visible_panels = 1). Higher numbers win. Equal priorities favor most recent.
+@export var error_priority: int = 4
+## Priority for SUCCESS panels in single panel mode (max_visible_panels = 1). Higher numbers win. Equal priorities favor most recent.
+@export var success_priority: int = 3
+## Priority for WARNING panels in single panel mode (max_visible_panels = 1). Higher numbers win. Equal priorities favor most recent.
+@export var warning_priority: int = 2
+## Priority for INFO panels in single panel mode (max_visible_panels = 1). Higher numbers win. Equal priorities favor most recent.
+@export var info_priority: int = 1
+
+@export_group("Control")
 @export var content_container: VBoxContainer
-@export var display_config: ButteredSausageDisplayConfig
 
 var _positioning_applied: bool = false
 var _target_position: Vector2 = Vector2.ZERO
@@ -31,7 +66,7 @@ func populate_from_result(result: SSDMResult) -> void:
 ## Closes all message panels and hides the display.[br][br]
 func clear_all_panels() -> void:
 	for child in content_container.get_children():
-		if child is ButteredSausagePanel:
+		if child is ButteredSausagePanelBase:
 			child.close()
 	hide()
 	
@@ -40,7 +75,7 @@ func clear_all_panels() -> void:
 ## Stops timers and animations before removal.[br][br]
 ##
 ## @param panel - The panel to remove[br]
-func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
+func _remove_panel_immediately(panel: ButteredSausagePanelBase) -> void:
 	# Stop any timers and mark as closing to stop looping animations
 	panel.is_closing = true
 	if panel.auto_dismiss_timer and is_instance_valid(panel.auto_dismiss_timer):
@@ -59,13 +94,13 @@ func _remove_panel_immediately(panel: ButteredSausagePanel) -> void:
 func _get_severity_priority(severity: int) -> int:
 	match severity:
 		SSDMSeverity.Level.ERROR:
-			return display_config.error_priority
+			return error_priority
 		SSDMSeverity.Level.SUCCESS:
-			return display_config.success_priority
+			return success_priority
 		SSDMSeverity.Level.WARNING:
-			return display_config.warning_priority
+			return warning_priority
 		SSDMSeverity.Level.INFO:
-			return display_config.info_priority
+			return info_priority
 	return 0
 
 
@@ -75,31 +110,31 @@ func _get_severity_priority(severity: int) -> int:
 ## @param new_severity - The severity of the panel about to be created[br]
 ## @return True if the new panel should be created, false otherwise[br]
 func _enforce_panel_limit(new_severity: int) -> bool:
-	if display_config.max_visible_panels <= 0:
+	if max_visible_panels <= 0:
 		return true  # Unlimited panels, always create
 
-	var panels: Array[ButteredSausagePanel] = []
+	var panels: Array[ButteredSausagePanelBase] = []
 	for child in content_container.get_children():
-		if child is ButteredSausagePanel:
-			# Skip panels that are closing or don't have config yet
-			if child.is_closing or not child.panel_config:
+		if child is ButteredSausagePanelBase:
+			# Skip panels that are closing
+			if child.is_closing:
 				continue
 			panels.append(child)
 
 	# Special case: max_visible_panels = 1 (single panel mode)
 	# Only create new panel if it has higher or equal priority than existing
-	if display_config.max_visible_panels == 1:
+	if max_visible_panels == 1:
 		# If no valid existing panels, allow creation
 		if panels.is_empty():
 			return true
 
 		var new_priority = _get_severity_priority(new_severity)
 		var highest_existing_priority = -1
-		var highest_priority_panel: ButteredSausagePanel = null
+		var highest_priority_panel: ButteredSausagePanelBase = null
 
 		# Find the panel with the highest priority
 		for panel in panels:
-			var panel_priority = _get_severity_priority(panel.panel_config.severity)
+			var panel_priority = _get_severity_priority(panel.severity)
 			if panel_priority > highest_existing_priority:
 				highest_existing_priority = panel_priority
 				highest_priority_panel = panel
@@ -121,10 +156,10 @@ func _enforce_panel_limit(new_severity: int) -> bool:
 
 	# For max_visible_panels > 1: Remove oldest panels (FIFO) until under limit
 	# We want to stay at (max - 1) to make room for the new panel about to be added
-	while panels.size() >= display_config.max_visible_panels:
+	while panels.size() >= max_visible_panels:
 		# Determine which panel is oldest based on reverse_panel_order setting
-		var oldest_panel: ButteredSausagePanel
-		if display_config.reverse_panel_order:
+		var oldest_panel: ButteredSausagePanelBase
+		if reverse_panel_order:
 			# When reverse order is enabled, new panels are inserted at index 0
 			# So the oldest panel is at the END of the array
 			oldest_panel = panels[panels.size() - 1]
@@ -145,40 +180,40 @@ func _update_position() -> void:
 	if not _positioning_applied:
 		return
 
-	var margin: float = display_config.margin_from_edge
-	var width: float = display_config.panel_width
+	var margin: float = margin_from_edge
+	var width: float = panel_width
 
 	# Use get_parent_area_size() to get the actual available space
 	var parent_size: Vector2 = get_parent_area_size()
 	var container_height: float = content_container.get_combined_minimum_size().y
 	var pos: Vector2 = Vector2.ZERO
 
-	match display_config.position_preset:
-		ButteredSausageDisplayConfig.PositionPreset.TOP_LEFT:
+	match position_preset:
+		PositionPreset.TOP_LEFT:
 			pos = Vector2(margin, margin)
 
-		ButteredSausageDisplayConfig.PositionPreset.TOP_CENTER:
+		PositionPreset.TOP_CENTER:
 			pos = Vector2((parent_size.x - width) / 2.0, margin)
 
-		ButteredSausageDisplayConfig.PositionPreset.TOP_RIGHT:
+		PositionPreset.TOP_RIGHT:
 			pos = Vector2(parent_size.x - width - margin, margin)
 
-		ButteredSausageDisplayConfig.PositionPreset.CENTER_LEFT:
+		PositionPreset.CENTER_LEFT:
 			pos = Vector2(margin, (parent_size.y - container_height) / 2.0)
 
-		ButteredSausageDisplayConfig.PositionPreset.CENTER:
+		PositionPreset.CENTER:
 			pos = Vector2((parent_size.x - width) / 2.0, (parent_size.y - container_height) / 2.0)
 
-		ButteredSausageDisplayConfig.PositionPreset.CENTER_RIGHT:
+		PositionPreset.CENTER_RIGHT:
 			pos = Vector2(parent_size.x - width - margin, (parent_size.y - container_height) / 2.0)
 
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT:
+		PositionPreset.BOTTOM_LEFT:
 			pos = Vector2(margin, parent_size.y - container_height - margin)
 
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER:
+		PositionPreset.BOTTOM_CENTER:
 			pos = Vector2((parent_size.x - width) / 2.0, parent_size.y - container_height - margin)
 
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT:
+		PositionPreset.BOTTOM_RIGHT:
 			pos = Vector2(parent_size.x - width - margin, parent_size.y - container_height - margin)
 
 	content_container.position = pos
@@ -190,8 +225,8 @@ func _apply_position_preset() -> void:
 	if _positioning_applied:
 		return
 
-	var margin: float = display_config.margin_from_edge
-	var width: float = display_config.panel_width
+	var margin: float = margin_from_edge
+	var width: float = panel_width
 
 	# Use layout_mode 0 (unmanaged positioning) - simplest approach
 	content_container.set("layout_mode", 0)
@@ -205,10 +240,10 @@ func _apply_position_preset() -> void:
 	content_container.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 
 	# Determine if this preset needs bottom anchoring
-	_anchor_to_bottom = display_config.position_preset in [
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_LEFT,
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_CENTER,
-		ButteredSausageDisplayConfig.PositionPreset.BOTTOM_RIGHT
+	_anchor_to_bottom = position_preset in [
+		PositionPreset.BOTTOM_LEFT,
+		PositionPreset.BOTTOM_CENTER,
+		PositionPreset.BOTTOM_RIGHT
 	]
 
 	# Set flag BEFORE calling update so it doesn't return early
@@ -229,7 +264,7 @@ func create_message(msg: String, severity: int) -> void:
 	_creating_panel = true
 
 	# Apply positioning if not yet applied
-	if not _positioning_applied:
+	if !_positioning_applied:
 		show()  # Must be visible for sizing
 		await get_tree().process_frame  # Wait for layout
 		_apply_position_preset()
@@ -237,7 +272,7 @@ func create_message(msg: String, severity: int) -> void:
 	# Check for duplicate message
 	var found: bool = false
 	for child in content_container.get_children():
-		if child is ButteredSausagePanel:
+		if child is ButteredSausagePanelBase:
 			if child.message_label.text == msg:
 				found = true
 				break
@@ -249,46 +284,43 @@ func create_message(msg: String, severity: int) -> void:
 		return
 
 	# No duplicate found, proceed to create panel
-	if true:
-		# Check limit before creating
-		if not _enforce_panel_limit(severity):
-			_creating_panel = false
-			return  # Don't create panel, existing higher priority panel takes precedence
-
-		var panel = message_panel_scene.instantiate()
-		if !message_panel_scene:
-			push_error("message_panel_scene must be set on buttered_sausage_display.tscn in the inspector")
-			_creating_panel = false
-			return
-
-		# Set panel_config early so subsequent messages can see this panel's config
-		var panel_config: ButteredSausagePanelConfig
-		match severity:
-			SSDMSeverity.Level.SUCCESS:
-				panel_config = display_config.success_config
-			SSDMSeverity.Level.ERROR:
-				panel_config = display_config.error_config
-			SSDMSeverity.Level.WARNING:
-				panel_config = display_config.warning_config
-			SSDMSeverity.Level.INFO:
-				panel_config = display_config.info_config
-		panel.panel_config = panel_config
-
-		# Add to tree so subsequent messages can see it
-		content_container.add_child(panel)
-
-		# If reverse order is enabled, move new panel to the top (index 0)
-		if display_config.reverse_panel_order:
-			content_container.move_child(panel, 0)
-
-		# Setup the panel (after it's in tree so timer can start)
-		panel.setup(msg, panel_config)
-
-		# Release the lock so other messages can proceed
+	# Check limit before creating
+	if not _enforce_panel_limit(severity):
 		_creating_panel = false
+		return  # Don't create panel, existing higher priority panel takes precedence
 
-		panel.slide_open()
+	var panel: ButteredSausagePanelBase
+	match severity:
+		SSDMSeverity.Level.SUCCESS:
+			panel = success_panel.instantiate() as ButteredSausagePanelBase
+		SSDMSeverity.Level.ERROR:
+			panel = error_panel.instantiate() as ButteredSausagePanelBase
+		SSDMSeverity.Level.WARNING:
+			panel = warning_panel.instantiate() as ButteredSausagePanelBase
+		SSDMSeverity.Level.INFO:
+			panel = info_panel.instantiate() as ButteredSausagePanelBase
 
+	for step in panel.entrance_animation_chain:
+		if step.animation:
+			step.animation.panel_width = panel_width
+	for step in panel.exit_animation_chain:
+		if step.animation:
+			step.animation.panel_width = panel_width
+
+	# Add to tree so subsequent messages can see it
+	content_container.add_child(panel)
+
+	# If reverse order is enabled, move new panel to the top (index 0)
+	if reverse_panel_order:
+		content_container.move_child(panel, 0)
+
+	# Setup the panel (after it's in tree so timer can start)
+	panel.setup(msg)
+
+	# Release the lock so other messages can proceed
+	_creating_panel = false
+
+	panel.slide_open()
 	show()
 	
 					
@@ -334,14 +366,4 @@ func _ready() -> void:
 
 	# Clear static style cache to ensure fresh styleboxes are created
 	# This prevents stale cached styles from persisting across editor reloads
-	ButteredSausagePanel.cached_styles.clear()
-
-	# Propagate panel_width from display config to all animator configs
-	for severity_config in [display_config.success_config, display_config.error_config,
-							display_config.warning_config, display_config.info_config]:
-		for step in severity_config.entrance_animation_chain:
-			if step.animation:
-				step.animation.panel_width = display_config.panel_width
-		for step in severity_config.exit_animation_chain:
-			if step.animation:
-				step.animation.panel_width = display_config.panel_width
+	ButteredSausagePanelBase.cached_styles.clear()
