@@ -18,39 +18,15 @@ const MODULATE_PROPERTY: String = "modulate"
 const ROTATION_PROPERTY: String = "rotation"
 const POSITION_PROPERTY: String = "position"
 const POSITION_X_PROPERTY: String = "position:x"
-const TEXT_EFFECTS_SHADER_CODE: String = """
-shader_type canvas_item;
-
-// Apparate effect: mystical scattered fade based on UV position
-uniform float apparate_enabled = 0.0;
-uniform float apparate_progress = 1.0;
-uniform float apparate_spread = 0.15;
-
-void fragment() {
-	vec4 color = texture(TEXTURE, UV);
-
-	// Apparate: scattered/mystical fade (UV.x based, creates random-looking pattern)
-	if (apparate_enabled > 0.5) {
-		float fade_start = apparate_progress - apparate_spread;
-		float fade_end = apparate_progress;
-
-		if (UV.x > fade_end) {
-			color.a = 0.0;
-		} else if (UV.x > fade_start) {
-			float fade_factor = (fade_end - UV.x) / apparate_spread;
-			color.a *= fade_factor;
-		}
-	}
-
-	COLOR = color;
-}
-"""
+const TEXT_EFFECTS_SHADER_FILE: String = "shaders/text_effects.gdshader"
 
 var wrapper: Control
 var panel: Control
 var rotation_container: Control  # Middle layer for rotation isolation
 var slide_tween: Tween
 var text_tween: Tween  # Tween for text animations (typewriter/apparate)
+var wave_fade_tween: Tween  # Tween for wave duration fade-out
+var shake_fade_tween: Tween  # Tween for shake duration fade-out
 var text_label: RichTextLabel  # Optional label for text effects
 var text_shader_material: ShaderMaterial  # Shader material for text effects
 var _original_label_material: Material  # Store original material to restore later
@@ -69,7 +45,7 @@ func configure(config: ButteredSausageAnimatorConfig) -> ButteredSausageAnimator
 	return self
 
 
-## Sets the text label for text effects (typewriter, apparate).[br][br]
+## Sets the text label for text effects (typewriter, apparate, wave, etc.).[br][br]
 ##
 ## @param label - The RichTextLabel to animate[br]
 ## @return This animator instance for method chaining[br]
@@ -80,13 +56,24 @@ func set_text_label(label: RichTextLabel) -> ButteredSausageAnimator:
 
 ## Returns true if any text animations are configured.[br][br]
 ##
-## @return True if typewriter or apparate is enabled[br]
+## @return True if any text effect is enabled[br]
 func _has_text_animations() -> bool:
 	return (animator_config.animate_typewriter or
-			animator_config.animate_text_apparate)
+			animator_config.animate_text_apparate or
+			_has_continuous_text_effects())
 
 
-## Plays text animations (typewriter and/or fade-in) on the text label.[br]
+## Returns true if any continuous shader effects are configured.[br][br]
+##
+## @return True if wave, shake, rainbow, or pulse is enabled[br]
+func _has_continuous_text_effects() -> bool:
+	return (animator_config.animate_text_wave or
+			animator_config.animate_text_shake or
+			animator_config.animate_text_rainbow or
+			animator_config.animate_text_pulse)
+
+
+## Plays text animations on the text label.[br]
 ## Called automatically by play() if text_label is set and text animations are enabled.[br][br]
 func _play_text_animations() -> void:
 	if not text_label or not _has_text_animations():
@@ -98,20 +85,26 @@ func _play_text_animations() -> void:
 		return
 
 	_target_visible_chars = char_count
-	text_label.visible_characters = 0
 
+	# Apply shader if any shader-based effects are enabled
+	var needs_shader = (animator_config.animate_text_apparate or _has_continuous_text_effects())
+	if needs_shader:
+		_apply_text_shader()
+		_setup_continuous_effects()
+
+	# Set up tween for one-time animations
 	if text_tween:
 		text_tween.kill()
-	text_tween = text_label.create_tween()
 
 	if animator_config.animate_typewriter:
 		# Typewriter: reveal characters at a constant rate
+		text_label.visible_characters = 0
+		text_tween = text_label.create_tween()
 		var duration = char_count / animator_config.characters_per_second
 		text_tween.tween_property(text_label, "visible_characters", char_count, duration)
 
 	elif animator_config.animate_text_apparate:
 		# Apparate: shader-based mystical scattered fade effect
-		_apply_text_shader()
 		text_shader_material.set_shader_parameter("apparate_enabled", 1.0)
 		text_shader_material.set_shader_parameter("apparate_progress", 0.0)
 		text_shader_material.set_shader_parameter("apparate_spread", animator_config.apparate_spread)
@@ -119,8 +112,81 @@ func _play_text_animations() -> void:
 		# Show all characters immediately - shader handles the fade
 		text_label.visible_characters = char_count
 
-		# Tween the shader's fade progress
-		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", 1.0, animator_config.apparate_duration)
+		# Tween progress to 1.0 + spread so fade band clears the right edge completely
+		text_tween = text_label.create_tween()
+		var end_progress = 1.0 + animator_config.apparate_spread
+		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", end_progress, animator_config.apparate_duration)
+
+	else:
+		# No one-time animation, just show all characters for continuous effects
+		text_label.visible_characters = char_count
+
+
+## Sets up continuous shader effects (wave, shake, rainbow, pulse).[br]
+## These effects run continuously using TIME and don't need tweening.[br][br]
+func _setup_continuous_effects() -> void:
+	if not text_shader_material:
+		return
+
+	# Kill any existing fade tweens
+	if wave_fade_tween:
+		wave_fade_tween.kill()
+	if shake_fade_tween:
+		shake_fade_tween.kill()
+
+	# Wave effect
+	if animator_config.animate_text_wave:
+		text_shader_material.set_shader_parameter("wave_enabled", 1.0)
+		text_shader_material.set_shader_parameter("wave_amplitude", animator_config.wave_amplitude)
+		text_shader_material.set_shader_parameter("wave_frequency", animator_config.wave_frequency)
+		text_shader_material.set_shader_parameter("wave_speed", animator_config.wave_speed)
+
+		# Fade out wave after duration (if > 0)
+		if animator_config.wave_duration > 0.0 and text_label:
+			wave_fade_tween = text_label.create_tween()
+			wave_fade_tween.tween_property(
+				text_shader_material,
+				"shader_parameter/wave_amplitude",
+				0.0,
+				animator_config.wave_duration
+			)
+	else:
+		text_shader_material.set_shader_parameter("wave_enabled", 0.0)
+
+	# Shake effect
+	if animator_config.animate_text_shake:
+		text_shader_material.set_shader_parameter("shake_enabled", 1.0)
+		text_shader_material.set_shader_parameter("shake_amount", animator_config.text_shake_amount)
+		text_shader_material.set_shader_parameter("shake_speed", animator_config.text_shake_speed)
+
+		# Fade out shake after duration (if > 0)
+		if animator_config.text_shake_duration > 0.0 and text_label:
+			shake_fade_tween = text_label.create_tween()
+			shake_fade_tween.tween_property(
+				text_shader_material,
+				"shader_parameter/shake_amount",
+				0.0,
+				animator_config.text_shake_duration
+			)
+	else:
+		text_shader_material.set_shader_parameter("shake_enabled", 0.0)
+
+	# Rainbow effect
+	if animator_config.animate_text_rainbow:
+		text_shader_material.set_shader_parameter("rainbow_enabled", 1.0)
+		text_shader_material.set_shader_parameter("rainbow_frequency", animator_config.rainbow_frequency)
+		text_shader_material.set_shader_parameter("rainbow_speed", animator_config.rainbow_speed)
+		text_shader_material.set_shader_parameter("rainbow_saturation", animator_config.rainbow_saturation)
+	else:
+		text_shader_material.set_shader_parameter("rainbow_enabled", 0.0)
+
+	# Pulse effect
+	if animator_config.animate_text_pulse:
+		text_shader_material.set_shader_parameter("pulse_enabled", 1.0)
+		text_shader_material.set_shader_parameter("pulse_speed", animator_config.pulse_speed)
+		text_shader_material.set_shader_parameter("pulse_min_alpha", animator_config.pulse_min_alpha)
+	else:
+		text_shader_material.set_shader_parameter("pulse_enabled", 0.0)
 
 
 ## Gets the character positions where each word ends (including trailing space).[br][br]
@@ -161,10 +227,23 @@ func _apply_text_shader() -> void:
 
 	# Create shader material if not already created
 	if not text_shader_material:
-		var shader = Shader.new()
-		shader.code = TEXT_EFFECTS_SHADER_CODE
+		# Build path relative to this script's location (works regardless of addon folder name)
+		var script_path = get_script().resource_path.get_base_dir()  # res://addons/[addon]/ui
+		var addon_path = script_path.get_base_dir()  # res://addons/[addon]
+		var shader_path = addon_path.path_join(TEXT_EFFECTS_SHADER_FILE)
+		var shader = load(shader_path)
+		if not shader:
+			push_error("ButteredSausageAnimator: Failed to load shader from " + shader_path)
+			return
 		text_shader_material = ShaderMaterial.new()
 		text_shader_material.shader = shader
+
+	# Reset all effects to disabled (they'll be enabled as needed)
+	text_shader_material.set_shader_parameter("wave_enabled", 0.0)
+	text_shader_material.set_shader_parameter("shake_enabled", 0.0)
+	text_shader_material.set_shader_parameter("rainbow_enabled", 0.0)
+	text_shader_material.set_shader_parameter("apparate_enabled", 0.0)
+	text_shader_material.set_shader_parameter("pulse_enabled", 0.0)
 
 	text_label.material = text_shader_material
 
@@ -185,9 +264,9 @@ func skip_text_animation() -> void:
 		text_label.visible_characters = _target_visible_chars
 		text_label.modulate.a = 1.0
 
-		# Complete shader animation if active
-		if text_shader_material:
-			text_shader_material.set_shader_parameter("apparate_progress", 1.0)
+		# Complete apparate animation if active (use 2.0 to ensure fade band is fully past)
+		if text_shader_material and animator_config.animate_text_apparate:
+			text_shader_material.set_shader_parameter("apparate_progress", 2.0)
 
 
 ## Calculates the pivot offset for rotation based on the configured pivot preset.[br][br]

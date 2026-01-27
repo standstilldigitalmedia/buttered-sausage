@@ -81,6 +81,30 @@ enum RotationPivot {
 @export var apparate_duration: float = 1.5  ## Total duration for the apparate effect in seconds.
 @export var apparate_spread: float = 0.15  ## Width of the fade gradient. Higher = softer transition.
 
+@export_subgroup("Wave")
+@export var animate_text_wave: bool = false  ## Enable wave effect. Text undulates vertically in a wave pattern. Continuous effect.
+@export var wave_amplitude: float = 0.03  ## Height of the wave. Higher = more dramatic wave motion.
+@export var wave_frequency: float = 10.0  ## Number of waves across the text. Higher = more compressed waves.
+@export var wave_speed: float = 3.0  ## Speed of wave animation. Higher = faster wave motion.
+@export var wave_duration: float = 0.0  ## Duration before wave fades out. 0 = infinite, >0 = fade out over this many seconds.
+
+@export_subgroup("Text Shake")
+@export var animate_text_shake: bool = false  ## Enable text shake effect. Text jitters randomly. Continuous effect.
+@export var text_shake_amount: float = 0.02  ## Intensity of shake. Higher = more aggressive jitter.
+@export var text_shake_speed: float = 20.0  ## Speed of shake updates. Higher = faster jitter.
+@export var text_shake_duration: float = 0.0  ## Duration before shake fades out. 0 = infinite, >0 = fade out over this many seconds.
+
+@export_subgroup("Rainbow")
+@export var animate_text_rainbow: bool = false  ## Enable rainbow effect. Text cycles through colors. Continuous effect.
+@export var rainbow_frequency: float = 1.0  ## Color cycles across text width. Higher = more color bands.
+@export var rainbow_speed: float = 1.0  ## Speed of color cycling. Higher = faster color shift.
+@export var rainbow_saturation: float = 1.0  ## Color intensity. 1.0 = vivid, 0.0 = grayscale.
+
+@export_subgroup("Pulse")
+@export var animate_text_pulse: bool = false  ## Enable pulse effect. Text fades in and out rhythmically. Continuous effect.
+@export var pulse_speed: float = 2.0  ## Speed of pulsing. Higher = faster pulse.
+@export var pulse_min_alpha: float = 0.3  ## Minimum opacity during pulse. 0.0 = fully transparent at lowest.
+
 @export_group("Timing and Easing")
 @export var animation_speed: float = 1.0  ## Duration of animation in seconds. Lower = faster, higher = slower. Typical range: 0.2-2.0 seconds.
 @export var transition_type: Tween.TransitionType = Tween.TRANS_CUBIC  ## Math curve for animation motion. CUBIC = smooth, LINEAR = constant speed, BOUNCE = bouncy, etc.
