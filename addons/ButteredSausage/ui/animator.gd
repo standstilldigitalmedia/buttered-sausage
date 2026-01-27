@@ -18,14 +18,46 @@ const MODULATE_PROPERTY: String = "modulate"
 const ROTATION_PROPERTY: String = "rotation"
 const POSITION_PROPERTY: String = "position"
 const POSITION_X_PROPERTY: String = "position:x"
+const TEXT_EFFECTS_SHADER_CODE: String = """
+shader_type canvas_item;
+
+// Apparate effect: mystical scattered fade based on UV position
+uniform float apparate_enabled = 0.0;
+uniform float apparate_progress = 1.0;
+uniform float apparate_spread = 0.15;
+
+void fragment() {
+	vec4 color = texture(TEXTURE, UV);
+
+	// Apparate: scattered/mystical fade (UV.x based, creates random-looking pattern)
+	if (apparate_enabled > 0.5) {
+		float fade_start = apparate_progress - apparate_spread;
+		float fade_end = apparate_progress;
+
+		if (UV.x > fade_end) {
+			color.a = 0.0;
+		} else if (UV.x > fade_start) {
+			float fade_factor = (fade_end - UV.x) / apparate_spread;
+			color.a *= fade_factor;
+		}
+	}
+
+	COLOR = color;
+}
+"""
 
 var wrapper: Control
 var panel: Control
 var rotation_container: Control  # Middle layer for rotation isolation
 var slide_tween: Tween
+var text_tween: Tween  # Tween for text animations (typewriter/apparate)
+var text_label: RichTextLabel  # Optional label for text effects
+var text_shader_material: ShaderMaterial  # Shader material for text effects
+var _original_label_material: Material  # Store original material to restore later
 var is_open: bool = false
 var _monitoring: bool = false
 var animator_config: ButteredSausageAnimatorConfig
+var _target_visible_chars: int = 0  # Target character count for skip functionality
 
 
 ## Configures the animator with animation parameters.[br][br]
@@ -35,6 +67,127 @@ var animator_config: ButteredSausageAnimatorConfig
 func configure(config: ButteredSausageAnimatorConfig) -> ButteredSausageAnimator:
 	animator_config = config
 	return self
+
+
+## Sets the text label for text effects (typewriter, apparate).[br][br]
+##
+## @param label - The RichTextLabel to animate[br]
+## @return This animator instance for method chaining[br]
+func set_text_label(label: RichTextLabel) -> ButteredSausageAnimator:
+	text_label = label
+	return self
+
+
+## Returns true if any text animations are configured.[br][br]
+##
+## @return True if typewriter or apparate is enabled[br]
+func _has_text_animations() -> bool:
+	return (animator_config.animate_typewriter or
+			animator_config.animate_text_apparate)
+
+
+## Plays text animations (typewriter and/or fade-in) on the text label.[br]
+## Called automatically by play() if text_label is set and text animations are enabled.[br][br]
+func _play_text_animations() -> void:
+	if not text_label or not _has_text_animations():
+		return
+
+	var text_content = text_label.get_parsed_text()
+	var char_count = text_content.length()
+	if char_count == 0:
+		return
+
+	_target_visible_chars = char_count
+	text_label.visible_characters = 0
+
+	if text_tween:
+		text_tween.kill()
+	text_tween = text_label.create_tween()
+
+	if animator_config.animate_typewriter:
+		# Typewriter: reveal characters at a constant rate
+		var duration = char_count / animator_config.characters_per_second
+		text_tween.tween_property(text_label, "visible_characters", char_count, duration)
+
+	elif animator_config.animate_text_apparate:
+		# Apparate: shader-based mystical scattered fade effect
+		_apply_text_shader()
+		text_shader_material.set_shader_parameter("apparate_enabled", 1.0)
+		text_shader_material.set_shader_parameter("apparate_progress", 0.0)
+		text_shader_material.set_shader_parameter("apparate_spread", animator_config.apparate_spread)
+
+		# Show all characters immediately - shader handles the fade
+		text_label.visible_characters = char_count
+
+		# Tween the shader's fade progress
+		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", 1.0, animator_config.apparate_duration)
+
+
+## Gets the character positions where each word ends (including trailing space).[br][br]
+##
+## @param text - The text to analyze[br]
+## @return Array of character indices marking word boundaries[br]
+func _get_word_end_positions(text: String) -> Array[int]:
+	var positions: Array[int] = []
+	var in_word = false
+
+	for i in range(text.length()):
+		var char = text[i]
+		var is_whitespace = char == " " or char == "\t" or char == "\n"
+
+		if in_word and is_whitespace:
+			# End of word - include the whitespace
+			positions.append(i + 1)
+			in_word = false
+		elif not is_whitespace:
+			in_word = true
+
+	# Add final position if text doesn't end with whitespace
+	if in_word:
+		positions.append(text.length())
+
+	return positions
+
+
+## Applies the text effects shader to the text label.[br]
+## Creates and caches the ShaderMaterial for reuse.[br][br]
+func _apply_text_shader() -> void:
+	if not text_label:
+		return
+
+	# Store original material to restore later if needed
+	if not _original_label_material and text_label.material:
+		_original_label_material = text_label.material
+
+	# Create shader material if not already created
+	if not text_shader_material:
+		var shader = Shader.new()
+		shader.code = TEXT_EFFECTS_SHADER_CODE
+		text_shader_material = ShaderMaterial.new()
+		text_shader_material.shader = shader
+
+	text_label.material = text_shader_material
+
+
+## Removes the text effects shader and restores the original material.[br][br]
+func _remove_text_shader() -> void:
+	if text_label:
+		text_label.material = _original_label_material
+	text_shader_material = null
+
+
+## Skips the current text animation, completing it instantly.[br]
+## Called when skip_on_click is enabled and user clicks the panel.[br][br]
+func skip_text_animation() -> void:
+	if text_tween and text_tween.is_running():
+		text_tween.kill()
+	if text_label and _target_visible_chars > 0:
+		text_label.visible_characters = _target_visible_chars
+		text_label.modulate.a = 1.0
+
+		# Complete shader animation if active
+		if text_shader_material:
+			text_shader_material.set_shader_parameter("apparate_progress", 1.0)
 
 
 ## Calculates the pivot offset for rotation based on the configured pivot preset.[br][br]
@@ -120,7 +273,7 @@ func play() -> void:
 		await shake()
 		return
 
-	# If no animations are configured, just show the wrapper and return
+	# If no panel animations are configured, just show the wrapper
 	if not _has_animations():
 		wrapper.show()
 		await wrapper.get_tree().process_frame
@@ -132,6 +285,8 @@ func play() -> void:
 		else:
 			wrapper.custom_minimum_size.x = animator_config.panel_width
 			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if animator_config.open_direction == OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+		# Text animations can still run even without panel animations
+		_play_text_animations()
 		is_open = true
 		start_monitoring()
 		return
@@ -193,6 +348,9 @@ func play() -> void:
 	await wrapper.get_tree().process_frame
 	if not is_instance_valid(wrapper) or not is_instance_valid(panel):
 		return  # Objects were freed during await
+
+	# Start text animations (runs independently of panel animations)
+	_play_text_animations()
 
 	# Set pivot offset for in-place scaling (now that panel.size is known)
 	# When rotation_container exists, scale and rotation use different nodes - no conflict

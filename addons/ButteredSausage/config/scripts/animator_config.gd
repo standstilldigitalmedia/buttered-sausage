@@ -70,6 +70,17 @@ enum RotationPivot {
 @export var shake_amount: float = 3.0  ## Maximum shake distance in pixels. Higher values = more aggressive shaking. Typical range: 2-10 pixels.
 @export var shake_speed: float = 0.05  ## Time between shake updates in seconds. Lower = faster shaking. Typical range: 0.01-0.1 seconds.
 
+@export_group("Text Effects")
+@export_subgroup("Typewriter")
+@export var animate_typewriter: bool = false  ## Enable typewriter effect. Text appears character by character like a typing animation.
+@export var characters_per_second: float = 30.0  ## Speed of typewriter effect. Higher = faster typing. 30 is a natural reading pace.
+@export var skip_on_click: bool = true  ## If true, clicking the panel completes the typewriter animation instantly.
+
+@export_subgroup("Apparate")
+@export var animate_text_apparate: bool = false  ## Enable apparate effect. Text materializes with a mystical scattered fade, like magic.
+@export var apparate_duration: float = 1.5  ## Total duration for the apparate effect in seconds.
+@export var apparate_spread: float = 0.15  ## Width of the fade gradient. Higher = softer transition.
+
 @export_group("Timing and Easing")
 @export var animation_speed: float = 1.0  ## Duration of animation in seconds. Lower = faster, higher = slower. Typical range: 0.2-2.0 seconds.
 @export var transition_type: Tween.TransitionType = Tween.TRANS_CUBIC  ## Math curve for animation motion. CUBIC = smooth, LINEAR = constant speed, BOUNCE = bouncy, etc.
