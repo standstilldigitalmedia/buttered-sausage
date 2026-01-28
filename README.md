@@ -4,6 +4,12 @@ A visual error/message display system for Godot 4.x with integrated Result patte
 
 ![Buttered Sausage in Action](screenshots/buttered_sausage_animation.gif)
 
+### Text Animations
+
+![Text Animations 1](screenshots/text_animations_1.gif)
+
+![Text Animations 2](screenshots/text_animations_2.gif)
+
 ### Screenshots
 
 ![Message Display](screenshots/display1.png)
