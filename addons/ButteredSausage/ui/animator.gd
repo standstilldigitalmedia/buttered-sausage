@@ -27,6 +27,7 @@ var slide_tween: Tween
 var text_tween: Tween  # Tween for text animations (typewriter/apparate)
 var wave_fade_tween: Tween  # Tween for wave duration fade-out
 var shake_fade_tween: Tween  # Tween for shake duration fade-out
+var glitch_fade_tween: Tween  # Tween for glitch duration fade-out
 var text_label: RichTextLabel  # Optional label for text effects
 var text_shader_material: ShaderMaterial  # Shader material for text effects
 var _original_label_material: Material  # Store original material to restore later
@@ -60,15 +61,17 @@ func set_text_label(label: RichTextLabel) -> ButteredSausageAnimator:
 func _has_text_animations() -> bool:
 	return (animator_config.animate_typewriter or
 			animator_config.animate_text_apparate or
+			animator_config.animate_text_crawl or
 			_has_continuous_text_effects())
 
 
 ## Returns true if any continuous shader effects are configured.[br][br]
 ##
-## @return True if wave, shake, rainbow, or pulse is enabled[br]
+## @return True if wave, shake, glitch, rainbow, or pulse is enabled[br]
 func _has_continuous_text_effects() -> bool:
 	return (animator_config.animate_text_wave or
 			animator_config.animate_text_shake or
+			animator_config.animate_text_glitch or
 			animator_config.animate_text_rainbow or
 			animator_config.animate_text_pulse)
 
@@ -87,7 +90,9 @@ func _play_text_animations() -> void:
 	_target_visible_chars = char_count
 
 	# Apply shader if any shader-based effects are enabled
-	var needs_shader = (animator_config.animate_text_apparate or _has_continuous_text_effects())
+	var needs_shader = (animator_config.animate_text_apparate or
+			animator_config.animate_text_crawl or
+			_has_continuous_text_effects())
 	if needs_shader:
 		_apply_text_shader()
 		_setup_continuous_effects()
@@ -117,9 +122,121 @@ func _play_text_animations() -> void:
 		var end_progress = 1.0 + animator_config.apparate_spread
 		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", end_progress, animator_config.apparate_duration)
 
+	elif animator_config.animate_text_crawl:
+		# Crawl: Star Wars style scrolling text
+		_setup_crawl_effect()
+
 	else:
 		# No one-time animation, just show all characters for continuous effects
 		text_label.visible_characters = char_count
+
+
+## Sets up the crawl effect (Star Wars style scrolling text).[br]
+## Uses position-based scrolling with clipping instead of shader UV manipulation.[br][br]
+func _setup_crawl_effect() -> void:
+	if not text_label:
+		push_error("ButteredSausageAnimator: crawl effect - missing text_label")
+		return
+
+	# Show all characters immediately
+	text_label.visible_characters = _target_visible_chars
+
+	# Get content height (full text height)
+	var content_height = text_label.get_content_height()
+	if content_height <= 0:
+		content_height = text_label.size.y
+	if content_height <= 0:
+		content_height = 100.0
+		push_warning("ButteredSausageAnimator: crawl effect - using fallback content height")
+
+	var viewport_height = animator_config.crawl_height
+	var original_parent = text_label.get_parent()
+
+	# Create a clipping viewport container
+	var crawl_viewport = Control.new()
+	crawl_viewport.name = "CrawlViewport"
+	crawl_viewport.clip_contents = true
+	crawl_viewport.custom_minimum_size.y = viewport_height
+	crawl_viewport.custom_minimum_size.x = 0
+	crawl_viewport.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	crawl_viewport.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	# Force size to not exceed minimum (prevent expansion)
+	crawl_viewport.set_deferred("size", Vector2(0, viewport_height))
+
+	# Get label's position in parent before reparenting
+	var label_index = text_label.get_index()
+	var label_size_flags_h = text_label.size_flags_horizontal
+
+	# Insert viewport container where label was
+	original_parent.add_child(crawl_viewport)
+	original_parent.move_child(crawl_viewport, label_index)
+
+	# Reparent label into viewport container
+	text_label.reparent(crawl_viewport)
+
+	# Keep label's horizontal size flags for proper width in HBox
+	crawl_viewport.size_flags_horizontal = label_size_flags_h
+
+	# Disable fit_content so the label doesn't try to size itself
+	if text_label.has_method("set_fit_content"):
+		text_label.set_fit_content(false)
+	elif "fit_content" in text_label:
+		text_label.fit_content = false
+
+	# Configure label for absolute positioning within viewport
+	text_label.anchor_top = 0.0
+	text_label.anchor_bottom = 0.0
+	text_label.anchor_left = 0.0
+	text_label.anchor_right = 1.0
+	text_label.offset_top = 0.0
+	text_label.offset_bottom = content_height
+	text_label.offset_left = 0.0
+	text_label.offset_right = 0.0
+
+	# Make sure label doesn't expand the viewport
+	text_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+
+	# Start with text at bottom of viewport (Star Wars style - text enters from below)
+	text_label.position.y = viewport_height
+
+	# Update wrapper size to match the new panel size with crawl viewport
+	if wrapper and panel:
+		wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
+
+	# Calculate scroll distance: from bottom of viewport to all text exited top
+	var scroll_distance = viewport_height + content_height
+
+	# Calculate duration based on speed (pixels per second)
+	var duration = scroll_distance / animator_config.crawl_speed
+	duration = max(duration, 1.0)
+
+	# Set up shader for fade effect at top of viewport
+	var fade_pixels = viewport_height * animator_config.crawl_fade_height
+	if text_shader_material and fade_pixels > 0.0:
+		text_shader_material.set_shader_parameter("crawl_enabled", 1.0)
+		text_shader_material.set_shader_parameter("crawl_fade_pixels", fade_pixels)
+		text_shader_material.set_shader_parameter("crawl_label_position_y", viewport_height)
+
+	# Animate label position scrolling up
+	text_tween = text_label.create_tween()
+	text_tween.set_parallel(true)
+
+	# Tween the label's position
+	text_tween.tween_property(
+		text_label,
+		"position:y",
+		-content_height,
+		duration
+	)
+
+	# Tween the shader parameter in sync (for fade effect)
+	if text_shader_material and fade_pixels > 0.0:
+		text_tween.tween_property(
+			text_shader_material,
+			"shader_parameter/crawl_label_position_y",
+			-content_height,
+			duration
+		)
 
 
 ## Sets up continuous shader effects (wave, shake, rainbow, pulse).[br]
@@ -133,10 +250,13 @@ func _setup_continuous_effects() -> void:
 		wave_fade_tween.kill()
 	if shake_fade_tween:
 		shake_fade_tween.kill()
+	if glitch_fade_tween:
+		glitch_fade_tween.kill()
 
 	# Wave effect
 	if animator_config.animate_text_wave:
 		text_shader_material.set_shader_parameter("wave_enabled", 1.0)
+		text_shader_material.set_shader_parameter("wave_horizontal", 1.0 if animator_config.wave_horizontal else 0.0)
 		text_shader_material.set_shader_parameter("wave_amplitude", animator_config.wave_amplitude)
 		text_shader_material.set_shader_parameter("wave_frequency", animator_config.wave_frequency)
 		text_shader_material.set_shader_parameter("wave_speed", animator_config.wave_speed)
@@ -170,6 +290,26 @@ func _setup_continuous_effects() -> void:
 			)
 	else:
 		text_shader_material.set_shader_parameter("shake_enabled", 0.0)
+
+	# Glitch effect
+	if animator_config.animate_text_glitch:
+		text_shader_material.set_shader_parameter("glitch_enabled", 1.0)
+		text_shader_material.set_shader_parameter("glitch_intensity", animator_config.glitch_intensity)
+		text_shader_material.set_shader_parameter("glitch_speed", animator_config.glitch_speed)
+		text_shader_material.set_shader_parameter("glitch_block_size", animator_config.glitch_block_size)
+		text_shader_material.set_shader_parameter("glitch_color_drift", animator_config.glitch_color_drift)
+
+		# Fade out glitch after duration (if > 0)
+		if animator_config.glitch_duration > 0.0 and text_label:
+			glitch_fade_tween = text_label.create_tween()
+			glitch_fade_tween.tween_property(
+				text_shader_material,
+				"shader_parameter/glitch_intensity",
+				0.0,
+				animator_config.glitch_duration
+			)
+	else:
+		text_shader_material.set_shader_parameter("glitch_enabled", 0.0)
 
 	# Rainbow effect
 	if animator_config.animate_text_rainbow:
@@ -241,9 +381,11 @@ func _apply_text_shader() -> void:
 	# Reset all effects to disabled (they'll be enabled as needed)
 	text_shader_material.set_shader_parameter("wave_enabled", 0.0)
 	text_shader_material.set_shader_parameter("shake_enabled", 0.0)
+	text_shader_material.set_shader_parameter("glitch_enabled", 0.0)
 	text_shader_material.set_shader_parameter("rainbow_enabled", 0.0)
 	text_shader_material.set_shader_parameter("apparate_enabled", 0.0)
 	text_shader_material.set_shader_parameter("pulse_enabled", 0.0)
+	text_shader_material.set_shader_parameter("crawl_enabled", 0.0)
 
 	text_label.material = text_shader_material
 

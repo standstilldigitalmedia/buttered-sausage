@@ -82,7 +82,8 @@ enum RotationPivot {
 @export var apparate_spread: float = 0.15  ## Width of the fade gradient. Higher = softer transition.
 
 @export_subgroup("Wave")
-@export var animate_text_wave: bool = false  ## Enable wave effect. Text undulates vertically in a wave pattern. Continuous effect.
+@export var animate_text_wave: bool = false  ## Enable wave effect. Text undulates in a wave pattern. Continuous effect.
+@export var wave_horizontal: bool = false  ## If true, wave moves text left/right. If false, wave moves text up/down.
 @export var wave_amplitude: float = 0.03  ## Height of the wave. Higher = more dramatic wave motion.
 @export var wave_frequency: float = 10.0  ## Number of waves across the text. Higher = more compressed waves.
 @export var wave_speed: float = 3.0  ## Speed of wave animation. Higher = faster wave motion.
@@ -94,6 +95,14 @@ enum RotationPivot {
 @export var text_shake_speed: float = 20.0  ## Speed of shake updates. Higher = faster jitter.
 @export var text_shake_duration: float = 0.0  ## Duration before shake fades out. 0 = infinite, >0 = fade out over this many seconds.
 
+@export_subgroup("Glitch")
+@export var animate_text_glitch: bool = false  ## Enable glitch effect. Digital corruption with slice displacement and RGB separation. Continuous effect.
+@export var glitch_intensity: float = 0.5  ## How often and how strong glitches occur. 0.0 = rare/subtle, 1.0 = constant/intense.
+@export var glitch_speed: float = 5.0  ## Speed of glitch updates. Higher = faster flickering.
+@export var glitch_block_size: float = 0.1  ## Size of horizontal slice blocks. Smaller = more slices.
+@export var glitch_color_drift: float = 0.02  ## RGB channel separation amount. Higher = more chromatic aberration.
+@export var glitch_duration: float = 0.0  ## Duration before glitch fades out. 0 = infinite, >0 = fade out over this many seconds.
+
 @export_subgroup("Rainbow")
 @export var animate_text_rainbow: bool = false  ## Enable rainbow effect. Text cycles through colors. Continuous effect.
 @export var rainbow_frequency: float = 1.0  ## Color cycles across text width. Higher = more color bands.
@@ -104,6 +113,13 @@ enum RotationPivot {
 @export var animate_text_pulse: bool = false  ## Enable pulse effect. Text fades in and out rhythmically. Continuous effect.
 @export var pulse_speed: float = 2.0  ## Speed of pulsing. Higher = faster pulse.
 @export var pulse_min_alpha: float = 0.3  ## Minimum opacity during pulse. 0.0 = fully transparent at lowest.
+
+@export_subgroup("Crawl")
+@export var animate_text_crawl: bool = false  ## Enable crawl effect. Star Wars style scrolling text. NOTE: Does not combine well with Rotation animation due to clipping limitations.
+@export var crawl_height: float = 72.0  ## Viewport height in pixels. Default is ~3 lines of text.
+@export var crawl_speed: float = 30.0  ## Scroll speed in pixels per second.
+@export var crawl_perspective: float = 0.0  ## PLANNED FEATURE (not yet implemented). Amount of perspective narrowing at top. 0.0 = none, 1.0 = extreme.
+@export var crawl_fade_height: float = 0.3  ## Portion of top that fades out. 0.0-1.0 of viewport height.
 
 @export_group("Timing and Easing")
 @export var animation_speed: float = 1.0  ## Duration of animation in seconds. Lower = faster, higher = slower. Typical range: 0.2-2.0 seconds.
