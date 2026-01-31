@@ -227,7 +227,7 @@ func slide_open() -> void:
 		await get_tree().process_frame
 		# Set wrapper size to match panel content
 		custom_minimum_size.y = panel_container.get_combined_minimum_size().y
-		size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		size_flags_vertical = 0  # Shrink to beginning
 		return
 
 	# Play entire animation chain once and detect if any want to loop

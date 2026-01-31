@@ -134,10 +134,12 @@ func play() -> void:
 			return  # Objects were freed during await
 		if config.axis == ButteredSausagePanelAnimatorConfig.Axis.VERTICAL:
 			wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
-			wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.size_flags_vertical = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
 		else:
 			wrapper.custom_minimum_size.x = config.panel_width
-			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
+			wrapper.size_flags_vertical = 0  # Shrink to content height
+			wrapper.size_flags_horizontal = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
 		is_open = true
 		start_monitoring()
 		finished.emit()
@@ -155,18 +157,38 @@ func play() -> void:
 			# Rotation container is just a passthrough wrapper with no inherent size
 			target_size = panel.get_combined_minimum_size().y
 			if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE:
-				wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+				wrapper.size_flags_vertical = 0  # Shrink to beginning
+				panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+				if rotation_container:
+					rotation_container.grow_vertical = Control.GROW_DIRECTION_BEGIN
 			else:
 				wrapper.size_flags_vertical = Control.SIZE_SHRINK_END
+				panel.grow_vertical = Control.GROW_DIRECTION_END
+				if rotation_container:
+					rotation_container.grow_vertical = Control.GROW_DIRECTION_END
 			wrapper.custom_minimum_size.y = 0
 		else:
 			property_name = X_PROPERTY
 			target_size = config.panel_width
+			# For horizontal animation, we need to calculate panel height at TARGET width
+			# Otherwise RichTextLabel wraps text to narrow width = very tall height
+			# Temporarily set full width, wait for layout, get height, then reset for animation
+			wrapper.custom_minimum_size.x = config.panel_width
+			wrapper.size_flags_vertical = 0
+			panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+			if rotation_container:
+				rotation_container.grow_vertical = Control.GROW_DIRECTION_BEGIN
 			if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE:
-				wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+				wrapper.size_flags_horizontal = 0  # Shrink to beginning
+				panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+				if rotation_container:
+					rotation_container.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 			else:
 				wrapper.size_flags_horizontal = Control.SIZE_SHRINK_END
-			wrapper.custom_minimum_size.x = 0
+				panel.grow_horizontal = Control.GROW_DIRECTION_END
+				if rotation_container:
+					rotation_container.grow_horizontal = Control.GROW_DIRECTION_END
+			# Height will be captured after frame wait when layout is correct
 
 	# Setup initial states for animations
 	if config.animate_scale:
@@ -216,17 +238,23 @@ func play() -> void:
 			# Always use panel's size directly
 			target_size = panel.get_combined_minimum_size().y
 		else:
-			target_size = config.panel_width
+			# For horizontal: now that layout happened at full width, capture correct height
+			var panel_height = panel.get_combined_minimum_size().y
+			wrapper.custom_minimum_size.y = panel_height
+			# Now set X to 0 to start the animation
+			wrapper.custom_minimum_size.x = 0
 	else:
 		# Not animating size - set wrapper to final size now
 		if config.axis == ButteredSausagePanelAnimatorConfig.Axis.VERTICAL:
 			# Just use panel's natural size - position moves within wrapper, clipping handles visibility
 			wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
-			wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.size_flags_vertical = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
 		else:
 			# Just use panel's natural width - position moves within wrapper, clipping handles visibility
 			wrapper.custom_minimum_size.x = config.panel_width
-			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.custom_minimum_size.y = panel.get_combined_minimum_size().y
+			wrapper.size_flags_vertical = 0  # Shrink to content height
+			wrapper.size_flags_horizontal = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
 
 	# Create tween - always use parallel mode so all animations play simultaneously
 	slide_tween = wrapper.create_tween()
@@ -310,11 +338,31 @@ func reverse(hide_after: bool = true) -> void:
 		if config.axis == ButteredSausagePanelAnimatorConfig.Axis.VERTICAL:
 			property_name = Y_PROPERTY
 			current_size = wrapper.custom_minimum_size.y if wrapper.custom_minimum_size.y > 0 else wrapper.size.y
-			wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.size_flags_vertical = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE:
+				panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+				if rotation_container:
+					rotation_container.grow_vertical = Control.GROW_DIRECTION_BEGIN
+			else:
+				panel.grow_vertical = Control.GROW_DIRECTION_END
+				if rotation_container:
+					rotation_container.grow_vertical = Control.GROW_DIRECTION_END
 		else:
 			property_name = X_PROPERTY
 			current_size = wrapper.custom_minimum_size.x if wrapper.custom_minimum_size.x > 0 else wrapper.size.x
-			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.size_flags_vertical = 0  # Shrink to content height
+			wrapper.size_flags_horizontal = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+			if rotation_container:
+				rotation_container.grow_vertical = Control.GROW_DIRECTION_BEGIN
+			if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE:
+				panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+				if rotation_container:
+					rotation_container.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+			else:
+				panel.grow_horizontal = Control.GROW_DIRECTION_END
+				if rotation_container:
+					rotation_container.grow_horizontal = Control.GROW_DIRECTION_END
 
 	# Create tween - always use parallel mode
 	slide_tween = wrapper.create_tween()
@@ -408,10 +456,10 @@ func close_immediate() -> void:
 	if config.animate_slide_out:
 		if config.axis == ButteredSausagePanelAnimatorConfig.Axis.VERTICAL:
 			wrapper.custom_minimum_size.y = 0
-			wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.size_flags_vertical = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
 		else:
 			wrapper.custom_minimum_size.x = 0
-			wrapper.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
+			wrapper.size_flags_horizontal = 0 if config.open_direction == ButteredSausagePanelAnimatorConfig.OpenDirection.POSITIVE else Control.SIZE_SHRINK_END
 
 	# Reset other animation states
 	if config.animate_scale:

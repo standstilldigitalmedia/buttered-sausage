@@ -100,7 +100,8 @@ func play(duration: float = 0.0) -> void:
 		# Tween progress to 1.0 + spread so fade band clears the right edge completely
 		text_tween = text_label.create_tween()
 		var end_progress = 1.0 + config.apparate_spread
-		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", end_progress, config.apparate_duration)
+		var apparate_duration = end_progress / config.apparate_speed
+		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", end_progress, apparate_duration)
 		await text_tween.finished
 
 	elif config.animate_text_crawl:
@@ -149,8 +150,9 @@ func reverse() -> void:
 		var current_progress = text_shader_material.get_shader_parameter("apparate_progress")
 		if current_progress == null:
 			current_progress = 1.0 + config.apparate_spread
+		var apparate_duration = current_progress / config.apparate_speed
 		text_tween = text_label.create_tween()
-		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", 0.0, config.apparate_duration)
+		text_tween.tween_property(text_shader_material, "shader_parameter/apparate_progress", 0.0, apparate_duration)
 		await text_tween.finished
 
 	elif config.animate_text_crawl:
@@ -210,7 +212,8 @@ func _setup_crawl_effect() -> void:
 	_crawl_viewport.custom_minimum_size.y = viewport_height
 	_crawl_viewport.custom_minimum_size.x = 0
 	_crawl_viewport.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_crawl_viewport.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	# 0 = shrink to beginning (default when SIZE_SHRINK_CENTER and SIZE_SHRINK_END not set)
+	_crawl_viewport.size_flags_vertical = 0
 	# Force size to not exceed minimum (prevent expansion)
 	_crawl_viewport.set_deferred("size", Vector2(0, viewport_height))
 
@@ -245,7 +248,8 @@ func _setup_crawl_effect() -> void:
 	text_label.offset_right = 0.0
 
 	# Make sure label doesn't expand the viewport
-	text_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	# 0 = shrink to beginning (default when SIZE_SHRINK_CENTER and SIZE_SHRINK_END not set)
+	text_label.size_flags_vertical = 0
 
 	# Start with text at bottom of viewport (Star Wars style - text enters from below)
 	text_label.position.y = viewport_height

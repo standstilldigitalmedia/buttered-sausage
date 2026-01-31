@@ -236,8 +236,9 @@ func _apply_position_preset() -> void:
 	content_container.custom_minimum_size.y = 0
 
 	# Set size flags
-	content_container.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	content_container.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	# 0 = shrink to beginning (default when SIZE_SHRINK_CENTER and SIZE_SHRINK_END not set)
+	content_container.size_flags_horizontal = 0
+	content_container.size_flags_vertical = 0
 
 	# Determine if this preset needs bottom anchoring
 	_anchor_to_bottom = position_preset in [
