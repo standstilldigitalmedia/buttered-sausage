@@ -1,10 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://c4u8l5ya7yuh0"]
+[gd_scene format=3 uid="uid://c4u8l5ya7yuh0"]
 
-[ext_resource type="Script" uid="uid://cmhyd4ksy6v3r" path="res://addons/buttered-sausage/ui/display/display.gd" id="1_4271g"]
-[ext_resource type="PackedScene" uid="uid://csth0xkldrx8f" path="res://addons/buttered-sausage/ui/panel/success.tscn" id="2_vlm2o"]
-[ext_resource type="PackedScene" uid="uid://dirfd1tmc1wkx" path="res://addons/buttered-sausage/ui/panel/error.tscn" id="3_gq0nb"]
-[ext_resource type="PackedScene" uid="uid://cpnsjlqvus7sb" path="res://addons/buttered-sausage/ui/panel/warning.tscn" id="4_frp6e"]
-[ext_resource type="PackedScene" uid="uid://i6g0fshlmbxm" path="res://addons/buttered-sausage/ui/panel/info.tscn" id="5_0brer"]
+[ext_resource type="Script" uid="uid://cmhyd4ksy6v3r" path="res://addons/ButteredSausage/ui/display/display.gd" id="1_4271g"]
+[ext_resource type="PackedScene" uid="uid://csth0xkldrx8f" path="res://addons/ButteredSausage/ui/panel/success.tscn" id="2_vlm2o"]
+[ext_resource type="PackedScene" uid="uid://dirfd1tmc1wkx" path="res://addons/ButteredSausage/ui/panel/error.tscn" id="3_gq0nb"]
+[ext_resource type="PackedScene" uid="uid://cpnsjlqvus7sb" path="res://addons/ButteredSausage/ui/panel/warning.tscn" id="4_frp6e"]
+[ext_resource type="PackedScene" uid="uid://i6g0fshlmbxm" path="res://addons/ButteredSausage/ui/panel/info.tscn" id="5_0brer"]
 
 [node name="ButteredSausageDisplay" type="Control" node_paths=PackedStringArray("content_container")]
 visible = false

@@ -1,34 +1,36 @@
-[gd_scene load_steps=14 format=3 uid="uid://dirfd1tmc1wkx"]
+[gd_scene format=3 uid="uid://dirfd1tmc1wkx"]
 
-[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/buttered-sausage/ui/panel/panel_base/panel_base.gd" id="1_5aaa4"]
-[ext_resource type="Texture2D" uid="uid://2sbeyjb6pn33" path="res://addons/buttered-sausage/ui/images/icons/error.png" id="2_k0jrv"]
-[ext_resource type="Texture2D" uid="uid://0see0p58plgd" path="res://addons/buttered-sausage/ui/images/icons/close.svg" id="3_ltrqa"]
-[ext_resource type="Script" uid="uid://doi0u0skoa80r" path="res://addons/buttered-sausage/config/scripts/animation_step.gd" id="4_5ojbs"]
-[ext_resource type="Resource" uid="uid://dc00x0lye2dlu" path="res://addons/buttered-sausage/config/resource/animation/slide.tres" id="5_ajl7e"]
-[ext_resource type="Resource" uid="uid://cuxql2cakujj8" path="res://addons/buttered-sausage/config/resource/animation/shake.tres" id="6_ej88u"]
-[ext_resource type="Resource" uid="uid://ywb373qw50p8" path="res://addons/buttered-sausage/config/resource/animation/color.tres" id="7_w48jx"]
+[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/ButteredSausage/ui/panel/panel_base/panel_base.gd" id="1_5aaa4"]
+[ext_resource type="Texture2D" uid="uid://2sbeyjb6pn33" path="res://addons/ButteredSausage/ui/images/icons/error.png" id="2_k0jrv"]
+[ext_resource type="Texture2D" uid="uid://0see0p58plgd" path="res://addons/ButteredSausage/ui/images/icons/close.svg" id="3_ltrqa"]
+[ext_resource type="Script" uid="uid://doi0u0skoa80r" path="res://addons/ButteredSausage/config/scripts/animation_step.gd" id="4_5e4b4"]
+[ext_resource type="Resource" uid="uid://ckbk5e2vxvei" path="res://addons/ButteredSausage/config/resource/animation/panel_animations/panel_slide.tres" id="5_bs8lf"]
+[ext_resource type="Resource" uid="uid://bx4nr0scqj6d" path="res://addons/ButteredSausage/config/resource/animation/panel_animations/panel_shake.tres" id="6_5thdu"]
+[ext_resource type="Resource" uid="uid://ljo6j3qtwyjg" path="res://addons/ButteredSausage/config/resource/animation/panel_animations/panel_color.tres" id="7_3p1yg"]
+[ext_resource type="Resource" uid="uid://q8weewrb1cvs" path="res://addons/ButteredSausage/config/resource/animation/text_animations/rainbow.tres" id="8_72ne0"]
 
-[sub_resource type="Resource" id="Resource_1euhp"]
-script = ExtResource("4_5ojbs")
-animation = ExtResource("5_ajl7e")
+[sub_resource type="Resource" id="Resource_6dg80"]
+script = ExtResource("4_5e4b4")
+panel_animation = ExtResource("5_bs8lf")
 metadata/_custom_type_script = "uid://doi0u0skoa80r"
 
-[sub_resource type="Resource" id="Resource_2fel0"]
-script = ExtResource("4_5ojbs")
-animation = ExtResource("6_ej88u")
+[sub_resource type="Resource" id="Resource_2fbcs"]
+script = ExtResource("4_5e4b4")
+panel_animation = ExtResource("6_5thdu")
 metadata/_custom_type_script = "uid://doi0u0skoa80r"
 
-[sub_resource type="Resource" id="Resource_b0rcx"]
-script = ExtResource("4_5ojbs")
-animation = ExtResource("7_w48jx")
-loop = true
+[sub_resource type="Resource" id="Resource_mlmsf"]
+script = ExtResource("4_5e4b4")
+panel_animation = ExtResource("7_3p1yg")
+panel_loop = true
+text_animation = ExtResource("8_72ne0")
 metadata/_custom_type_script = "uid://doi0u0skoa80r"
 
-[sub_resource type="Resource" id="Resource_syxju"]
-script = ExtResource("4_5ojbs")
-animation = ExtResource("7_w48jx")
-reverse = true
-loop = true
+[sub_resource type="Resource" id="Resource_igvh6"]
+script = ExtResource("4_5e4b4")
+panel_animation = ExtResource("7_3p1yg")
+panel_reverse = true
+panel_loop = true
 metadata/_custom_type_script = "uid://doi0u0skoa80r"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
@@ -37,7 +39,7 @@ bg_color = Color(1, 1, 1, 0.078431375)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q5wwd"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="ErrorPanel" type="Control" node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
+[node name="ErrorPanel" type="Control" unique_id=1972298033 node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -50,7 +52,7 @@ icon = ExtResource("2_k0jrv")
 close_button_icon = ExtResource("3_ltrqa")
 border_color = Color(0.85430586, 0.3491902, 0.3491902, 0.90200007)
 auto_dismiss = false
-entrance_animation_chain = Array[ExtResource("4_5ojbs")]([SubResource("Resource_1euhp"), SubResource("Resource_2fel0"), SubResource("Resource_b0rcx"), SubResource("Resource_syxju")])
+entrance_animation_chain = Array[ExtResource("4_5e4b4")]([SubResource("Resource_6dg80"), SubResource("Resource_2fbcs"), SubResource("Resource_mlmsf"), SubResource("Resource_igvh6")])
 severity = 3
 rotation_container = NodePath("RotationIsolationLayer")
 panel_container = NodePath("RotationIsolationLayer/PanelContainer")
@@ -61,7 +63,7 @@ message_label = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/
 close_button_control = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3")
 close_button = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton")
 
-[node name="RotationIsolationLayer" type="Control" parent="."]
+[node name="RotationIsolationLayer" type="Control" parent="." unique_id=933423272]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -70,7 +72,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer"]
+[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer" unique_id=2093801285]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -79,22 +81,22 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_astwa")
 
-[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer" unique_id=1115884455]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 6
 
-[node name="HBoxContainer" type="HBoxContainer" parent="RotationIsolationLayer/PanelContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="RotationIsolationLayer/PanelContainer/MarginContainer" unique_id=13126975]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Control2" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control2" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=612661925]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="IconTextureRect" type="TextureRect" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2"]
+[node name="IconTextureRect" type="TextureRect" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2" unique_id=1773999777]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -104,7 +106,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MessageLabel" type="RichTextLabel" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="MessageLabel" type="RichTextLabel" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=1083112166]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -113,10 +115,10 @@ text = "Error message will appear here"
 fit_content = true
 scroll_active = false
 
-[node name="Control3" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control3" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=1599223869]
 layout_mode = 2
 
-[node name="CloseButton" type="Button" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3"]
+[node name="CloseButton" type="Button" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3" unique_id=1525651609]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

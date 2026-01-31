@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://ywb373qw50p8"]
-
-[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/buttered-sausage/config/scripts/animator_config.gd" id="1_ra0vt"]
-
-[resource]
-script = ExtResource("1_ra0vt")
-animate_color = true
-color_from = Color(1, 0, 0, 0.11764706)
-color_to = Color(1, 0, 0, 1)

@@ -301,11 +301,11 @@ func create_message(msg: String, severity: int) -> void:
 			panel = info_panel.instantiate() as ButteredSausagePanelBase
 
 	for step in panel.entrance_animation_chain:
-		if step.animation:
-			step.animation.panel_width = panel_width
+		if step.panel_animation:
+			step.panel_animation.panel_width = panel_width
 	for step in panel.exit_animation_chain:
-		if step.animation:
-			step.animation.panel_width = panel_width
+		if step.panel_animation:
+			step.panel_animation.panel_width = panel_width
 
 	# Add to tree so subsequent messages can see it
 	content_container.add_child(panel)

@@ -1,9 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://buuml2eayrxv5"]
+[gd_scene format=3 uid="uid://buuml2eayrxv5"]
 
-[ext_resource type="Script" uid="uid://yeyrlw2i3mt8" path="res://addons/buttered-sausage/demo/buttered_sausage_demo.gd" id="1_demo"]
-[ext_resource type="Texture2D" uid="uid://csugofyougpoh" path="res://addons/buttered-sausage/ui/images/buttered_sausage_logo.png" id="2_07jf3"]
-[ext_resource type="PackedScene" uid="uid://c4u8l5ya7yuh0" path="res://addons/buttered-sausage/ui/display/display.tscn" id="2_error_display"]
-[ext_resource type="Texture2D" uid="uid://3uhtr35ysehm" path="res://addons/buttered-sausage/ui/images/standstill_logo.png" id="3_07jf3"]
+[ext_resource type="Script" uid="uid://yeyrlw2i3mt8" path="res://addons/ButteredSausage/demo/buttered_sausage_demo.gd" id="1_demo"]
+[ext_resource type="Texture2D" uid="uid://csugofyougpoh" path="res://addons/ButteredSausage/ui/images/buttered_sausage_logo.png" id="2_07jf3"]
+[ext_resource type="PackedScene" uid="uid://c4u8l5ya7yuh0" path="res://addons/ButteredSausage/ui/display/display.tscn" id="2_error_display"]
+[ext_resource type="Texture2D" uid="uid://3uhtr35ysehm" path="res://addons/ButteredSausage/ui/images/standstill_logo.png" id="3_07jf3"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5jgn0"]
 bg_color = Color(0, 0, 0, 1)
@@ -20,7 +20,7 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[node name="MessageDisplayDemo" type="Control" node_paths=PackedStringArray("main_message", "warning_1", "warning_2", "warning_3", "info_1", "info_2", "max_panels_spinbox", "buttered_sausage_display")]
+[node name="MessageDisplayDemo" type="Control" unique_id=1648678 node_paths=PackedStringArray("main_message", "warning_1", "warning_2", "warning_3", "info_1", "info_2", "max_panels_spinbox", "buttered_sausage_display")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,7 +37,7 @@ info_2 = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/Sc
 max_panels_spinbox = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer/MaxPanelsSpinBox")
 buttered_sausage_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect/ButteredSausageDisplay")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=15603824]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,175 +46,175 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_5jgn0")
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=547459498]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1843562691]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=974672598]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Buttered Sausage Demo"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Subtitle" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=968178623]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Enter messages below and click buttons to see the message display system in action"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=330614565]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=701431108]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 15
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=222319142]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 
-[node name="LeftPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer"]
+[node name="LeftPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer" unique_id=1266846442]
 custom_minimum_size = Vector2(490, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel" unique_id=559181582]
 layout_mode = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer" unique_id=568748066]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="InputLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="InputLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=339192413]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Message Inputs"
 
-[node name="HSeparator1" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="HSeparator1" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=597090754]
 layout_mode = 2
 
-[node name="MainMessageLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="MainMessageLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1051853185]
 layout_mode = 2
 text = "Main Message:"
 
-[node name="MainMessage" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="MainMessage" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1133412932]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Enter main message..."
 
-[node name="WarningsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="WarningsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=110423123]
 layout_mode = 2
 text = "Warnings:"
 
-[node name="Warning1" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="Warning1" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1128242712]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Warning 1 (optional)"
 
-[node name="Warning2" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="Warning2" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1671722492]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Warning 2 (optional)"
 
-[node name="Warning3" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="Warning3" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1931871363]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Warning 3 (optional)"
 
-[node name="InfoLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="InfoLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1302114055]
 layout_mode = 2
 text = "Info Messages:"
 
-[node name="Info1" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="Info1" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=49849764]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Info 1 (optional)"
 
-[node name="Info2" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="Info2" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1069563437]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Info 2 (optional)"
 
-[node name="HSeparator2" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=2060346522]
 layout_mode = 2
 
-[node name="OptionsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="OptionsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=871576618]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Options"
 
-[node name="HSeparator3" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=386999482]
 layout_mode = 2
 
-[node name="MaxPanelsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="MaxPanelsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1500944012]
 layout_mode = 2
 text = "Max Visible Panels (0 = unlimited, 1 = single panel mode):"
 
-[node name="MaxPanelsSpinBox" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="MaxPanelsSpinBox" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1864324639]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 20.0
 rounded = true
 allow_greater = true
 
-[node name="HSeparator4" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="HSeparator4" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=518292043]
 layout_mode = 2
 
-[node name="ActionsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="ActionsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=922304709]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Actions"
 
-[node name="HSeparator5" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="HSeparator5" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=954607554]
 layout_mode = 2
 
-[node name="ShowSuccess" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="ShowSuccess" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=119215546]
 layout_mode = 2
 text = "Show Success"
 
-[node name="ShowError" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="ShowError" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=134367289]
 layout_mode = 2
 text = "Show Error"
 
-[node name="ShowWarning" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="ShowWarning" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=171955580]
 layout_mode = 2
 text = "Show Warning"
 
-[node name="ShowInfo" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="ShowInfo" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=785112616]
 layout_mode = 2
 text = "Show Info"
 
-[node name="HSeparator6" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="HSeparator6" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1787659908]
 layout_mode = 2
 
-[node name="ClearDisplay" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="ClearDisplay" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=1239252802]
 layout_mode = 2
 text = "Clear Display"
 
-[node name="DemoScenarios" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer"]
+[node name="DemoScenarios" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/LeftPanel/MarginContainer/VBoxContainer" unique_id=272055588]
 layout_mode = 2
 text = "Run Demo Scenarios"
 
-[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1263874910]
 layout_mode = 2
 size_flags_horizontal = 3
 texture = ExtResource("2_07jf3")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect"]
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect" unique_id=1250312921]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -227,7 +227,7 @@ grow_horizontal = 0
 grow_vertical = 0
 texture = ExtResource("3_07jf3")
 
-[node name="ButteredSausageDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect" instance=ExtResource("2_error_display")]
+[node name="ButteredSausageDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TextureRect" unique_id=407572787 instance=ExtResource("2_error_display")]
 unique_name_in_owner = true
 layout_mode = 1
 

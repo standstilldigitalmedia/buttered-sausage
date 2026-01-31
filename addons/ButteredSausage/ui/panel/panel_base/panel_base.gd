@@ -114,6 +114,7 @@ var is_closing: bool = false
 var auto_dismiss_timer: Timer
 var timer_paused: bool = false
 var paused_time_left: float = 0.0
+var text_animator: ButteredSausageTextAnimator  # Cached animator for text effects and skip_on_click
 static var cached_styles: Dictionary = {}
 
 
@@ -231,12 +232,13 @@ func slide_open() -> void:
 
 	# Play entire animation chain once and detect if any want to loop
 	var has_looping_animations: bool = false
+	var is_first_step: bool = true
 	for step in entrance_animation_chain:
-		# Skip steps with no animation assigned
-		if not step.animation:
+		# Skip steps with no animations assigned
+		if not step.panel_animation and not step.text_animation:
 			continue
 
-		if step.loop:
+		if step.panel_loop:
 			has_looping_animations = true
 
 		# Apply delay before this step
@@ -245,25 +247,66 @@ func slide_open() -> void:
 			if is_closing:
 				break
 
-		if step.animation.animate_color:
+		# Handle color animation stylebox setup (only for forward animations)
+		# Reversed animations should start from the current color, not reset to color_from
+		if step.panel_animation and step.panel_animation.animate_color and not step.panel_reverse:
 			# Create a stylebox with all the configured styling (corners, borders, etc.)
 			# Animator will tween the bg_color property directly
 			var stylebox = create_stylebox()
-			stylebox.bg_color = step.animation.color_from
+			stylebox.bg_color = step.panel_animation.color_from
 			panel_container.add_theme_stylebox_override(PANEL_THEME, stylebox)
 
-		var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
-		if step.reverse:
-			await animator.reverse()
-		else:
-			await animator.play()
+		# Create animators for this step
+		var panel_anim: ButteredSausagePanelAnimator = null
+		var text_anim: ButteredSausageTextAnimator = null
 
-	# Loop only animations marked for looping
+		if step.panel_animation:
+			panel_anim = ButteredSausagePanelAnimator.new(self, panel_container, rotation_container)
+			panel_anim.configure(step.panel_animation)
+
+		# Text animations only run on first step
+		if step.text_animation and is_first_step:
+			text_anim = ButteredSausageTextAnimator.new(message_label)
+			text_anim.configure(step.text_animation)
+			# Cache animator for skip_on_click
+			if step.text_animation.animate_typewriter or step.text_animation.animate_text_apparate:
+				text_animator = text_anim
+				if step.text_animation.skip_on_click and not panel_container.gui_input.is_connected(_on_panel_gui_input):
+					panel_container.gui_input.connect(_on_panel_gui_input)
+			is_first_step = false
+
+		# Play panel and text animations simultaneously
+		# Start both without awaiting, then wait for both to finish
+		if panel_anim:
+			if step.panel_reverse:
+				# For looping animations, don't hide after reverse (they need to stay visible for the loop)
+				panel_anim.reverse(not step.panel_loop)
+			else:
+				panel_anim.play()
+
+		if text_anim:
+			if step.text_reverse:
+				text_anim.reverse()
+			else:
+				text_anim.play(step.text_duration)
+
+		# Wait for animations to complete
+		# For text animations with duration=0 (infinite), don't wait - let them continue
+		if panel_anim:
+			await panel_anim.finished
+		if text_anim and step.text_duration > 0:
+			await text_anim.finished
+
+		# Handle crawl layout adjustment
+		if step.text_animation and step.text_animation.animate_text_crawl:
+			custom_minimum_size.y = panel_container.get_combined_minimum_size().y
+
+	# Loop only panel animations marked for looping
 	if has_looping_animations:
 		while not is_closing:
 			for step in entrance_animation_chain:
-				# Skip steps with no animation or not marked for looping
-				if not step.animation or not step.loop:
+				# Skip steps with no panel animation or not marked for looping
+				if not step.panel_animation or not step.panel_loop:
 					continue
 
 				# Apply delay before this step
@@ -272,14 +315,17 @@ func slide_open() -> void:
 					if is_closing:
 						break
 
-				var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
-				if step.reverse:
-					await animator.reverse()
+				var panel_anim = ButteredSausagePanelAnimator.new(self, panel_container, rotation_container)
+				panel_anim.configure(step.panel_animation)
+				if step.panel_reverse:
+					# Use hide_after=false for looping - don't hide the panel
+					panel_anim.reverse(false)
 				else:
-					await animator.play()
+					panel_anim.play()
+				await panel_anim.finished
 				if is_closing:
 					break  # Exit immediately if panel is closing
-		
+
 
 ## Animates the panel closing based on configuration.[br]
 ## Priority: 1) exit_animation_chain (if provided), 2) close_behavior setting
@@ -287,19 +333,22 @@ func slide_closed() -> void:
 	# Priority 1: Use custom exit animation chain if provided
 	if !exit_animation_chain.is_empty():
 		for step in exit_animation_chain:
-			# Skip steps with no animation assigned
-			if !step.animation:
+			# Skip steps with no panel animation assigned
+			if !step.panel_animation:
 				continue
 
 			# Apply delay before this step
 			if step.delay_before > 0.0:
 				await get_tree().create_timer(step.delay_before).timeout
 
-			var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
-			if step.reverse:
-				await animator.reverse()
+			var panel_anim = ButteredSausagePanelAnimator.new(self, panel_container, rotation_container)
+			panel_anim.configure(step.panel_animation)
+			# Use hide_after=false - we hide explicitly at the end
+			if step.panel_reverse:
+				panel_anim.reverse(false)
 			else:
-				await animator.play()
+				panel_anim.play()
+			await panel_anim.finished
 		panel_container.hide()
 		return
 
@@ -317,20 +366,23 @@ func slide_closed() -> void:
 				for i in range(entrance_animation_chain.size() - 1, -1, -1):
 					var step = entrance_animation_chain[i]
 
-					# Skip steps with no animation assigned
-					if not step.animation:
+					# Skip steps with no panel animation assigned
+					if not step.panel_animation:
 						continue
 
 					# Apply delay before this step
 					if step.delay_before > 0.0:
 						await get_tree().create_timer(step.delay_before).timeout
 
-					var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
+					var panel_anim = ButteredSausagePanelAnimator.new(self, panel_container, rotation_container)
+					panel_anim.configure(step.panel_animation)
 					# Invert the reverse flag when mirroring
-					if step.reverse:
-						await animator.play()
+					# Use hide_after=false - we hide explicitly at the end
+					if step.panel_reverse:
+						panel_anim.play()
 					else:
-						await animator.reverse()
+						panel_anim.reverse(false)
+					await panel_anim.finished
 				panel_container.hide()
 
 		CloseBehavior.REVERSE_FIRST_ANIMATION:
@@ -340,18 +392,21 @@ func slide_closed() -> void:
 			else:
 				var step = entrance_animation_chain[0]
 
-				# Only reverse if animation is assigned
-				if step.animation:
+				# Only reverse if panel animation is assigned
+				if step.panel_animation:
 					# Apply delay before this step
 					if step.delay_before > 0.0:
 						await get_tree().create_timer(step.delay_before).timeout
 
-					var animator = ButteredSausageAnimator.new(self, panel_container, step.animation)
+					var panel_anim = ButteredSausagePanelAnimator.new(self, panel_container, rotation_container)
+					panel_anim.configure(step.panel_animation)
 					# Invert the reverse flag when reversing
-					if step.reverse:
-						await animator.play()
+					# Use hide_after=false - we hide explicitly at the end
+					if step.panel_reverse:
+						panel_anim.play()
 					else:
-						await animator.reverse()
+						panel_anim.reverse(false)
+					await panel_anim.finished
 				panel_container.hide()
 				
 					
@@ -380,6 +435,13 @@ func _on_auto_dismiss_timeout() -> void:
 ## Closes the panel with animation.[br][br]
 func _on_close_pressed() -> void:
 	close(true)
+
+
+## Called when panel receives input. Used for skip_on_click functionality.[br][br]
+func _on_panel_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if text_animator:
+			text_animator.skip()
 
 
 ## Pauses the auto-dismiss timer when mouse hovers over the panel.[br][br]

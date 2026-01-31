@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://b3icksrw00gko"]
+[gd_scene format=3 uid="uid://b3icksrw00gko"]
 
-[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/buttered-sausage/ui/panel/panel_base/panel_base.gd" id="1_astwa"]
+[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/ButteredSausage/ui/panel/panel_base/panel_base.gd" id="1_astwa"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
 bg_color = Color(1, 1, 1, 0.078431375)
@@ -8,7 +8,7 @@ bg_color = Color(1, 1, 1, 0.078431375)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q5wwd"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="ButteredSausagePanelBase" type="Control" node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
+[node name="ButteredSausagePanelBase" type="Control" unique_id=1991166403 node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -25,7 +25,7 @@ message_label = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/
 close_button_control = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3")
 close_button = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton")
 
-[node name="RotationIsolationLayer" type="Control" parent="."]
+[node name="RotationIsolationLayer" type="Control" parent="." unique_id=1997684978]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,7 +34,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer"]
+[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer" unique_id=1160490147]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -43,22 +43,22 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_astwa")
 
-[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer" unique_id=1707312668]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 6
 
-[node name="HBoxContainer" type="HBoxContainer" parent="RotationIsolationLayer/PanelContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="RotationIsolationLayer/PanelContainer/MarginContainer" unique_id=188741224]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Control2" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control2" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=1836458594]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="IconTextureRect" type="TextureRect" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2"]
+[node name="IconTextureRect" type="TextureRect" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2" unique_id=834754402]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -68,7 +68,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MessageLabel" type="RichTextLabel" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="MessageLabel" type="RichTextLabel" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=1134809207]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -77,10 +77,10 @@ text = "Error message will appear here"
 fit_content = true
 scroll_active = false
 
-[node name="Control3" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control3" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=743386578]
 layout_mode = 2
 
-[node name="CloseButton" type="Button" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3"]
+[node name="CloseButton" type="Button" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3" unique_id=717324653]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

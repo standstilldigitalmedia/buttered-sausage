@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ButteredSausageAnimatorConfig" load_steps=2 format=3 uid="uid://dc00x0lye2dlu"]
-
-[ext_resource type="Script" uid="uid://b2r2k6ocjv7u1" path="res://addons/buttered-sausage/config/scripts/animator_config.gd" id="1_swxiq"]
-
-[resource]
-script = ExtResource("1_swxiq")
-animate_slide_out = true

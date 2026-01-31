@@ -1,14 +1,17 @@
-[gd_scene load_steps=9 format=3 uid="uid://cpnsjlqvus7sb"]
+[gd_scene format=3 uid="uid://cpnsjlqvus7sb"]
 
-[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/buttered-sausage/ui/panel/panel_base/panel_base.gd" id="1_iq52w"]
-[ext_resource type="Texture2D" uid="uid://ci1gq6tj7f47n" path="res://addons/buttered-sausage/ui/images/icons/warning.png" id="2_m15as"]
-[ext_resource type="Texture2D" uid="uid://0see0p58plgd" path="res://addons/buttered-sausage/ui/images/icons/close.svg" id="3_cmpgq"]
-[ext_resource type="Script" uid="uid://doi0u0skoa80r" path="res://addons/buttered-sausage/config/scripts/animation_step.gd" id="4_3rhk3"]
-[ext_resource type="Resource" uid="uid://k3ret6an5n1y" path="res://addons/buttered-sausage/config/resource/animation/rotate.tres" id="5_p1dlt"]
+[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/ButteredSausage/ui/panel/panel_base/panel_base.gd" id="1_iq52w"]
+[ext_resource type="Texture2D" uid="uid://ci1gq6tj7f47n" path="res://addons/ButteredSausage/ui/images/icons/warning.png" id="2_m15as"]
+[ext_resource type="Texture2D" uid="uid://0see0p58plgd" path="res://addons/ButteredSausage/ui/images/icons/close.svg" id="3_cmpgq"]
+[ext_resource type="Script" uid="uid://doi0u0skoa80r" path="res://addons/ButteredSausage/config/scripts/animation_step.gd" id="4_0os3i"]
+[ext_resource type="Resource" uid="uid://cbvbfpb4r4c4q" path="res://addons/ButteredSausage/config/resource/animation/panel_animations/panel_rotate.tres" id="5_ym12w"]
+[ext_resource type="Resource" uid="uid://cungs3r1cxtxm" path="res://addons/ButteredSausage/config/resource/animation/text_animations/wave.tres" id="6_0s166"]
 
-[sub_resource type="Resource" id="Resource_6rcqg"]
-script = ExtResource("4_3rhk3")
-animation = ExtResource("5_p1dlt")
+[sub_resource type="Resource" id="Resource_qv7bg"]
+script = ExtResource("4_0os3i")
+panel_animation = ExtResource("5_ym12w")
+text_animation = ExtResource("6_0s166")
+text_duration = 2.0
 metadata/_custom_type_script = "uid://doi0u0skoa80r"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
@@ -17,7 +20,7 @@ bg_color = Color(1, 1, 1, 0.078431375)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q5wwd"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="WarningPanel" type="Control" node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
+[node name="WarningPanel" type="Control" unique_id=209000389 node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container", "icon_texture_control", "icon_texture_rect", "message_label", "close_button_control", "close_button")]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -29,7 +32,8 @@ background_color = Color(0.9063318, 0.7977378, 0.3491902, 0.90200007)
 icon = ExtResource("2_m15as")
 close_button_icon = ExtResource("3_cmpgq")
 border_color = Color(0.85430586, 0.735357, 0, 0.90200007)
-entrance_animation_chain = Array[ExtResource("4_3rhk3")]([SubResource("Resource_6rcqg")])
+duration = 4.0
+entrance_animation_chain = Array[ExtResource("4_0os3i")]([SubResource("Resource_qv7bg")])
 severity = 2
 rotation_container = NodePath("RotationIsolationLayer")
 panel_container = NodePath("RotationIsolationLayer/PanelContainer")
@@ -40,7 +44,7 @@ message_label = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/
 close_button_control = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3")
 close_button = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton")
 
-[node name="RotationIsolationLayer" type="Control" parent="."]
+[node name="RotationIsolationLayer" type="Control" parent="." unique_id=491856561]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -49,7 +53,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer"]
+[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer" unique_id=916916694]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -58,22 +62,22 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_astwa")
 
-[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer" unique_id=1161103403]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 6
 
-[node name="HBoxContainer" type="HBoxContainer" parent="RotationIsolationLayer/PanelContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="RotationIsolationLayer/PanelContainer/MarginContainer" unique_id=1637481954]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Control2" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control2" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=1107716875]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="IconTextureRect" type="TextureRect" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2"]
+[node name="IconTextureRect" type="TextureRect" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control2" unique_id=688361544]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -83,7 +87,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MessageLabel" type="RichTextLabel" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="MessageLabel" type="RichTextLabel" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=1577423699]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -92,10 +96,10 @@ text = "Error message will appear here"
 fit_content = true
 scroll_active = false
 
-[node name="Control3" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Control3" type="Control" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer" unique_id=265040964]
 layout_mode = 2
 
-[node name="CloseButton" type="Button" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3"]
+[node name="CloseButton" type="Button" parent="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3" unique_id=97891853]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
