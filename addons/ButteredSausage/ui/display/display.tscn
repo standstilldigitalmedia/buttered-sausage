@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cpnsjlqvus7sb" path="res://addons/ButteredSausage/ui/panel/warning.tscn" id="4_frp6e"]
 [ext_resource type="PackedScene" uid="uid://i6g0fshlmbxm" path="res://addons/ButteredSausage/ui/panel/info.tscn" id="5_0brer"]
 
-[node name="ButteredSausageDisplay" type="Control" node_paths=PackedStringArray("content_container")]
+[node name="ButteredSausageDisplay" type="Control" unique_id=329728266 node_paths=PackedStringArray("content_container")]
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -22,5 +22,5 @@ warning_panel = ExtResource("4_frp6e")
 info_panel = ExtResource("5_0brer")
 content_container = NodePath("ContentContainer")
 
-[node name="ContentContainer" type="VBoxContainer" parent="."]
+[node name="ContentContainer" type="VBoxContainer" parent="." unique_id=1166593892]
 layout_mode = 0

@@ -86,6 +86,8 @@ float random(vec2 st) {
 }
 
 void fragment() {
+	// Capture incoming modulation (includes font_color, modulate property, etc.)
+	vec4 modulate_color = COLOR;
 	vec2 uv = UV;
 
 	// === Crawl Effect ===
@@ -206,5 +208,10 @@ void fragment() {
 		color.a *= pulse;
 	}
 
-	COLOR = color;
+	// Apply modulation: rainbow overrides RGB so only use alpha, others use full modulation
+	if (rainbow_enabled > 0.5) {
+		COLOR = vec4(color.rgb, color.a * modulate_color.a);
+	} else {
+		COLOR = color * modulate_color;
+	}
 }

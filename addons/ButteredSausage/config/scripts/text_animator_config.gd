@@ -14,8 +14,8 @@ extends Resource
 
 @export_group("Apparate")
 @export var animate_text_apparate: bool = false  ## Enable apparate effect. Text materializes with a mystical scattered fade, like magic.
-@export var apparate_duration: float = 1.5  ## Total duration for the apparate effect in seconds.
-@export var apparate_spread: float = 0.15  ## Width of the fade gradient. Higher = softer transition.
+@export var apparate_speed: float = 0.7  ## Speed of apparate effect. Higher = faster materialization.
+@export var apparate_spread: float = 1.0  ## Width of the fade gradient. Higher = softer transition.
 
 @export_group("Wave")
 @export var animate_text_wave: bool = false  ## Enable wave effect. Text undulates in a wave pattern. Continuous effect.

@@ -66,7 +66,7 @@ func _on_clear_display_pressed() -> void:
 
 ## Updates the max visible panels setting from the spinbox value.
 func _on_max_panels_value_changed(value: float) -> void:
-	buttered_sausage_display.display_config.max_visible_panels = int(value)
+	buttered_sausage_display.max_visible_panels = int(value)
 
 
 ## Runs through several demo scenarios showing different SSDMResult patterns.[br]
@@ -76,12 +76,12 @@ func _on_demo_scenarios_pressed() -> void:
 	var result1 = SSDMResult.success("Deleting user avatar directory...")
 	result1.with_warning("Could not delete avatar_old.png (file in use)")
 	result1.with_warning("Skipped script file: avatar_controller.gd")
-	result1.with_info("Successfully deleted 8 of 10 files")
+	result1.with_info("Processed 47 files in 2.3 seconds. This could be faster but several optimizations will be required. Please review your code and optimize accordingly.")
 	buttered_sausage_display.populate_from_result(result1)
 	await get_tree().create_timer(1.5).timeout
 	var result2 = SSDMResult.success("Saving resources...")
-	result2.with_info("Saved player.tres")
-	result2.with_info("Saved enemy.tres")
+	result2.with_info("Found 3 duplicate entries. This will not do. Duplicate entries in this application spell disaster. Please remove the duplicate entries before I have a stroke.")
+	result2.with_info("Saved enemy.tres. You can view the properties of the class in the inspector by double clicking on enemy.tres in the FileSystem dock in the lower left corner of the editor.")
 	result2.with_warning("Could not save config.tres (disk full)")
 	result2.to_failure("Save operation failed - disk full")
 	buttered_sausage_display.populate_from_result(result2)
@@ -92,13 +92,13 @@ func _on_demo_scenarios_pressed() -> void:
 	var child_result2 = SSDMResult.success("Deleted directory: old_assets/")
 	child_result2.with_warning("Skipped 2 locked files")
 	parent_result.merge_from(child_result2)
-	parent_result.with_info("Batch operation completed successfully")
+	parent_result.with_info("Batch operation completed successfully. It is a good thing this is done now. I'd hate for this to wait until Monday because the boss can be a real dingus.")
 	buttered_sausage_display.populate_from_result(parent_result)
 	await get_tree().create_timer(1.5).timeout
 	var result3 = SSDMResult.failure("Cannot create resource - validation failed")
 	result3.with_detail("Resource name 'invalid*name' contains illegal characters", SSDMSeverity.Level.ERROR)
 	result3.with_detail("Resource name already exists in library", SSDMSeverity.Level.ERROR)
-	result3.with_info("Suggested name: 'invalid_name_2'")
+	result3.with_info("Suggested name: 'invalid_name_2'. What a terrible suggestion. Why are we even trying to name something invalid_name? That's crazy. How about hickamadoo for a name?")
 	buttered_sausage_display.populate_from_result(result3)
 
 
@@ -107,5 +107,5 @@ func _ready() -> void:
 	main_message.text = "File processing completed"
 	warning_1.text = "Skipped locked file: document.txt"
 	warning_2.text = "Failed to delete temporary cache"
-	info_1.text = "Processed 47 files in 2.3 seconds"
-	info_2.text = "Found 3 duplicate entries"
+	info_1.text = "Processed 47 files in 2.3 seconds. This could be faster but several optimizations will be required. Please review your code and optimize accordingly."
+	info_2.text = "Found 3 duplicate entries. This will not do. Duplicate entries in this application spell disaster. Please remove the duplicate entries before I have a stroke."

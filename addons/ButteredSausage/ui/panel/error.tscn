@@ -8,6 +8,8 @@
 [ext_resource type="Resource" uid="uid://bx4nr0scqj6d" path="res://addons/ButteredSausage/config/resource/animation/panel_animations/panel_shake.tres" id="6_5thdu"]
 [ext_resource type="Resource" uid="uid://ljo6j3qtwyjg" path="res://addons/ButteredSausage/config/resource/animation/panel_animations/panel_color.tres" id="7_3p1yg"]
 [ext_resource type="Resource" uid="uid://q8weewrb1cvs" path="res://addons/ButteredSausage/config/resource/animation/text_animations/rainbow.tres" id="8_72ne0"]
+[ext_resource type="Resource" uid="uid://cbvbfpb4r4c4q" path="res://addons/ButteredSausage/config/resource/animation/panel_animations/panel_rotate.tres" id="9_5thdu"]
+[ext_resource type="Resource" uid="uid://brtyrxj4fdnsf" path="res://addons/ButteredSausage/config/resource/animation/text_animations/crawl.tres" id="10_3p1yg"]
 
 [sub_resource type="Resource" id="Resource_6dg80"]
 script = ExtResource("4_5e4b4")
@@ -33,6 +35,12 @@ panel_reverse = true
 panel_loop = true
 metadata/_custom_type_script = "uid://doi0u0skoa80r"
 
+[sub_resource type="Resource" id="Resource_72ne0"]
+script = ExtResource("4_5e4b4")
+panel_animation = ExtResource("9_5thdu")
+text_animation = ExtResource("10_3p1yg")
+metadata/_custom_type_script = "uid://doi0u0skoa80r"
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
 bg_color = Color(1, 1, 1, 0.078431375)
 
@@ -50,9 +58,9 @@ script = ExtResource("1_5aaa4")
 background_color = Color(0.9063318, 0.48452926, 0.48452926, 0.90200007)
 icon = ExtResource("2_k0jrv")
 close_button_icon = ExtResource("3_ltrqa")
-border_color = Color(0.85430586, 0.3491902, 0.3491902, 0.90200007)
-auto_dismiss = false
+border_color = Color(0.85490197, 0.34901962, 0.34901962, 0.9019608)
 entrance_animation_chain = Array[ExtResource("4_5e4b4")]([SubResource("Resource_6dg80"), SubResource("Resource_2fbcs"), SubResource("Resource_mlmsf"), SubResource("Resource_igvh6")])
+exit_animation_chain = Array[ExtResource("4_5e4b4")]([SubResource("Resource_72ne0")])
 severity = 3
 rotation_container = NodePath("RotationIsolationLayer")
 panel_container = NodePath("RotationIsolationLayer/PanelContainer")
@@ -134,5 +142,6 @@ grow_vertical = 2
 tooltip_text = "Close message"
 theme_override_styles/normal = SubResource("StyleBoxFlat_q5wwd")
 icon_alignment = 1
+expand_icon = true
 
 [connection signal="pressed" from="RotationIsolationLayer/PanelContainer/MarginContainer/HBoxContainer/Control3/CloseButton" to="." method="_on_close_pressed"]
