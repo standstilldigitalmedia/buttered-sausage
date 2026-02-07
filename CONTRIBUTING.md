@@ -24,8 +24,9 @@ Thank you for your interest in contributing! This addon was developed with care 
 
 1. Fork the repository
 2. Clone your fork
-3. Open the project in Godot 4.x
-4. Run the demo scene: `addons/ButteredSausage/demo/buttered_sausage_demo.tscn`
+3. Install [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) - copy `addons/SSDMCore/` to your project's `addons/` directory
+4. Open the project in Godot 4.x
+5. Run the demo scene: `addons/ButteredSausage/demo/buttered_sausage_demo.tscn`
 
 #### Development Setup
 
@@ -86,18 +87,22 @@ addons/ButteredSausage/
 │   ├── resource/         # Pre-configured .tres files
 │   └── scripts/          # Configuration classes
 ├── demo/                 # Interactive demo scene
-├── logic/               # Core result pattern (standalone)
+├── shaders/              # Text effects shader
 ├── ui/
-│   ├── animator.gd      # Animation engine (standalone)
-│   ├── display/         # Display manager
-│   └── panel/           # Individual panels
-└── utility/             # Helper scripts
+│   ├── panel_animator.gd # Panel animation engine (standalone)
+│   ├── text_animator.gd  # Text animation engine (standalone)
+│   ├── display/          # Display manager
+│   └── panel/            # Individual panels
+└── plugin.cfg            # Plugin configuration
 ```
 
+**Dependencies:**
+- [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) - Provides `SSDMResult` and `SSDMSeverity` classes
+
 **Standalone Components:**
-- `logic/` - Result pattern (no dependencies)
-- `ui/animator.gd` - Animation system (only needs config)
-- These can be used independently of the full display system
+- `ui/panel_animator.gd` - Panel animation system (only needs config) - can animate any Control node
+- `ui/text_animator.gd` - Text animation system (only needs config) - can animate any RichTextLabel
+- `SSDMResult` / `SSDMSeverity` - Result pattern from Standstill Core (no UI dependencies)
 
 ## Questions?
 

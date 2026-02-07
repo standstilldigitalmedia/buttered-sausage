@@ -5,6 +5,80 @@ All notable changes to Buttered Sausage will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-06
+
+### Migration Notes
+
+**BREAKING CHANGES** - This release requires code changes. See README.md "Upgrading from 1.0.x to 2.0.0" for detailed migration steps.
+
+**New Dependency:** [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) is now required. Install it via the Godot Asset Library or manually before upgrading.
+
+**Result Pattern Migration:**
+| Old (1.0.x) | New (2.0.0) |
+|-------------|-------------|
+| `ButteredSausage` | `SSDMResult` (from Standstill Core) |
+| `ButteredSausageSeverity` | `SSDMSeverity.Level` (from Standstill Core) |
+
+**Animation Chain Migration:**
+| Old (1.0.x) | New (2.0.0) |
+|-------------|-------------|
+| `animation_chain` | `entrance_animation_chain` |
+| `close_animation_chain` | `exit_animation_chain` |
+| `Array[ButteredSausageAnimatorConfig]` | `Array[ButteredSausageAnimationStep]` |
+
+**Configuration Architecture Migration:**
+
+The configuration system has been simplified from Resource-based to Scene-based:
+
+| Old (1.0.x) | New (2.0.0) |
+|-------------|-------------|
+| `ButteredSausageDisplayConfig` resource | Properties directly on `ButteredSausageDisplay` node |
+| `ButteredSausagePanelConfig` resource | Properties directly on panel scenes |
+| Single `panel.tscn` + 4 config `.tres` files | 4 separate panel scenes (`success.tscn`, `error.tscn`, `warning.tscn`, `info.tscn`) |
+| `display_config` export on Display | `success_panel`, `error_panel`, `warning_panel`, `info_panel` exports |
+
+**Benefits:**
+- Simpler mental model - each panel scene is self-contained
+- Visual editing in Godot inspector
+- Fewer files to manage
+- Standard Godot scene inheritance pattern
+
+### Added
+- **Dependency:** [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) addon required for `SSDMResult` and `SSDMSeverity`
+- `ButteredSausageAnimationStep` resource for per-step animation control
+  - `animation` - Reference to a `ButteredSausageAnimatorConfig`
+  - `reverse` - Play animation backwards
+  - `loop` - Loop animation until panel closes
+  - `delay_before` - Delay in seconds before starting step
+- `ButteredSausagePanelBase` class - base class for panel scenes with all configuration as `@export` properties
+- Separate panel scenes for each severity level (`success.tscn`, `error.tscn`, `warning.tscn`, `info.tscn`)
+- Icon color customization via `icon_modulate` property
+- Close button text mode via `close_button_text` property
+- Close button color customization via `close_button_modulate` property
+
+### Changed
+- **BREAKING:** Result pattern now uses `SSDMResult` and `SSDMSeverity` from Standstill Core
+- **BREAKING:** Configuration moved from Resource files to scene properties
+  - Display settings now directly on `ButteredSausageDisplay` node (no more `display_config` export)
+  - Panel settings now directly on panel scenes (no more `ButteredSausagePanelConfig` resources)
+- **BREAKING:** `animation_chain` renamed to `entrance_animation_chain`
+- **BREAKING:** `close_animation_chain` renamed to `exit_animation_chain`
+- **BREAKING:** Animation chains now use `Array[ButteredSausageAnimationStep]` instead of `Array[ButteredSausageAnimatorConfig]`
+- Panel scenes are now instantiated per-severity instead of using a single panel scene with config injection
+
+### Removed
+- **BREAKING:** `ButteredSausage` class (use `SSDMResult` from Standstill Core)
+- **BREAKING:** `ButteredSausageSeverity` enum (use `SSDMSeverity.Level` from Standstill Core)
+- **BREAKING:** `ButteredSausageDisplayConfig` class (properties moved to `ButteredSausageDisplay`)
+- **BREAKING:** `ButteredSausagePanelConfig` class (properties moved to `ButteredSausagePanelBase`)
+- **BREAKING:** `ButteredSausagePanel` class (replaced by `ButteredSausagePanelBase`)
+- **BREAKING:** `loop_animation` property removed from `ButteredSausageAnimatorConfig` (moved to `ButteredSausageAnimationStep`)
+- `logic/` folder removed (Result pattern now in Standstill Core)
+- `config/resource/display/display_config.tres` removed
+- `config/resource/panel/*.tres` files removed (error_config, success_config, warning_config, info_config)
+- `config/scripts/display_config.gd` removed
+- `config/scripts/panel_config.gd` removed
+
 ## [1.0.1] - 2026-01-15
 
 ### Migration Notes
