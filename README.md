@@ -4,12 +4,6 @@ A visual error/message display system for Godot 4.x with integrated Result patte
 
 ![Buttered Sausage in Action](screenshots/buttered_sausage_animation.gif)
 
-### Text Animations
-
-![Text Animations 1](screenshots/text_animations_1.gif)
-
-![Text Animations 2](screenshots/text_animations_2.gif)
-
 ### Screenshots
 
 ![Message Display](screenshots/display1.png)
@@ -56,13 +50,15 @@ Perfect for editor tools, file managers, save systems, validation feedback, and 
 - Configurable pivot points for rotation and scale
 - Full control over timing, easing, and transitions
 - Support for looping animations
-- Standalone animator (`ButteredSausageAnimator` + `ButteredSausageAnimatorConfig`) can be used to animate any Control node
+- Standalone panel animator (`ButteredSausagePanelAnimator` + `ButteredSausagePanelAnimatorConfig`) can be used to animate any Control node
+- Standalone text animator (`ButteredSausageTextAnimator` + `ButteredSausageTextAnimatorConfig`) can be used for dialogue systems, RPG text, or any text animation needs
 - **Note:** Size animation cannot be combined with transform animations (see KNOWN_ISSUES.md)
 
 ### Configuration System
 - **ButteredSausageDisplay** - Display positioning, panel width, and severity panel scene references (configured directly on the node)
 - **Panel Scenes** - Each severity has its own scene (`success.tscn`, `error.tscn`, etc.) with colors, fonts, icons, borders, timing, and animation chains
-- **ButteredSausageAnimatorConfig** - Individual animation effects as reusable Resources
+- **ButteredSausagePanelAnimatorConfig** - Panel animation effects (slide, scale, rotation, etc.) as reusable Resources
+- **ButteredSausageTextAnimatorConfig** - Text animation effects (typewriter, wave, glitch, etc.) as reusable Resources
 - Display and panel settings editable directly in the Inspector on scenes
 
 ## Why "Buttered Sausage"?
@@ -429,7 +425,7 @@ Unlike the display and panel configurations (which are pre-created), you'll crea
 1. Right-click in the FileSystem panel → **New Resource**
 2. Select **Resource** (empty resource)
 3. Save it with a descriptive name (e.g., `slide_fade_in.tres`)
-4. In the Inspector, click the **Script** property and select `res://addons/ButteredSausage/config/scripts/animator_config.gd`
+4. In the Inspector, click the **Script** property and select `res://addons/ButteredSausage/config/scripts/panel_animator_config.gd`
 5. Configure the animation properties
 
 Each config can enable multiple effects simultaneously:
@@ -528,9 +524,13 @@ These components can be used independently without the full display system:
 - **Dependencies:** Standstill Core addon
 - **Usage:** Encapsulate operation results with messages, errors, data payload and accumulated details
 
-**ButteredSausageAnimator** - Control animation system
-- **Dependencies:** `ButteredSausageAnimatorConfig`
+**ButteredSausagePanelAnimator** - Panel animation system
+- **Dependencies:** `ButteredSausagePanelAnimatorConfig`
 - **Usage:** Animate any Control node with slides, scales, fades, rotations, colors, and positions
+
+**ButteredSausageTextAnimator** - Text animation system
+- **Dependencies:** `ButteredSausageTextAnimatorConfig`
+- **Usage:** Animate RichTextLabel nodes with typewriter, apparate, wave, shake, glitch, rainbow, pulse, and crawl effects
 
 ### Full Display System
 

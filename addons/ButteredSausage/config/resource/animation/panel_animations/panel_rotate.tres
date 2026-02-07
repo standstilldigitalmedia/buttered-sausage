@@ -5,4 +5,3 @@
 [resource]
 script = ExtResource("1_jdkd5")
 animate_rotation = true
-rotation_to_degrees = 360.0

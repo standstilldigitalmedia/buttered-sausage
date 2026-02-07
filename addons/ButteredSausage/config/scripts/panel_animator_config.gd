@@ -27,7 +27,6 @@ enum RotationPivot {
 	BOTTOM_LEFT,     ## Rotation/scale pivot at bottom-left corner of panel. Good for "falling leaf" effects.
 	BOTTOM_CENTER,   ## Rotation/scale pivot at bottom-center edge of panel. Panel swings from this point.
 	BOTTOM_RIGHT,    ## Rotation/scale pivot at bottom-right corner of panel. Good for corner spin effects.
-	CUSTOM           ## Use custom pivot coordinates set in rotation_pivot_custom or scale_pivot_custom properties.
 }
 
 @export_group("Slide Out")
@@ -38,22 +37,21 @@ enum RotationPivot {
 @export_group("Transform Animations")
 @export_subgroup("Scale")
 @export var animate_scale: bool = false  ## Enable scale animation (grow/shrink effect). Can combine with Rotation and Position.
-@export var scale_from: Vector2 = Vector2(0.9, 0.9)  ## Starting scale (1.0 = normal size). Values less than 1.0 start small, greater than 1.0 start large.
+@export var scale_from: Vector2 = Vector2(0.1, 0.1)  ## Starting scale (1.0 = normal size). Values less than 1.0 start small, greater than 1.0 start large.
 @export var scale_to: Vector2 = Vector2.ONE  ## Ending scale (1.0 = normal size). Animation tweens from scale_from to scale_to.
 @export var scale_pivot_preset: RotationPivot = RotationPivot.CENTER  ## Point around which scaling occurs. CENTER = grows from center, TOP_LEFT = grows from top-left corner, etc.
-@export var scale_pivot_custom: Vector2 = Vector2.ZERO  ## Custom pivot point in pixels. Only used when scale_pivot_preset is CUSTOM.
+@export var scale_pivot_custom: Vector2 = Vector2.ZERO  ## Custom pivot point in pixels from top-left. Overrides scale_pivot_preset when non-zero.
 
 @export_subgroup("Rotation")
 @export var animate_rotation: bool = false  ## Enable rotation animation (spin effect). Can combine with Scale and Position.
 @export var rotation_from_degrees: float = 0.0  ## Starting rotation angle in degrees (0 = no rotation). Example: -90 starts rotated left, 90 starts rotated right.
-@export var rotation_to_degrees: float = 0.0  ## Ending rotation angle in degrees. Animation rotates from rotation_from to rotation_to. Use 360 for a full spin.
-@export var rotation_orbit: bool = false  ## If true, panel orbits around pivot point while rotating. If false, spins in place at pivot.
+@export var rotation_to_degrees: float = 360.0  ## Ending rotation angle in degrees. Animation rotates from rotation_from to rotation_to. Use 360 for a full spin.
 @export var rotation_pivot_preset: RotationPivot = RotationPivot.CENTER  ## Point around which rotation occurs. CENTER = spins around center, corners = spins around that corner.
-@export var rotation_pivot_custom: Vector2 = Vector2.ZERO  ## Custom pivot point in pixels from top-left. Only used when rotation_pivot_preset is CUSTOM.
+@export var rotation_pivot_custom: Vector2 = Vector2.ZERO  ## Custom pivot point in pixels from top-left. Overrides rotation_pivot_preset when non-zero.
 
 @export_subgroup("Position")
 @export var animate_position: bool = false  ## Enable position animation (move/slide effect). Can combine with Scale and Rotation.
-@export var position_offset: Vector2 = Vector2.ZERO  ## Starting offset position in pixels. Positive X = starts right, negative X = starts left, same for Y. Animates to (0,0).
+@export var position_offset: Vector2 = Vector2(20.0, 20.0)  ## Starting offset position in pixels. Positive X = starts right, negative X = starts left, same for Y. Animates to (0,0).
 
 @export_group("Visual Effects")
 @export_subgroup("Fade")

@@ -41,6 +41,9 @@ func configure(cfg: ButteredSausagePanelAnimatorConfig) -> ButteredSausagePanelA
 ## @param node - The Control node to calculate pivot for[br]
 ## @return The pivot offset as a Vector2[br]
 func _get_pivot_offset(node: Control) -> Vector2:
+	# Custom pivot overrides preset when non-zero
+	if config.rotation_pivot_custom != Vector2.ZERO:
+		return config.rotation_pivot_custom
 	match config.rotation_pivot_preset:
 		ButteredSausagePanelAnimatorConfig.RotationPivot.TOP_LEFT:
 			return Vector2.ZERO
@@ -60,8 +63,6 @@ func _get_pivot_offset(node: Control) -> Vector2:
 			return Vector2(node.size.x / 2, node.size.y)
 		ButteredSausagePanelAnimatorConfig.RotationPivot.BOTTOM_RIGHT:
 			return node.size
-		ButteredSausagePanelAnimatorConfig.RotationPivot.CUSTOM:
-			return config.rotation_pivot_custom
 	return Vector2.ZERO
 
 
@@ -70,6 +71,9 @@ func _get_pivot_offset(node: Control) -> Vector2:
 ## @param node - The Control node to calculate pivot for[br]
 ## @return The pivot offset as a Vector2[br]
 func _get_scale_pivot_offset(node: Control) -> Vector2:
+	# Custom pivot overrides preset when non-zero
+	if config.scale_pivot_custom != Vector2.ZERO:
+		return config.scale_pivot_custom
 	match config.scale_pivot_preset:
 		ButteredSausagePanelAnimatorConfig.RotationPivot.TOP_LEFT:
 			return Vector2.ZERO
@@ -89,8 +93,6 @@ func _get_scale_pivot_offset(node: Control) -> Vector2:
 			return Vector2(node.size.x / 2, node.size.y)
 		ButteredSausagePanelAnimatorConfig.RotationPivot.BOTTOM_RIGHT:
 			return node.size
-		ButteredSausagePanelAnimatorConfig.RotationPivot.CUSTOM:
-			return config.scale_pivot_custom
 	return Vector2.ZERO
 
 
@@ -196,7 +198,7 @@ func play() -> void:
 		# Pivot offset will be set to center after layout for in-place scaling
 	if config.animate_rotation:
 		# Use rotation_container for isolation (except in orbit mode where we rotate panel content)
-		var rotation_target = panel if config.rotation_orbit else (rotation_container if rotation_container else wrapper)
+		var rotation_target = rotation_container if rotation_container else wrapper
 		rotation_target.rotation = deg_to_rad(config.rotation_from_degrees)
 		# Pivot offset will be set after layout when size is known
 	if config.animate_position:
@@ -229,7 +231,7 @@ func play() -> void:
 
 	# Set pivot offset for rotation (now that node size is known)
 	if config.animate_rotation:
-		var rotation_target = panel if config.rotation_orbit else (rotation_container if rotation_container else wrapper)
+		var rotation_target = rotation_container if rotation_container else wrapper
 		rotation_target.pivot_offset = _get_pivot_offset(rotation_target)
 
 	# Set or recalculate size after frame
@@ -277,7 +279,7 @@ func play() -> void:
 		if config.rotation_to_degrees == 360.0 and config.rotation_from_degrees == 0.0:
 			to_radians = TAU
 		# Use rotation_container for isolation (except in orbit mode where we rotate panel content)
-		var rotation_target = panel if config.rotation_orbit else (rotation_container if rotation_container else wrapper)
+		var rotation_target = rotation_container if rotation_container else wrapper
 		slide_tween.tween_property(rotation_target, ROTATION_PROPERTY, to_radians, anim_speed).from(from_radians)
 	if config.animate_position:
 		# Animate position on rotation_container if it exists, otherwise on panel
@@ -385,7 +387,7 @@ func reverse(hide_after: bool = true) -> void:
 		if config.rotation_to_degrees == 360.0 and config.rotation_from_degrees == 0.0:
 			to_radians = TAU
 		# Use rotation_container for isolation (except in orbit mode where we rotate panel content)
-		var rotation_target = panel if config.rotation_orbit else (rotation_container if rotation_container else wrapper)
+		var rotation_target = rotation_container if rotation_container else wrapper
 		slide_tween.tween_property(rotation_target, ROTATION_PROPERTY, from_radians, anim_speed).from(to_radians)
 	if config.animate_position:
 		# Animate position on rotation_container if it exists, otherwise on panel
@@ -416,9 +418,7 @@ func reverse(hide_after: bool = true) -> void:
 		if config.animate_scale:
 			panel.scale = Vector2.ONE
 		if config.animate_rotation:
-			if config.rotation_orbit:
-				panel.rotation = 0.0
-			elif rotation_container:
+			if rotation_container:
 				rotation_container.rotation = 0.0
 			else:
 				wrapper.rotation = 0.0
@@ -465,9 +465,7 @@ func close_immediate() -> void:
 	if config.animate_scale:
 		panel.scale = Vector2.ONE
 	if config.animate_rotation:
-		if config.rotation_orbit:
-			panel.rotation = 0.0
-		elif rotation_container:
+		if rotation_container:
 			rotation_container.rotation = 0.0
 		else:
 			wrapper.rotation = 0.0

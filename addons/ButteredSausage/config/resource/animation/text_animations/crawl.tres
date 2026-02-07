@@ -6,3 +6,5 @@
 script = ExtResource("1_x8wek")
 animate_text_crawl = true
 crawl_height = 50.0
+crawl_speed = 20.0
+crawl_fade_height = 0.5

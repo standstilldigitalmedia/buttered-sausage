@@ -87,18 +87,21 @@ addons/ButteredSausage/
 │   ├── resource/         # Pre-configured .tres files
 │   └── scripts/          # Configuration classes
 ├── demo/                 # Interactive demo scene
+├── shaders/              # Text effects shader
 ├── ui/
-│   ├── animator.gd      # Animation engine (standalone)
-│   ├── display/         # Display manager
-│   └── panel/           # Individual panels
-└── plugin.cfg           # Plugin configuration
+│   ├── panel_animator.gd # Panel animation engine (standalone)
+│   ├── text_animator.gd  # Text animation engine (standalone)
+│   ├── display/          # Display manager
+│   └── panel/            # Individual panels
+└── plugin.cfg            # Plugin configuration
 ```
 
 **Dependencies:**
 - [Standstill Core](https://github.com/standstilldigitalmedia/standstill-core) - Provides `SSDMResult` and `SSDMSeverity` classes
 
 **Standalone Components:**
-- `ui/animator.gd` - Animation system (only needs config) - can animate any Control node
+- `ui/panel_animator.gd` - Panel animation system (only needs config) - can animate any Control node
+- `ui/text_animator.gd` - Text animation system (only needs config) - can animate any RichTextLabel
 - `SSDMResult` / `SSDMSeverity` - Result pattern from Standstill Core (no UI dependencies)
 
 ## Questions?

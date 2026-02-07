@@ -4,7 +4,7 @@
 ## Integrates with SSDMResult (from Standstill Core) for displaying operation results with details.[br][br]
 ##
 ## Dependencies: Standstill Core addon (provides SSDMResult and SSDMSeverity).[br]
-## Configure via ButteredSausageDisplayConfig resource in the inspector.
+## Configure via properties directly on the ButteredSausageDisplay node in the inspector.
 class_name ButteredSausageDisplay
 extends Control
 

@@ -29,7 +29,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 script = ExtResource("1_ie1q1")
 background_color = Color(0.2, 0.6, 0.2, 0.9019608)
-font_color = Color(1, 0, 0, 1)
 icon = ExtResource("2_0tows")
 close_button_icon = ExtResource("3_o50yl")
 entrance_animation_chain = Array[ExtResource("4_y3p3f")]([SubResource("Resource_qpvnb")])

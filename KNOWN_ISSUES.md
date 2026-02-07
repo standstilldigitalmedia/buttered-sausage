@@ -71,5 +71,5 @@ animate_rotation = true  # These will conflict
 ---
 
 **Related Files:**
-- `addons/ButteredSausage/ui/animator.gd` - Animation logic
-- `addons/ButteredSausage/config/scripts/animator_config.gd` - Configuration structure
+- `addons/ButteredSausage/ui/panel_animator.gd` - Panel animation logic
+- `addons/ButteredSausage/config/scripts/panel_animator_config.gd` - Panel animation configuration

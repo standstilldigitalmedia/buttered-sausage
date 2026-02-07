@@ -51,7 +51,7 @@ enum CloseBehavior {
 
 @export_group("Font")
 @export var font: Font  ## Custom font resource for message text. Leave empty to use default theme font.
-@export var font_color: Color = Color(0.0, 0.0, 0.0, 1.0)  ## Color of the message text. Remains constant during color animations.
+@export var font_color: Color = Color(1.0, 1.0, 1.0, 1.0)  ## Color of the message text. Remains constant during color animations.
 @export var font_size: int = 12  ## Size of the message text in pixels.
 
 @export_group("Icon")
