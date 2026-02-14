@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ButteredSausagePanelAnimatorConfig" format=3 uid="uid://bx4nr0scqj6d"]
+
+[ext_resource type="Script" uid="uid://bfo75bwotxxp7" path="res://addons/ButteredSausage/config/panel_animator_config.gd" id="1_nh860"]
+
+[resource]
+script = ExtResource("1_nh860")
+animate_shake = true

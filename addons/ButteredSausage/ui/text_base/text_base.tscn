@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dcgd2pu0o6ymk"]
+
+[ext_resource type="Script" uid="uid://dn5pl288lcca2" path="res://addons/ButteredSausage/ui/text_base/text_base.gd" id="1_j5nqq"]
+
+[node name="TextBase" type="RichTextLabel" unique_id=778281784]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_j5nqq")

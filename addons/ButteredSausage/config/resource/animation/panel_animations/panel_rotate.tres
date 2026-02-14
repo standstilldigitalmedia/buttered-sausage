@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ButteredSausagePanelAnimatorConfig" format=3 uid="uid://cbvbfpb4r4c4q"]
-
-[ext_resource type="Script" uid="uid://bfo75bwotxxp7" path="res://addons/ButteredSausage/config/scripts/panel_animator_config.gd" id="1_jdkd5"]
-
-[resource]
-script = ExtResource("1_jdkd5")
-animate_rotation = true

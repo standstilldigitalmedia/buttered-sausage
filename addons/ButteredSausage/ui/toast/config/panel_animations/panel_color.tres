@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ButteredSausagePanelAnimatorConfig" format=3 uid="uid://ljo6j3qtwyjg"]
+
+[ext_resource type="Script" uid="uid://bfo75bwotxxp7" path="res://addons/ButteredSausage/config/panel_animator_config.gd" id="1_jnti5"]
+
+[resource]
+script = ExtResource("1_jnti5")
+animate_color = true
+color_from = Color(1, 0, 0, 1)
+color_to = Color(0.78431374, 0, 0, 0.19607843)

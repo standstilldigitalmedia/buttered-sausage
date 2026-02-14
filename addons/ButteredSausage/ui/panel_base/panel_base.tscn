@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://f2lxikwgkfj"]
+
+[ext_resource type="Script" uid="uid://d0du1h7foc0c5" path="res://addons/ButteredSausage/ui/panel_base/panel_base.gd" id="1_pbscr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_astwa"]
+bg_color = Color(1, 1, 1, 0.078431375)
+
+[node name="ButteredSausagePanelBase" type="Control" unique_id=1991166403 node_paths=PackedStringArray("rotation_container", "panel_container", "margin_container")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 4
+script = ExtResource("1_pbscr")
+rotation_container = NodePath("RotationIsolationLayer")
+panel_container = NodePath("RotationIsolationLayer/PanelContainer")
+margin_container = NodePath("RotationIsolationLayer/PanelContainer/MarginContainer")
+
+[node name="RotationIsolationLayer" type="Control" parent="." unique_id=1997684978]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="RotationIsolationLayer" unique_id=1160490147]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_astwa")
+
+[node name="MarginContainer" type="MarginContainer" parent="RotationIsolationLayer/PanelContainer" unique_id=1707312668]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6

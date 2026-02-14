@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ButteredSausageTextAnimatorConfig" format=3 uid="uid://q8weewrb1cvs"]
+
+[ext_resource type="Script" uid="uid://cmpevkx3jvvdl" path="res://addons/ButteredSausage/config/text_animator_config.gd" id="1_wesag"]
+
+[resource]
+script = ExtResource("1_wesag")
+animate_text_rainbow = true

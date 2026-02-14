@@ -12,7 +12,7 @@ extends Control
 @export var info_1: LineEdit
 @export var info_2: LineEdit
 @export var max_panels_spinbox: SpinBox
-@export var buttered_sausage_display: ButteredSausageDisplay
+@export var buttered_sausage_display: ButteredSausageToastDisplay
 
 
 ## Adds warning and info details from the input fields to the result.[br][br]
