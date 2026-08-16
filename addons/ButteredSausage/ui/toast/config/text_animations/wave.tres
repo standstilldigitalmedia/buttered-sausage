@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ButteredSausageTextAnimatorConfig" format=3 uid="uid://cungs3r1cxtxm"]
-
-[ext_resource type="Script" uid="uid://cmpevkx3jvvdl" path="res://addons/ButteredSausage/config/text_animator_config.gd" id="1_gc217"]
-
-[resource]
-script = ExtResource("1_gc217")
-animate_text_wave = true
